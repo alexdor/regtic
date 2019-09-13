@@ -8,9 +8,9 @@ The system is using the serverless framework, and has the following structure
 
 ```
 └── regtic
-		├── app
-		├── database
-		├── gateway
+    ├── app
+    ├── database
+    ├── gateway
     └── workers
 ```
 
