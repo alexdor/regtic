@@ -17,6 +17,7 @@ The system is using the serverless framework, and has the following structure
 ### Formats
 
 - Country codes [ISO 3166-1](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes), e.g. DK for Denmark
+- Use the full VAT number, for each company, as specified [here](https://en.wikipedia.org/wiki/VAT_identification_number)
 
   
 
