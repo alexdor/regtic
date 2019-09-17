@@ -17,19 +17,19 @@ const cvrApi = axios.create({
   }
 })
 
-async function scrollRequest (body, config) {
+async function scrollRequest (body, config = {}) {
   const scrollTimeout = config.scrollTimeout
     ? config.scrollTimeout
     : '1m'
   const endpoint = config.initialRequest
     ? `cvr-permanent/_search?scroll=${scrollTimeout}`
     : '_search/scroll'
-  return cvrApi.get(endpoint, body)
+  return cvrApi.post(endpoint, body)
 }
 
 const testQuery = {
   size: 1,
-  _source: ["Vrdeltagerperson.navne.navn"],
+  _source: ['Vrdeltagerperson.navne.navn'],
   query: {
     match_all: {}
   }
@@ -38,9 +38,10 @@ const testQuery = {
 async function scrollTest () {
   try {
     const intialRequestResult = await scrollRequest(testQuery, { initialRequest: true })
-    // const subsequentRequestResult = await scrollRequest({ scroll: '1m', scroll_id: intialRequestResult.data._scroll_id })
+    const subsequentRequestResult = await scrollRequest({ scroll: '1m', scroll_id: intialRequestResult.data._scroll_id })
 
-    console.log(JSON.stringify(intialRequestResult.data))
+    console.log(JSON.stringify(intialRequestResult.data.hits.hits))
+    console.log(JSON.stringify(subsequentRequestResult.data.hits.hits))
   }
   catch (error) {
     console.log('### ERROR INCOMING ###')
