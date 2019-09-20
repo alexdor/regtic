@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:11-alpine
     container_name: regtic-postgres
     restart: unless-stopped
     ports:
