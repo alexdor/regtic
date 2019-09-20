@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run is-docker-running && concurrently --kill-others --prefix \"[{name}]\" --names \"docker,serverless\" --prefix-colors \"dim,blue\" \"docker-compose up & sleep 5\" \"serverless offline\"",
-    "is-docker-running": "docker ps > /dev/null"
+    "is-docker-running": "docker ps > /dev/null",
+    "lint:js": "eslint --fix .",
+    "lint:py": "black ."
   },
   "repository": {
     "type": "git",
@@ -16,6 +18,37 @@
     "concurrently": "^4.1.2"
   },
   "devDependencies": {
+    "@ljharb/eslint-config": "^14.1.0",
+    "eslint": "^6.4.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "husky": "^3.0.5",
+    "lint-staged": "^9.2.5",
+    "prettier": "^1.18.2",
     "serverless-offline": "^5.11.0"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ],
+    "*.{md,json}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.py": [
+      "black",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }

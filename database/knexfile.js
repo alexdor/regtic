@@ -1,14 +1,14 @@
-require('load-environment')
+require("load-environment");
 
 module.exports = {
   development: {
-    client: 'pg',
+    client: "pg",
     connection: process.env.REGTIC_DATABASE_URL,
     migrations: {
-      directory: 'migrations',
+      directory: "migrations"
     },
     seeds: {
-      directory: 'seeds'
+      directory: "seeds"
     }
   }
-}
+};

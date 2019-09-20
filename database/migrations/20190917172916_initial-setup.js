@@ -1,6 +1,6 @@
-require('load-environment')
+require("load-environment");
 
-const isDevelopment = process.env.NODE_ENV === 'development'
+const isDevelopment = process.env.NODE_ENV === "development";
 
 exports.up = function(knex) {
   return knex.schema.raw(`
@@ -74,12 +74,12 @@ exports.up = function(knex) {
     ALTER TABLE company_to_person ADD FOREIGN KEY (person) REFERENCES persons (id);
     
     ALTER TABLE bad_persons_aliases ADD FOREIGN KEY (bad_person_id) REFERENCES bad_persons (id);  
-  `)
-}
+  `);
+};
 
 exports.down = function(knex) {
   // make sure that this rollback is not able to run in production
-  if (!isDevelopment) return
+  if (!isDevelopment) return;
 
   return knex.schema.raw(`
     DROP TABLE bad_persons_aliases;
@@ -90,5 +90,5 @@ exports.down = function(knex) {
     DROP TABLE persons;
 
     DROP EXTENSION "uuid-ossp";
-  `)
-}
+  `);
+};
