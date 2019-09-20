@@ -37,7 +37,7 @@
       "eslint --fix",
       "git add"
     ],
-    "*.{md,json}": [
+    "*.{md,json,yml}": [
       "prettier --write",
       "git add"
     ],
