@@ -1,7 +1,7 @@
 service: regtic-main-service
 # app and org for use with dashboard.serverless.com
-app: regtic-app
-org: regtic
+# app: regtic-app
+# org: regtic
 # app and org for use with dashboard.serverless.com
 #app: regtic-test-app
 #org: regtic
