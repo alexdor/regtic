@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "npm run is-docker-running && concurrently --kill-others --prefix \"[{name}]\" --names \"docker\" --prefix-colors \"dim\" \"docker-compose up & sleep 5\"",
+    "start": "npm run is-docker-running && concurrently --kill-others --prefix \"[{name}]\" --names \"docker,serverless\" --prefix-colors \"dim,blue\" \"docker-compose up & sleep 5\" \"serverless offline\"",
     "is-docker-running": "docker ps > /dev/null"
   },
   "repository": {
@@ -14,5 +14,8 @@
   "license": "ISC",
   "dependencies": {
     "concurrently": "^4.1.2"
+  },
+  "devDependencies": {
+    "serverless-offline": "^5.11.0"
   }
 }
