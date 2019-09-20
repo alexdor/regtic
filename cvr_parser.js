@@ -1092,7 +1092,7 @@ const parse = (entry) => {
  * Parses all found companies and adds them to the PostgreSQL database.
  * Note: A bit unsure about this part - will need to discuss it Tuesday.
 **/
-const parseAllAndSave = (list) => {
+async function parseAllAndSave (list) => {
 	const pool = new Pool({
 		user: 'username',
 		host: 'localhost',
@@ -1104,21 +1104,18 @@ const parseAllAndSave = (list) => {
 	for (var i = 0; i < list.hits.hits.length; i++) {
 		var result = parse(list.hits.hits[i]._source.Vrvirksomhed)
 		var company = result.company
-		pool.query('INSERT INTO companies (address, vat, starting_date, country_code) VALUES ($1, $2, $3, $4) RETURNING id', [company.address, company.vat, company.starting_date, company.country_code], (error_company, result_company) => {
-			if (error_company) throw error_company
-			
-			for (var j = 0; j < result.persons.length; j++) {
-				var person = result.persons[j]
-				pool.query('INSERT INTO persons (first_name, country_code) VALUES ($1, $2, $3) RETURNING id', [person.name, person.country_code], (error_person, result_person) => {
-					if (error_person) throw error_person
-					
-					pool.query('INSERT INTO company_to_person (company, person) VALUES ($1, $2) RETURNING id', [result_company.rows[0].id, result_person.rows[0].id], (error_cpassoc, result_cpassoc) => {
-						if (error_cpassoc) throw error_cpassoc
-						
-					})
-				})
-			}
-		})
+		var result_company
+		var result_person
+		
+		result_company = await pool.query(
+			`INSERT INTO companies (address, vat, starting_date, country_code) VALUES ($1, $2, $3, $4) ON CONFLICT (vat) DO
+			UPDATE SET address = $1, country_code = $4 RETURNING id`, [company.address, company.vat, company.starting_date, company.country_code])
+		
+		for (var j = 0; j < result.persons.length; j++) {
+			var person = result.persons[j]
+			result_person = await pool.query(`INSERT INTO persons (first_name, country_code) VALUES ($1, $2, $3) ON CONFLICT (first_name, country_code) DO NOTHING RETURNING id`, [person.name, person.country_code])
+			await pool.query('INSERT INTO company_to_person (company, person) VALUES ($1, $2) ON CONFLICT (company, person) DO NOTHING', [result_company.rows[0].id, result_person.rows[0].id])
+		}
 	}
 }
 
