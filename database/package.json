@@ -6,7 +6,8 @@
   "dependencies": {
     "knex": "^0.19.4",
     "load-environment": "^3.0.0",
-    "pg": "^7.12.1"
+    "pg": "^7.12.1",
+    "yaml": "^1.6.0"
   },
   "scripts": {
     "seed-make": "knex seed:make $1",
