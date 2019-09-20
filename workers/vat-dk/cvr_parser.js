@@ -4083,6 +4083,7 @@ async function parseAllAndSave (list) {
 		var company = result.company
 		var result_company
 		var result_person
+		var result_ownercompany
 		
 		result_company = await pool.query(
 			`INSERT INTO companies (address, vat, starting_date, country_code) VALUES ($1, $2, $3, $4) ON CONFLICT (vat) DO
@@ -4092,6 +4093,15 @@ async function parseAllAndSave (list) {
 			var person = result.persons[j]
 			result_person = await pool.query(`INSERT INTO persons (first_name, country_code) VALUES ($1, $2, $3) ON CONFLICT (first_name, country_code) DO NOTHING RETURNING id`, [person.name, person.country_code])
 			await pool.query('INSERT INTO company_to_person (company, person) VALUES ($1, $2) ON CONFLICT (company, person) DO NOTHING', [result_company.rows[0].id, result_person.rows[0].id])
+		}
+		
+		for (var j = 0; j < result.ownerCompanies; j++) {
+			var ownerCompany = result.ownerCompanies[j]
+			result_ownercompany = await pool.query(`INSERT INTO companies (address, vat, starting_date, country_code) VALUES ($1, $2, $3, $4) ON CONFLICT (vat) DO
+			UPDATE SET address = $1, country_code = $4 RETURNING id`, [ownerCompany.address, ownerCompany.vat, ownerCompany.starting_date, ownerCompany.country_code])
+			
+			await pool.query('INSERT INTO company_to_company (mother_company, daughter_company) VALUES ($1, $2) ON CONFLICT (mother_company, daughter_company) DO NOTHING',
+				[result_ownercompany.rows[0].id, result_company.rows[0].id])
 		}
 	}
 }
