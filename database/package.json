@@ -1,0 +1,19 @@
+{
+  "name": "regtic-database",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "ISC",
+  "dependencies": {
+    "knex": "^0.19.4",
+    "load-environment": "^3.0.0",
+    "pg": "^7.12.1",
+    "yaml": "^1.6.0"
+  },
+  "scripts": {
+    "seed-make": "knex seed:make $1",
+    "seed-run": "knex seed:run",
+    "migrate-make": "knex migrate:make $1",
+    "migrate-latest": "knex migrate:latest",
+    "migrate-rollback": "knex migrate:rollback"
+  }
+}
