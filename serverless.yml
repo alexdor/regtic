@@ -74,6 +74,13 @@ functions:
           method: get
           path: hellopython
     handler: workers/python-worker.hello
+  pepworker:
+    runtime: python3.6
+    events:
+      - http:
+          method: get
+          path: pepworker
+    handler: workers/pepworker.run
   hellonode:
     runtime: nodejs10.x
     events:
