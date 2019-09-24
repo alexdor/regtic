@@ -9,7 +9,8 @@
     "start-serverless": "serverless offline",
     "is-docker-running": "docker ps > /dev/null",
     "lint:js": "eslint --fix .",
-    "lint:py": "black ."
+    "lint:py": "black .",
+    "lint-staged": "lint-staged"
   },
   "repository": {
     "type": "git",
@@ -58,7 +59,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "npm run lint-staged"
     }
   }
 }
