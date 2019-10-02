@@ -81,6 +81,13 @@ functions:
           method: get
           path: hellonode
     handler: workers/nodejs-worker.hello
+  cvr-parse:
+    runtime: nodejs10.x
+    events:
+      - http:
+          method: post
+          path: cvr-parse
+    handler: workers/vat-dk/index.scrollAndParse
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
