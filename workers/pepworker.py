@@ -43,20 +43,16 @@ def parse_pep_xlsx(link):
 
 
 def remove_pep_from_db():
-    queried_bad_persons_list = pythondbtools.dbtools.read_bad_persons()
-    for bad_person in queried_bad_persons_list:
-        if bad_person.type == "PEP":
-            pythondbtools.dbtools.delete_bad_person(bad_person)
+    pythondbtools.dbtools.delete_all_bad_persons(list_type="PEP")
 
 
 def add_new_pep_to_db(df):
-    pythondbtools.dbtools.push_df(df)
+    pythondbtools.dbtools.update_df(df, list_type="PEP")
 
 
 def run(event, context):
     file_link = get_link_to_file()
     parsed_df = parse_pep_xlsx(file_link)
-    remove_pep_from_db()
     add_new_pep_to_db(parsed_df)
     return {
         "statusCode": 200,
@@ -68,5 +64,4 @@ def run(event, context):
 if __name__ == "__main__":
     file_link = get_link_to_file()
     parsed_df = parse_pep_xlsx(file_link)
-    remove_pep_from_db()
     add_new_pep_to_db(parsed_df)

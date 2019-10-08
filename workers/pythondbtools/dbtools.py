@@ -20,7 +20,6 @@ db_uri = "postgres://admin:admin@localhost:5432/regtic"
 base = declarative_base()
 db = create_engine(db_uri)
 Session = sessionmaker(db)
-session = Session()
 base.metadata.create_all(db)
 
 
@@ -33,28 +32,58 @@ class BadPerson(base):
     address = Column(String)
 
 
-def push_bad_person(session, full_name, type, source, address):
+def push_bad_person(full_name, type, source, address):
+    session = Session()
     bad_person = BadPerson(
         full_name=full_name, type=type, source=source, address=address
     )
-    session.add(bad_person)
-    session.commit()
+    try:
+        session.add(bad_person)
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
 
-def push_df(df):
-    for index, bad_person in df.iterrows():
-        bad_person_obj = BadPerson(
-            full_name=bad_person["full_name"],
-            type=bad_person["type"],
-            source=bad_person["source"],
-            address=bad_person["address"],
-        )
-        session.add(bad_person_obj)
-    session.commit()
+def update_df(df, list_type):
+    session = Session()
+
+    try:
+        delete_all_bad_persons_in_session(session, list_type)
+
+        for index, bad_person in df.iterrows():
+            bad_person_obj = BadPerson(
+                full_name=bad_person["full_name"],
+                type=bad_person["type"],
+                source=bad_person["source"],
+                address=bad_person["address"],
+            )
+            session.add(bad_person_obj)
+
+        session.commit()
+    except:
+        session.rollback()
+    finally:
+        session.close()
 
 
-def read_bad_persons():
-    bad_persons = session.query(BadPerson)
+def read_bad_persons(list_type=None):
+    session = Session()
+    bad_persons = []
+
+    try:
+        if type is not None:
+            bad_persons = session.query(BadPerson).filter(BadPerson.type == list_type)
+        else:
+            bad_persons = session.query(BadPerson)
+        session.commit()
+    except:
+        session.rollback()
+    finally:
+        session.close()
+
     bad_persons_list = []
     for bad_person in bad_persons:
         bad_persons_list.append(bad_person)
@@ -62,15 +91,41 @@ def read_bad_persons():
 
 
 def delete_bad_person(bad_person):
-    session.delete(bad_person)
-    session.commit()
-
-
-def delete_all_bad_persons():
-    bad_persons = session.query(BadPerson)
-    for bad_person in bad_persons:
+    session = Session()
+    try:
         session.delete(bad_person)
         session.commit()
+    except:
+        session.rollback()
+    finally:
+        session.close()
+
+
+def delete_all_bad_persons_in_session(session=None, list_type=None):
+    if list_type is not None:
+        bad_persons = session.query(BadPerson).filter(BadPerson.type == list_type)
+    else:
+        bad_persons = session.query(BadPerson)
+
+    for bad_person in bad_persons:
+        session.delete(bad_person)
+
+
+def delete_all_bad_persons(list_type=None):
+    session = Session()
+
+    try:
+        if list_type is not None:
+            bad_persons = session.query(BadPerson).filter(BadPerson.type == list_type)
+        else:
+            bad_persons = session.query(BadPerson)
+
+        for bad_person in bad_persons:
+            session.delete(bad_person)
+    except:
+        session.rollback()
+    finally:
+        session.close()
 
 
 if __name__ == "__main__":
