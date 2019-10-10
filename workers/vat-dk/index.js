@@ -74,27 +74,25 @@ module.exports.scrollAndParse = async (event, context) => {
     const scrollRequestResponse = await scrollRequest(query, {
       scrollId: event.body.scrollId
     });
+
     const scrollIdFromResponse = scrollRequestResponse.data._scroll_id;
+    const hitListLengthFromResponse = scrollRequestResponse.data.hits.hits
+      ? scrollRequestResponse.data.hits.hits.length
+      : -1;
+    parseAndSaveResponse(scrollRequestResponse);
 
-    await parseAndSaveResponse(scrollRequestResponse);
-
-    return JSON.stringify({
+    return {
       statusCode: 200,
-      body: { scrollId: scrollIdFromResponse }
-    });
+      body: JSON.stringify({
+        scrollId: scrollIdFromResponse,
+        hitListLength: hitListLengthFromResponse
+      })
+    };
   } catch (error) {
     console.log(error);
-    return JSON.stringify({
+    return {
       statusCode: 500,
-      body: { error: "unexpected_failure" }
-    });
+      body: JSON.stringify({ error: "unexpected_failure" })
+    };
   }
 };
-
-/*
-
-module.exports.scrollAndParse = async (event, context) => {
-  return { statusCode: 200, body: "Hello world!" };
-};
-
-*/
