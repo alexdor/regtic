@@ -1,6 +1,3 @@
-// dotenv handler
-require("load-environment");
-
 // imports
 const axios = require("axios");
 const cvrParser = require("./cvr-parser");
@@ -9,7 +6,7 @@ const dbHelper = require("./db-helper");
 // configurations
 const cvrApi = axios.create({
   baseURL: process.env.CVR_BASE_URL,
-  timeout: 5000,
+  timeout: 200000,
   headers: {
     "Content-Type": "application/json"
   },
@@ -52,6 +49,9 @@ async function parseAndSaveResponse(response) {
   hitList.forEach(async hit => {
     const company = cvrParser.parse(hit);
 
+    const isCompanyParsed = !!company;
+    if (!isCompanyParsed) return;
+
     const insertCompanyResult = await dbHelper.insertCompany(company);
     const companyId = insertCompanyResult.rows[0].id;
 
@@ -69,7 +69,7 @@ async function parseAndSaveResponse(response) {
   });
 }
 
-export async function scrollAndParse(event, context) {
+module.exports.scrollAndParse = async (event, context) => {
   try {
     const scrollRequestResponse = await scrollRequest(query, {
       scrollId: event.body.scrollId
@@ -78,9 +78,23 @@ export async function scrollAndParse(event, context) {
 
     await parseAndSaveResponse(scrollRequestResponse);
 
-    return { statusCode: 200, body: { scrollId: scrollIdFromResponse } };
+    return JSON.stringify({
+      statusCode: 200,
+      body: { scrollId: scrollIdFromResponse }
+    });
   } catch (error) {
     console.log(error);
-    return { statusCode: 500 };
+    return JSON.stringify({
+      statusCode: 500,
+      body: { error: "unexpected_failure" }
+    });
   }
-}
+};
+
+/*
+
+module.exports.scrollAndParse = async (event, context) => {
+  return { statusCode: 200, body: "Hello world!" };
+};
+
+*/
