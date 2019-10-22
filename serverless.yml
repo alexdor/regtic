@@ -36,7 +36,7 @@ plugins:
   - serverless-python-requirements
 functions:
   pepworker:
-    runtime: python3.6
+    runtime: python3.7
     events:
       - http:
           method: get
