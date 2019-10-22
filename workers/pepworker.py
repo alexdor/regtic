@@ -12,7 +12,7 @@ def get_link_to_file():
     soup = BeautifulSoup(req.content, "html.parser")
     file_href = soup.find_all(href=re.compile("PEPliste"))
     file_url = file_href[0].get("href")  # do test here for multiple links
-    return base_url + file_url
+    return f"{base_url}{file_url}"
 
 
 def parse_pep_xlsx(link):
