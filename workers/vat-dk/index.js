@@ -3,6 +3,8 @@ const axios = require("axios");
 const cvrParser = require("./cvr-parser");
 const dbHelper = require("./db-helper");
 
+// const companyArray = {}
+
 // configurations
 const cvrApi = axios.create({
   baseURL: process.env.CVR_BASE_URL,
@@ -17,7 +19,7 @@ const cvrApi = axios.create({
 });
 
 const query = {
-  size: 100,
+  size: 200,
   _source: [
     "Vrvirksomhed.cvrNummer",
     "Vrvirksomhed.virksomhedMetadata.nyesteNavn.navn",
@@ -36,50 +38,73 @@ const query = {
   }
 };
 
-async function scrollRequest(body, config = {}) {
+async function scrollRequest(config = {}) {
   const scrollTimeout = config.scrollTimeout ? config.scrollTimeout : "1m";
-  const endpoint = config.scrollId
-    ? "_search/scroll"
-    : `cvr-permanent/_search?scroll=${scrollTimeout}`;
-  return cvrApi.post(endpoint, body);
+  const isFirstRequest = !config.scrollId;
+  const request = isFirstRequest
+    ? cvrApi.post(
+        `/cvr-permanent/virksomhed/_search?scroll=${scrollTimeout}`,
+        query
+      )
+    : cvrApi.post("/_search/scroll", {
+        scroll: scrollTimeout,
+        scroll_id: config.scrollId
+      });
+  return request;
+}
+
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
 }
 
 async function parseAndSaveResponse(response) {
   const hitList = response.data.hits.hits;
-  hitList.forEach(async hit => {
-    const company = cvrParser.parse(hit);
+  await asyncForEach(hitList, async hit => {
+    try {
+      const company = cvrParser.parse(hit);
 
-    const isCompanyParsed = !!company;
-    if (!isCompanyParsed) return;
+      const isCompanyParsed = !!company;
+      if (!isCompanyParsed) return;
 
-    const insertCompanyResult = await dbHelper.insertCompany(company);
-    const companyId = insertCompanyResult.rows[0].id;
+      const companyId = await dbHelper.insertCompany(company);
 
-    company.persons.forEach(async person => {
-      const insertPersonResult = await dbHelper.insertPerson(person);
-      const personId = insertPersonResult.rows[0].id;
-      await dbHelper.insertCompanyToPerson(companyId, personId);
-    });
+      for (let i = 0; i < company.persons.length; i++) {
+        const person = company.persons[i];
+        const personId = await dbHelper.insertPerson(person);
+        await dbHelper.insertCompanyToPerson(companyId, personId);
+      }
 
-    company.motherCompanies.forEach(async motherCompany => {
-      const motherCompanyInsert = await dbHelper.insertCompany(motherCompany);
-      const motherCompanyId = motherCompanyInsert.rows[0].id;
-      await dbHelper.insertCompanyToCompany(motherCompanyId, companyId);
-    });
+      for (let i = 0; i < company.motherCompanies.length; i++) {
+        const motherCompany = company.motherCompanies[i];
+        const motherCompanyId = await dbHelper.insertCompany(motherCompany);
+        if (!motherCompanyId) {
+          const error = { error_msg: "no id was returned for company" };
+          console.log({ error, motherCompany });
+          return;
+        }
+        await dbHelper.insertCompanyToCompany(motherCompanyId, companyId);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   });
 }
 
 module.exports.scrollAndParse = async (event, context) => {
   try {
-    const scrollRequestResponse = await scrollRequest(query, {
-      scrollId: event.body.scrollId
+    eventBody = JSON.parse(event.body);
+    const scrollRequestResponse = await scrollRequest({
+      scrollId: eventBody.scrollId
     });
 
     const scrollIdFromResponse = scrollRequestResponse.data._scroll_id;
     const hitListLengthFromResponse = scrollRequestResponse.data.hits.hits
       ? scrollRequestResponse.data.hits.hits.length
       : -1;
-    parseAndSaveResponse(scrollRequestResponse);
+
+    await parseAndSaveResponse(scrollRequestResponse);
 
     return {
       statusCode: 200,

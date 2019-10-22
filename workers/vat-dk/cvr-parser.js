@@ -4,20 +4,32 @@ function addressToString(address) {
   } ${address.husnummerFra || ""} ${address.bogstavFra || ""}`.trim();
 }
 
+function getName(entity) {
+  const entityNameObj = entity.navne.find(
+    navnObj => !navnObj.periode.gyldigTil
+  );
+  return entityNameObj ? entityNameObj.navn : null;
+}
+
+function getCountryCode(entity) {
+  const entityLocationObj = entity.beliggenhedsadresse.find(
+    ba => !ba.periode.gyldigTil
+  );
+  return entityLocationObj ? entityLocationObj.landekode : "ZZ";
+}
+
 function parsePerson(person) {
   return {
-    name: person.navne[0].navn,
-    countryCode: person.beliggenhedsadresse[0]
-      ? person.beliggenhedsadresse[0].landekode
-      : "ZZ"
+    name: getName(person),
+    countryCode: getCountryCode(person)
   };
 }
 
 function parseMotherCompany(motherCompany) {
   return {
-    name: motherCompany.navne[0].navn,
+    name: getName(motherCompany),
     address: addressToString(motherCompany.beliggenhedsadresse[0]),
-    countryCode: motherCompany.beliggenhedsadresse[0].landekode,
+    countryCode: getCountryCode(motherCompany),
     vat: "DK-" + motherCompany.forretningsnoegle,
     startingDate: motherCompany.sidstOpdateret
   };
