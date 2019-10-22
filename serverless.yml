@@ -45,8 +45,11 @@ functions:
       - http:
           method: get
           path: pepworker
-    module: workers/pythondbtools
-    handler: pepworker.run
+    module: pepworker
+    handler: workers/pepworker/pepworker.run
+    package:
+      include:
+        - workers/pythondbtools
 # you can overwrite defaults here
 #  stage: dev
 #  region: us-east-1
