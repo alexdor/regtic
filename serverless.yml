@@ -17,6 +17,32 @@ provider:
   name: aws
   runtime: nodejs10.x
 
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    zip: true
+    slim: true
+    # In some cases, stripping binaries leads to problems like "ELF load command address/offset not properly aligned", even when done in the Docker environment. You can still slim down the package without *.so files with if we face this case we have to comment out the following:
+    # strip: false
+    useDownloadCache: true
+    useStaticCache: true
+    dockerEnv:
+      - REGTIC_DATABASE_URL
+    individually: true
+    staticCacheMaxVersions: 10
+
+plugins:
+  - serverless-offline
+  - serverless-python-requirements
+functions:
+  pepworker:
+    runtime: python3.6
+    events:
+      - http:
+          method: get
+          path: pepworker
+    module: pepworker
+    handler: workers/pepworker.run
 # you can overwrite defaults here
 #  stage: dev
 #  region: us-east-1
@@ -49,31 +75,7 @@ provider:
 #  exclude:
 #    - exclude-me.js
 #    - exclude-me-dir/**
-
-plugins:
-  - serverless-offline
-functions:
-  hellopython:
-    runtime: python3.6
-    events:
-      - http:
-          method: get
-          path: hellopython
-    handler: workers/python-worker.hello
-  pepworker:
-    runtime: python3.6
-    events:
-      - http:
-          method: get
-          path: pepworker
-    handler: workers/pepworker.run
-  hellonode:
-    runtime: nodejs10.x
-    events:
-      - http:
-          method: get
-          path: hellonode
-    handler: workers/nodejs-worker.hello
+#
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
