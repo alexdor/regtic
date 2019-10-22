@@ -68,14 +68,14 @@ plugins:
   - serverless-offline
 functions:
   hellopython:
-    runtime: python3.6
+    runtime: python3.7
     events:
       - http:
           method: get
           path: hellopython
     handler: workers/python-worker.hello
   pepworker:
-    runtime: python3.6
+    runtime: python3.7
     events:
       - http:
           method: get

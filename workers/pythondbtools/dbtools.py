@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
 import uuid
+import yaml
 
 """
 id              (UUID)
@@ -16,11 +17,17 @@ updated_at      (Now)
 created_at      (Now)
 """
 
-db_uri = "postgres://admin:admin@localhost:5432/regtic"
+env_dict = yaml.load(open("serverless.yml"))
+
+db_uri = (
+    "postgres://admin:admin@localhost:5432/regtic"
+)  # todo get from env variable env_dict['environment']['REGTIC_DATABASE_URL']
 base = declarative_base()
 db = create_engine(db_uri)
 Session = sessionmaker(db)
 base.metadata.create_all(db)
+
+TYPE_ENUM = {0: "PEP", 1: "SANCTION"}
 
 
 class BadPerson(base):
@@ -32,10 +39,10 @@ class BadPerson(base):
     address = Column(String)
 
 
-def push_bad_person(full_name, type, source, address):
+def push_bad_person(full_name, list_type, source, address):
     session = Session()
     bad_person = BadPerson(
-        full_name=full_name, type=type, source=source, address=address
+        full_name=full_name, type=list_type, source=source, address=address
     )
     try:
         session.add(bad_person)
