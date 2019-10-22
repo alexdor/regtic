@@ -130,11 +130,3 @@ def delete_all_bad_persons(list_type=None):
         session.rollback()
     finally:
         session.close()
-
-
-if __name__ == "__main__":
-    engine = create_engine(db_uri)
-    inspector = inspect(engine)
-    print(inspector.get_table_names())
-    print(inspector.get_columns("bad_persons"))
-    delete_all_bad_persons()

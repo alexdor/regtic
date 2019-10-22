@@ -42,7 +42,7 @@ def parse_pep_xlsx(link):
     names_df["type"] = TYPE_ENUM[0]
     names_df["source"] = link
     names_df["address"] = None
-    names_df["full_name"] = f"{names_df['first_name']} {names_df['sur_name']}"
+    names_df["full_name"] = names_df["first_name"] + " " + names_df["sur_name"]
     names_df = names_df[returned_cols]
     return names_df
 
