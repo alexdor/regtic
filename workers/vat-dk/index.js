@@ -92,7 +92,7 @@ async function parseAndSaveResponse(response) {
 
 module.exports.scrollAndParse = async (event, context) => {
   try {
-    eventBody = JSON.parse(event.body);
+    const eventBody = JSON.parse(event.body);
     const scrollRequestResponse = await scrollRequest({
       scrollId: eventBody.scrollId
     });
