@@ -8,7 +8,7 @@ import pythondbtools.dbtools
 def get_link_to_file():
     base_url = "https://www.finanstilsynet.dk"
     page_url = "/Tal-og-Fakta/PEP-liste"
-    req = requests.get(base_url + page_url)
+    req = requests.get(f"{base_url}{page_url}")
     soup = BeautifulSoup(req.content, "html.parser")
     file_href = soup.find_all(href=re.compile("PEPliste"))
     file_url = file_href[0].get("href")  # do test here for multiple links
