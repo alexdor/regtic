@@ -2,6 +2,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import requests
 import re
+
 import pythondbtools.dbtools
 
 from pythondbtools.dbtools import TYPE_ENUM
@@ -14,7 +15,7 @@ def get_link_to_file():
     soup = BeautifulSoup(req.content, "html.parser")
     file_href = soup.find_all(href=re.compile("PEPliste"))
     file_url = file_href[0].get("href")  # do test here for multiple links
-    return base_url + file_url
+    return f"{base_url}{file_url}"
 
 
 def parse_pep_xlsx(link):
@@ -36,24 +37,20 @@ def parse_pep_xlsx(link):
     names_df = data[parsing_cols]
     names_df = names_df.dropna(axis="index")
     names_df = names_df.rename(columns=rename_dict)
-    names_df["type"] = TYPE_ENUM[0]  # TODO get from enum
+    names_df["type"] = TYPE_ENUM[0]
     names_df["source"] = link
     names_df["address"] = None
-    names_df[
-        "full_name"
-    ] = f"{names_df['first_name']} {names_df['sur_name']}"  # todo check if change works
+    names_df["full_name"] = f"{names_df['first_name']} {names_df['sur_name']}"
     names_df = names_df[returned_cols]
     return names_df
 
 
 def remove_pep_from_db():
-    pythondbtools.dbtools.delete_all_bad_persons(
-        list_type=TYPE_ENUM[0]
-    )  # todo get from enum
+    pythondbtools.dbtools.delete_all_bad_persons(list_type=TYPE_ENUM[0])
 
 
 def add_new_pep_to_db(df):
-    pythondbtools.dbtools.update_df(df, list_type=TYPE_ENUM[0])  # todo get from enum
+    pythondbtools.dbtools.update_df(df, list_type=TYPE_ENUM[0])
 
 
 def run(event, context):

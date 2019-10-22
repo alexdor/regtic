@@ -18,10 +18,8 @@ created_at      (Now)
 """
 
 env_dict = yaml.load(open("serverless.yml"))
+db_uri = env_dict["environment"]["REGTIC_DATABASE_URL"]
 
-db_uri = (
-    "postgres://admin:admin@localhost:5432/regtic"
-)  # todo get from env variable env_dict['environment']['REGTIC_DATABASE_URL']
 base = declarative_base()
 db = create_engine(db_uri)
 Session = sessionmaker(db)
