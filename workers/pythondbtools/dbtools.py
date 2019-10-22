@@ -1,11 +1,11 @@
-from sqlalchemy import create_engine
-from sqlalchemy import Column, String
+import os
+import uuid
+
+import yaml
+from sqlalchemy import Column, String, create_engine, inspect
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
-import uuid
-import yaml
 
 """
 id              (UUID)
@@ -17,8 +17,7 @@ updated_at      (Now)
 created_at      (Now)
 """
 
-env_dict = yaml.load(open("serverless.yml"))
-db_uri = env_dict["environment"]["REGTIC_DATABASE_URL"]
+db_uri = os.environ["REGTIC_DATABASE_URL"]
 
 base = declarative_base()
 db = create_engine(db_uri)

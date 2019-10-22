@@ -1,5 +1,6 @@
-import os
+import json
 import re
+import traceback
 
 import pandas as pd
 import requests
@@ -55,14 +56,21 @@ def add_new_pep_to_db(df):
 
 
 def run(event, context):
-    # file_link = get_link_to_file()
-    # parsed_df = parse_pep_xlsx(file_link)
-    # add_new_pep_to_db(parsed_df)
-    return {
-        "statusCode": 200,
-        "body": f"<html><body><p>{os.listdir('.')}</p></body></html>",
-        "headers": {"Content-Type": "text/html"},
-    }
+    try:
+        file_link = get_link_to_file()
+        parsed_df = parse_pep_xlsx(file_link)
+        add_new_pep_to_db(parsed_df)
+        return {
+            "statusCode": 200,
+            "body": '{"data": "pepworker finished"}',
+            "headers": {"Content-Type": "application/json"},
+        }
+    except Exception as err:
+        return {
+            "statusCode": 500,
+            "body": f'\{"error": "pepworker failed, error:{traceback.format_exc()}"\}',
+            "headers": {"Content-Type": "application/json"},
+        }
 
 
 if __name__ == "__main__":

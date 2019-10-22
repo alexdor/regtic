@@ -9,16 +9,21 @@ service: regtic-main-service
 #app: regtic-test-app
 #org: regtic
 
-environment:
-  NODE_ENV: development
-  REGTIC_DATABASE_URL: postgres://admin:admin@localhost:5432/regtic
-
 provider:
   name: aws
   runtime: nodejs10.x
 
+package:
+  individually: true
+
+plugins:
+  - serverless-offline
+  - serverless-python-requirements
 custom:
+  dbURL: postgres://admin:admin@localhost:5432/regtic
+  environment: development
   pythonRequirements:
+    invalidateCaches: true
     dockerizePip: true
     zip: true
     slim: true
@@ -31,22 +36,21 @@ custom:
     individually: true
     staticCacheMaxVersions: 10
 
-package:
-  individually: true
-
-plugins:
-  - serverless-offline
-  - serverless-python-requirements
+environment:
+  NODE_ENV: ${self:custom.enviroment}
+  REGTIC_DATABASE_URL: ${self:custom.dbURL}
 
 functions:
   pepworker:
+    environment:
+      REGTIC_DATABASE_URL: ${self:custom.dbURL}
     runtime: python3.7
     events:
       - http:
           method: get
           path: pepworker
-    module: pepworker
     handler: workers/pepworker/pepworker.run
+    module: workers/pepworker
     package:
       include:
         - workers/pythondbtools
