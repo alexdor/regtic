@@ -3,8 +3,6 @@ const axios = require("axios");
 const cvrParser = require("./cvr-parser");
 const dbHelper = require("./db-helper");
 
-// const companyArray = {}
-
 // configurations
 const cvrApi = axios.create({
   baseURL: process.env.CVR_BASE_URL,
@@ -39,7 +37,7 @@ const query = {
 };
 
 async function scrollRequest(config = {}) {
-  const scrollTimeout = config.scrollTimeout ? config.scrollTimeout : "1m";
+  const scrollTimeout = config.scrollTimeout ? config.scrollTimeout : "2m";
   const isFirstRequest = !config.scrollId;
   const request = isFirstRequest
     ? cvrApi.post(
