@@ -7,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from workers.pythondbtools import dbtools
-from workers.pythondbtools.dbtools import TYPE_ENUM
+from workers.pythondbtools.dbtools import BAD_PERSON_TYPE
 
 
 def get_link_to_file():
@@ -39,7 +39,7 @@ def parse_pep_xlsx(link):
     names_df = data[parsing_cols]
     names_df = names_df.dropna(axis="index")
     names_df = names_df.rename(columns=rename_dict)
-    names_df["type"] = TYPE_ENUM[0]
+    names_df["type"] = BAD_PERSON_TYPE.PEP
     names_df["source"] = link
     names_df["address"] = None
     names_df["full_name"] = names_df["first_name"] + " " + names_df["sur_name"]
@@ -48,11 +48,11 @@ def parse_pep_xlsx(link):
 
 
 def remove_pep_from_db():
-    dbtools.delete_all_bad_persons(list_type=TYPE_ENUM[0])
+    dbtools.delete_all_bad_persons(list_type=BAD_PERSON_TYPE.PEP)
 
 
 def add_new_pep_to_db(df):
-    dbtools.update_df(df, list_type=TYPE_ENUM[0])
+    dbtools.update_df(df, list_type=BAD_PERSON_TYPE.PEP)
 
 
 def run(event, context):

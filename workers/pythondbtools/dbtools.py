@@ -1,5 +1,6 @@
 import os
 import uuid
+from enum import Enum
 
 import yaml
 from sqlalchemy import Column, String, create_engine, inspect
@@ -24,7 +25,10 @@ db = create_engine(db_uri)
 Session = sessionmaker(db)
 base.metadata.create_all(db)
 
-TYPE_ENUM = {0: "PEP", 1: "SANCTION"}
+
+class BAD_PERSON_TYPE(Enum):
+    PEP = "PEP"
+    SANCTION = "SANCTION"
 
 
 class BadPerson(base):
