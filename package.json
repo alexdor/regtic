@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "npm run is-docker-running && concurrently --kill-others --prefix \"[{name}]\" --names \"docker,serverless\" --prefix-colors \"dim,blue\" \"docker-compose up & sleep 5\" \"serverless offline\"",
+    "start": "npm run is-docker-running && concurrently --kill-others --prefix \"[{name}]\" --names \"docker,serverless,app\" --prefix-colors \"dim,blue,magenta\" \"npm run start-docker\" \"npm run start-serverless\" \"npm run start-app\"",
+    "start-app": "cd app && npm run serve",
+    "start-docker": "docker-compose up",
+    "start-serverless": "serverless offline --noTimeout",
     "is-docker-running": "docker ps > /dev/null",
     "lint:js": "eslint --fix .",
-    "lint:py": "black ."
+    "lint:py": "black .",
+    "lint-staged": "lint-staged"
   },
   "repository": {
     "type": "git",
@@ -15,17 +19,19 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@typescript-eslint/parser": "^2.3.0",
-    "concurrently": "^4.1.2",
-    "typescript": "^3.6.3"
+    "@typescript-eslint/parser": "^2.5.0",
+    "aws-sam-local": "^0.2.11",
+    "concurrently": "^5.0.0",
+    "serverless-iam-roles-per-function": "^2.0.2",
+    "typescript": "^3.6.4"
   },
   "devDependencies": {
     "@ljharb/eslint-config": "^14.1.0",
-    "@typescript-eslint/eslint-plugin": "^2.3.0",
+    "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@vue/eslint-config-prettier": "^5.0.0",
     "@vue/eslint-config-typescript": "^4.0.0",
-    "eslint": "^6.4.0",
-    "eslint-config-prettier": "^6.3.0",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.4.0",
     "eslint-config-standard": "^14.1.0",
     "eslint-plugin-html": "^6.0.0",
     "eslint-plugin-import": "^2.18.2",
@@ -34,10 +40,10 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "eslint-plugin-vue": "^5.2.3",
-    "husky": "^3.0.5",
-    "lint-staged": "^9.2.5",
+    "husky": "^3.0.9",
+    "lint-staged": "^9.4.2",
     "prettier": "^1.18.2",
-    "serverless-offline": "^5.11.0",
+    "serverless-offline": "^5.12.0",
     "serverless-python-requirements": "^5.0.0"
   },
   "lint-staged": {
@@ -52,11 +58,15 @@
     "*.py": [
       "black",
       "git add"
+    ],
+    "*.go": [
+      "gofmt -w",
+      "git add"
     ]
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "npm run lint-staged"
     }
   }
 }

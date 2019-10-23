@@ -1,3 +1,5 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/bdb923b9-fd7d-46f0-91b5-796690da8448/deploy-status)](https://app.netlify.com/sites/affectionate-swartz-baae10/deploys)
+
 # Regtic
 
 This is the base repo for the anti-money laundering project which is/was a part of the HardTech Entrepreneurship course at the Technical University of Denmark anno 2019.
