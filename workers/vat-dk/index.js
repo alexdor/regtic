@@ -57,15 +57,15 @@ async function asyncForEach(array, callback) {
   }
 }
 
-async function parseAndSaveResponse(response) {
-  const hitList = response.data.hits.hits;
+async function parseAndSaveResponse(responseData) {
+  const hitList = responseData.hits.hits;
   await asyncForEach(hitList, async hit => {
     try {
       const company = cvrParser.parse(hit);
 
-      const isCompanyParsed = !!company;
-      if (!isCompanyParsed) return;
+      if (!company) return;
 
+      // FIXME: This part needs to be done inside a transaction
       const companyId = await dbHelper.insertCompany(company);
 
       for (let i = 0; i < company.persons.length; i++) {
@@ -92,30 +92,29 @@ async function parseAndSaveResponse(response) {
 
 module.exports.scrollAndParse = async (event, context) => {
   try {
-    const eventBody = JSON.parse(event.body);
     const scrollRequestResponse = await scrollRequest({
-      scrollId: eventBody.scrollId
+      scrollId: JSON.parse(event.body) || {}
     });
 
-    const scrollIdFromResponse = scrollRequestResponse.data._scroll_id;
-    const hitListLengthFromResponse = scrollRequestResponse.data.hits.hits
-      ? scrollRequestResponse.data.hits.hits.length
-      : -1;
+    const data = scrollRequestResponse.data || {};
+    await parseAndSaveResponse(data);
 
-    await parseAndSaveResponse(scrollRequestResponse);
+    const hitListLengthFromResponse = data.hits.hits
+      ? data.hits.hits.length
+      : -1;
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        scrollId: scrollIdFromResponse,
+        scrollId: data._scroll_id,
         hitListLength: hitListLengthFromResponse
       })
     };
   } catch (error) {
-    console.log(error);
+    // TODO: Use sentry here and don't retun the error to the consumer
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "unexpected_failure" })
+      body: JSON.stringify({ error, message: "unexpected_failure" })
     };
   }
 };
