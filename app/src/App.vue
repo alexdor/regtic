@@ -7,16 +7,17 @@
           background-color="#545c64"
           text-color="#fff"
           active-text-color="#409eff"
-          default-active="1"
+          :default-active="$route.path"
+          :router="true"
         >
           <img src="./assets/regtic-logo.svg" class="fit-to-width" />
-          <el-menu-item index="1"
+          <el-menu-item index="/"
             ><i class="el-icon-menu"></i>Dashboard</el-menu-item
           >
-          <el-menu-item index="2"
+          <el-menu-item index="/watchlist"
             ><i class="el-icon-star-on"></i>Watchlist</el-menu-item
           >
-          <el-menu-item index="3"
+          <el-menu-item index="not-added-yet"
             ><i class="el-icon-s-finance"></i>Subscription</el-menu-item
           >
         </el-menu>
@@ -34,28 +35,25 @@
 <script>
 export default {
   name: "app",
-  components: {},
-  methods: {
-    goBack() {
-      history.back();
-    }
-  }
+  components: {}
 };
 </script>
 
 <style>
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-}
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
+  #app {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #2c3e50;
+  }
+  #app, .el-tooltip__popper {
+    font-family: "Avenir", Helvetica, Arial, sans-serif;
+  }
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
 #app,
 #app .el-container,
 #app .el-container .el-aside,
