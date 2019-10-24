@@ -20,14 +20,16 @@
 <script>
   export default {
     data() {
-      return {
-        title: "Title"
-      }
+      return {}
     },
     props: ["title"],
     created() {
-      console.log(this);
       document.title = this.title;
+    },
+    methods: {
+      goBack() {
+        history.back();
+      }
     }
   };
 </script>
