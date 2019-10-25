@@ -45,7 +45,7 @@ export default {
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
   }
-  #app, .el-tooltip__popper {
+  #app, .el-tooltip__popper, .el-dropdown-menu {
     font-family: "Avenir", Helvetica, Arial, sans-serif;
   }
   html,
