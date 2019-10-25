@@ -62,28 +62,8 @@ async function parseAndSaveResponse(responseData) {
   await asyncForEach(hitList, async hit => {
     try {
       const company = cvrParser.parse(hit);
-
       if (!company) return;
-
-      // FIXME: This part needs to be done inside a transaction
-      const companyId = await dbHelper.insertCompany(company);
-
-      for (let i = 0; i < company.persons.length; i++) {
-        const person = company.persons[i];
-        const personId = await dbHelper.insertPerson(person);
-        await dbHelper.insertCompanyToPerson(companyId, personId);
-      }
-
-      for (let i = 0; i < company.motherCompanies.length; i++) {
-        const motherCompany = company.motherCompanies[i];
-        const motherCompanyId = await dbHelper.insertCompany(motherCompany);
-        if (!motherCompanyId) {
-          const error = { error_msg: "no id was returned for company" };
-          console.log({ error, motherCompany });
-          return;
-        }
-        await dbHelper.insertCompanyToCompany(motherCompanyId, companyId);
-      }
+      await dbHelper.insertDataTransactionally(company);
     } catch (error) {
       console.log(error);
     }
