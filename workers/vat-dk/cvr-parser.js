@@ -20,7 +20,14 @@ function getCountryCode(entity) {
 
 function parsePerson(person) {
   return {
-    name: getName(person),
+    firstName: getName(person)
+      .split(" ")
+      .slice(0, -1)
+      .join(" "),
+    lastName: getName(person)
+      .split(" ")
+      .slice(-1)
+      .join(" "),
     countryCode: getCountryCode(person)
   };
 }

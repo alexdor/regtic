@@ -30,7 +30,11 @@ async function insertCompany(client, company) {
 }
 
 async function insertPerson(client, person) {
-  return client.query(insertPersonQuery, [person.name, person.countryCode]);
+  return client.query(insertPersonQuery, [
+    person.firstName,
+    person.lastName,
+    person.countryCode
+  ]);
 }
 
 async function insertCompanyToPerson(client, companyId, personId) {
