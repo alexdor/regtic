@@ -3,20 +3,56 @@
     <el-row>
       <el-col :span="18"><h1>Watchlist</h1></el-col>
       <el-col :span="6" align="right">
-        <el-button type="primary" icon="el-icon-download">Generate report</el-button>
+        <el-button type="primary" icon="el-icon-download"
+          >Generate report</el-button
+        >
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span="12" v-for="company in items">
+      <el-col :span="12" v-for="company in items" v-bind:key="company.id">
         <el-card>
-          <span class="text-large">{{company.name}}</span>
-          <el-button class="right-button btn-margin-left" type="danger" icon="el-icon-delete" circle></el-button>
+          <span class="text-large">{{ company.name }}</span>
+          <el-popover
+            placement="top"
+            width="200"
+            trigger="click"
+            v-model="company.deleteVisible"
+          >
+            <p>Are you sure to delete this?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button
+                size="mini"
+                type="text"
+                @click="company.deleteVisible = false"
+                >cancel</el-button
+              >
+              <el-button
+                type="danger"
+                size="mini"
+                @click="company.deleteVisible = false"
+                >confirm</el-button
+              >
+            </div>
+            <el-button
+              slot="reference"
+              class="right-button btn-margin-left"
+              type="danger"
+              icon="el-icon-delete"
+              circle
+            ></el-button>
+          </el-popover>
           <router-link :to="'/check/' + company.id">
-            <el-button class="right-button" type="primary" icon="el-icon-check" round>Check</el-button>
+            <el-button
+              class="right-button"
+              type="primary"
+              icon="el-icon-check"
+              round
+              >Check</el-button
+            >
           </router-link>
           <div class="body">
-            <p>{{company.address}}</p>
-            <p>{{company.vat}}</p>
+            <p>{{ company.address }}</p>
+            <p>{{ company.vat }}</p>
           </div>
         </el-card>
       </el-col>
@@ -29,18 +65,78 @@ export default {
   data() {
     return {
       items: [
-        { vat: "DK-12345678", name: "Bad company example", id: "1234-5678-9012-3456" },
-        { vat: "DK-23456789", name: "Other company demo", id: "2345-5678-9012-3456" },
-        { vat: "DK-34567890", name: "Example company", id: "3456-5678-9012-3456" },
-        { vat: "DK-12345678", name: "Bad company example 2", id: "1234-5678-9012-3456" },
-        { vat: "DK-23456789", name: "Other company demo 2", id: "2345-5678-9012-3456" },
-        { vat: "DK-34567890", name: "Example company 2", id: "3456-5678-9012-3456" },
-        { vat: "DK-12345678", name: "Bad company example 3", id: "1234-5678-9012-3456" },
-        { vat: "DK-23456789", name: "Other company demo 3", id: "2345-5678-9012-3456" },
-        { vat: "DK-34567890", name: "Example company 3", id: "3456-5678-9012-3456" },
-        { vat: "DK-12345678", name: "Bad company example 4", id: "1234-5678-9012-3456" },
-        { vat: "DK-23456789", name: "Other company demo 4", id: "2345-5678-9012-3456" },
-        { vat: "DK-34567890", name: "Example company 4", id: "3456-5678-9012-3456" }
+        {
+          vat: "DK-12345678",
+          name: "Bad company example",
+          id: "1234-5678-9012-3456",
+          deleteVisible: false
+        },
+        {
+          vat: "DK-23456789",
+          name: "Other company demo",
+          id: "2345-5678-9012-3456",
+          deleteVisible: false
+        },
+        {
+          vat: "DK-34567890",
+          name: "Example company",
+          id: "3456-5678-9012-3456",
+          deleteVisible: false
+        },
+        {
+          vat: "DK-12345678",
+          name: "Bad company example 2",
+          id: "4567-5678-9012-3456",
+          deleteVisible: false
+        },
+        {
+          vat: "DK-23456789",
+          name: "Other company demo 2",
+          id: "5678-5678-9012-3456",
+          deleteVisible: false
+        },
+        {
+          vat: "DK-34567890",
+          name: "Example company 2",
+          id: "6789-5678-9012-3456",
+          deleteVisible: false
+        },
+        {
+          vat: "DK-12345678",
+          name: "Bad company example 3",
+          id: "7890-5678-9012-3456",
+          deleteVisible: false
+        },
+        {
+          vat: "DK-23456789",
+          name: "Other company demo 3",
+          id: "8901-5678-9012-3456",
+          deleteVisible: false
+        },
+        {
+          vat: "DK-34567890",
+          name: "Example company 3",
+          id: "9012-5678-9012-3456",
+          deleteVisible: false
+        },
+        {
+          vat: "DK-12345678",
+          name: "Bad company example 4",
+          id: "0123-5678-9012-3456",
+          deleteVisible: false
+        },
+        {
+          vat: "DK-23456789",
+          name: "Other company demo 4",
+          id: "1223-5678-9012-3456",
+          deleteVisible: false
+        },
+        {
+          vat: "DK-34567890",
+          name: "Example company 4",
+          id: "1224-5678-9012-3456",
+          deleteVisible: false
+        }
       ]
     };
   }
@@ -49,25 +145,29 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-  .text-large {
-    display: inline-block;
-    font-size: 18px;
-    margin-bottom: 6px;
-  }
+.text-large {
+  display: inline-block;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
 
-  .el-card p {
-    margin: 0;
-    color: #777779;
-  }
+.el-card p {
+  margin: 0;
+  color: #777779;
+}
 
-  .btn-margin-left {
-    margin-left: 15px;
-  }
+.btn-margin-left {
+  margin-left: 15px;
+}
 
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
+.el-popover p {
+  margin-top: 0;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
 
 li {
   display: inline-block;

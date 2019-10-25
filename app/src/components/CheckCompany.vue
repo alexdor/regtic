@@ -5,7 +5,11 @@
       Check your company relations with a click of a button. Simple, easy.
     </p>
     <div class="vertical-spacing">
-      <el-input v-model="state" class="inline-input full-with" placeholder="Company name or CVR"></el-input>
+      <el-input
+        v-model="state"
+        class="inline-input full-with"
+        placeholder="Company name or CVR"
+      ></el-input>
       <!--<el-autocomplete
         class="inline-input full-width"
         v-model="state"
@@ -16,7 +20,13 @@
       ></el-autocomplete>-->
     </div>
     <div class="vertical-spacing">
-      <el-button type="primary" class="full-width" :disabled="state.length == 0" @click.native="$router.push('/select-company/' + state)">Check</el-button>
+      <el-button
+        type="primary"
+        class="full-width"
+        :disabled="state.length == 0"
+        @click.native="$router.push('/select-company/' + state)"
+        >Search</el-button
+      >
     </div>
   </div>
 </template>
@@ -29,7 +39,7 @@ export default {
       state: ""
     };
   },
-    methods: {
+  methods: {
     querySearchCompany(queryString, cb) {
       var links = this.links;
       var results = queryString

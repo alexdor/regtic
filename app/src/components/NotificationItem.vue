@@ -11,7 +11,10 @@
       ></i>
     </el-col>
     <el-col :span="21">
-      <p v-html="data.text"></p>
+      <p>
+        <b>{{ data.boldText }}</b
+        >{{ data.text }}
+      </p>
     </el-col>
   </el-row>
 </template>
