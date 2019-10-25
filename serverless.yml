@@ -1,3 +1,6 @@
+# For full config options, check the docs:
+#    docs.serverless.com
+
 service: regtic-main-service
 # app and org for use with dashboard.serverless.com
 # app: regtic-app
@@ -6,31 +9,50 @@ service: regtic-main-service
 #app: regtic-test-app
 #org: regtic
 
-environment:
-  NODE_ENV: development
-  REGTIC_DATABASE_URL: postgres://admin:admin@localhost:5432/regtic
-
-# Welcome to Serverless!
-#
-# This file is the main config file for your service.
-# It's very minimal at this point and uses default values.
-# You can always add more config options for more control.
-# We've included some commented out config examples here.
-# Just uncomment any of them to get that config option.
-#
-# For full config options, check the docs:
-#    docs.serverless.com
-#
-# Happy Coding!
-
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
-# frameworkVersion: "=X.X.X"
-
 provider:
   name: aws
   runtime: nodejs10.x
 
+package:
+  individually: true
+
+plugins:
+  - serverless-offline
+  - serverless-python-requirements
+custom:
+  dbURL: postgres://admin:admin@localhost:5432/regtic
+  environment: development
+  pythonRequirements:
+    dockerizePip: true
+    zip: true
+    slim: true
+    # In some cases, stripping binaries leads to problems like "ELF load command address/offset not properly aligned", even when done in the Docker environment. You can still slim down the package without *.so files with if we face this case we have to comment out the following:
+    # strip: false
+    useDownloadCache: true
+    useStaticCache: true
+    dockerEnv:
+      - REGTIC_DATABASE_URL
+    individually: true
+    staticCacheMaxVersions: 10
+
+environment:
+  NODE_ENV: ${self:custom.enviroment}
+  REGTIC_DATABASE_URL: ${self:custom.dbURL}
+
+functions:
+  pepworker:
+    environment:
+      REGTIC_DATABASE_URL: ${self:custom.dbURL}
+    runtime: python3.7
+    events:
+      - http:
+          method: get
+          path: pepworker
+    handler: workers/pepworker/pepworker.run
+    module: workers/pepworker
+    package:
+      include:
+        - workers/pythondbtools
 # you can overwrite defaults here
 #  stage: dev
 #  region: us-east-1
@@ -63,24 +85,7 @@ provider:
 #  exclude:
 #    - exclude-me.js
 #    - exclude-me-dir/**
-
-plugins:
-  - serverless-offline
-functions:
-  hellopython:
-    runtime: python3.6
-    events:
-      - http:
-          method: get
-          path: hellopython
-    handler: workers/python-worker.hello
-  hellonode:
-    runtime: nodejs10.x
-    events:
-      - http:
-          method: get
-          path: hellonode
-    handler: workers/nodejs-worker.hello
+#
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

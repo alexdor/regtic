@@ -219,6 +219,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Pycharm stuff
+.idea/
 
 # Serverless directories
 .serverless
