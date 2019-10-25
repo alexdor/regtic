@@ -17,7 +17,7 @@
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item
                   v-for="msg in notifications"
-                  v-bind:key="msg"
+                  v-bind:key="msg.id"
                   class="notification-item"
                 >
                   <router-link v-if="msg.link != null" :to="msg.link">
@@ -62,20 +62,26 @@ export default {
       },
       notifications: [
         {
+          id: 1,
           type: "add",
-          text: "<b>Company</b> was added to your watchlist",
+          boldText: "Company",
+          text: " was added to your watchlist",
           date: new Date(),
           link: "/watchlist"
         },
         {
+          id: 2,
           type: "status",
-          text: "<b>A new monthly report is ready to download</b>",
+          boldText: "A new monthly report is ready to download",
+          text: "",
           date: new Date(),
           link: null
         },
         {
+          id: 3,
           type: "warn",
-          text: "<b>Donald Trump</b> has been added to the PEP list",
+          boldText: "Donald Trump",
+          text: " has been added to the PEP list",
           date: new Date(2017, 1, 1),
           link: null
         }

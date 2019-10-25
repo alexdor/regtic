@@ -40,20 +40,21 @@ export default {
 </script>
 
 <style>
-  #app {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #2c3e50;
-  }
-  #app, .el-tooltip__popper, .el-dropdown-menu {
-    font-family: "Avenir", Helvetica, Arial, sans-serif;
-  }
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-  }
+#app {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+}
+#app,
+.el-popper {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
 #app,
 #app .el-container,
 #app .el-container .el-aside,

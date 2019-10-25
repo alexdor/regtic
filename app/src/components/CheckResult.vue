@@ -3,57 +3,93 @@
     <el-row>
       <el-col :span="18"><h1>Overview</h1></el-col>
       <el-col :span="6" align="right">
-        <el-button type="info" icon="el-icon-collection-tag">Add to watchlist</el-button>
-        <el-button type="primary" icon="el-icon-download">Generate report</el-button>
+        <el-button type="info" icon="el-icon-collection-tag"
+          >Add to watchlist</el-button
+        >
+        <el-button type="primary" icon="el-icon-download"
+          >Generate report</el-button
+        >
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span="6">
+      <el-col :span="12">
         <el-card>
-          <span class="text-large">Daughter companies</span>
-          <p>{{result.daughter_companies_total}}</p>
+          <div slot="header" class="clearfix">
+            <span>People</span>
+          </div>
+          <el-table
+            class="full-width"
+            :data="result.people"
+            :default-sort="{ prop: 'type', order: 'descending' }"
+          >
+            <el-table-column prop="full_name" label="Name" sortable>
+            </el-table-column>
+            <el-table-column
+              prop="type"
+              label="Status"
+              sortable
+              width="100"
+              align="center"
+            >
+              <template slot-scope="scope">
+                <el-tooltip
+                  v-if="scope.row.type == 'pep'"
+                  class="item"
+                  :content="scope.row.source"
+                  placement="top"
+                  effect="dark"
+                >
+                  <el-button
+                    circle
+                    size="mini"
+                    icon="el-icon-link"
+                    type="warning"
+                  ></el-button>
+                </el-tooltip>
+                <el-tooltip
+                  v-else-if="scope.row.type == 'sanction'"
+                  class="item"
+                  :content="scope.row.source"
+                  placement="top"
+                  effect="dark"
+                >
+                  <el-button
+                    circle
+                    size="mini"
+                    icon="el-icon-link"
+                    type="danger"
+                  ></el-button>
+                </el-tooltip>
+                <el-button
+                  v-else
+                  circle
+                  size="mini"
+                  icon="el-icon-check"
+                  type="success"
+                ></el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </el-card>
       </el-col>
-      <el-col :span="6">
+      <el-col :span="12">
         <el-card>
-          <span class="text-large">People checked</span>
-          <p>{{result.people_total}}</p>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card>
-          <span class="text-large">Companies found on your watchlist</span>
-          <p>{{result.companies_on_watchlist_percent * 100}}%</p>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card>
-          <span class="text-large">Politically exposed people detected</span>
-          <p>{{result.pep_detect}}</p>
+          <div slot="header" class="clearfix">
+            <span>Companies</span>
+          </div>
+          <el-table
+            class="full-width"
+            :data="result.companies"
+            :default-sort="{ prop: 'type', order: 'descending' }"
+          >
+            <el-table-column prop="vat" label="VAT" sortable width="120">
+            </el-table-column>
+            <el-table-column prop="name" label="Name" sortable>
+            </el-table-column>
+          </el-table>
         </el-card>
       </el-col>
     </el-row>
-    <el-card>
-      <div slot="header" class="clearfix">
-        <span>Detected companies</span>
-      </div>
-      <div v-for="company in result.detected_companies" class="text item">
-        <el-tooltip class="item" :content="company.source" placement="top" effect="dark"><el-button circle size="mini" icon="el-icon-link"></el-button></el-tooltip> {{company.vat}} - {{company.name}}
-      </div>
-    </el-card>
-    <el-card>
-      <div slot="header" class="clearfix">
-        <span>Detected people</span>
-      </div>
-      <div v-for="person in result.detected_people" class="text item">
-        <el-badge v-if="person.pep" value="PEP" class="item mini" type="warning"><el-tooltip class="item" :content="person.source" placement="top" effect="dark">
-          <el-button circle size="mini" icon="el-icon-link"></el-button></el-tooltip> {{person.full_name}}
-        </el-badge>
-        <span v-else>
-          <el-tooltip class="item" :content="person.source" placement="top" effect="dark"><el-button circle size="mini" icon="el-icon-link"></el-button></el-tooltip> {{person.full_name}}
-        </span>
-      </div>
-    </el-card>
   </div>
 </template>
 
@@ -63,21 +99,46 @@ export default {
     return {
       name: "Regtic Demo",
       id: this.$route.params.id,
+      typeSort: {
+        ok: 0,
+        pep: 1,
+        sanction: 2
+      },
       result: {
-        daughter_companies_total: 5,
-        people_total: 2500,
-        companies_on_watchlist_percent: 0.2,
-        pep_detect: 1,
-        detected_companies: [
-          { vat: "DK-12345678", name: "Bad company example", source: "EU Sanctions List 2019 (www.example.org/path-to-file) - 23/10/2019" },
-          { vat: "DK-23456789", name: "Other company demo", source: "EU Sanctions List 2019 (www.example.org/path-to-file) - 23/10/2019" },
-          { vat: "DK-34567890", name: "Example company", source: "FATF List 2019 (www.example.org/path-to-file2) - 18/10/2019" }
+        companies: [
+          { vat: "DK-12345678", name: "Bad company example" },
+          { vat: "DK-23456789", name: "Other company demo" },
+          { vat: "DK-34567890", name: "Example company" }
         ],
-        detected_people: [
-          { full_name: "John Doe", pep: false, source: "EU Sanctions List 2019 (www.example.org/path-to-file) - 23/10/2019" },
-          { full_name: "Jane Doe", pep: false, source: "FN Sanctions List 2019 (www.other.org/path-to-file) - 21/10/2019" },
-          { full_name: "James Doe", pep: false, source: "EU Sanctions List 2019 (www.example.org/path-to-file) - 23/10/2019" },
-          { full_name: "Donald Trump", pep: true, source: "EU PEP List 2019 (www.example.org/path-to-file) - 22/10/2019" },
+        people: [
+          {
+            full_name: "John Doe",
+            source:
+              "EU Sanctions List 2019 (www.example.org/path-to-file) - 23/10/2019",
+            type: "sanction"
+          },
+          {
+            full_name: "Jane Doe",
+            source:
+              "FN Sanctions List 2019 (www.other.org/path-to-file) - 21/10/2019",
+            type: "sanction"
+          },
+          {
+            full_name: "James Doe",
+            source:
+              "EU Sanctions List 2019 (www.example.org/path-to-file) - 23/10/2019",
+            type: "sanction"
+          },
+          {
+            full_name: "Donald Trump",
+            source:
+              "EU PEP List 2019 (www.example.org/path-to-file) - 22/10/2019",
+            type: "pep"
+          },
+          { full_name: "John Doe", type: "ok" },
+          { full_name: "Jane Doe", type: "ok" },
+          { full_name: "James Doe", type: "ok" },
+          { full_name: "Donald Trump", type: "ok" }
         ]
       }
     };
@@ -87,16 +148,16 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-  .text-large {
-    display: inline-block;
-    font-size: 18px;
-    margin-bottom: 6px;
-  }
+.text-large {
+  display: inline-block;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
 
-  .el-card p {
-    margin: 0;
-    color: #777779;
-  }
+.el-card p {
+  margin: 0;
+  color: #777779;
+}
 
 ul {
   list-style-type: none;
