@@ -9,11 +9,13 @@ const cvrApi = axios.create({
   timeout: 200000,
   headers: {
     "Content-Type": "application/json"
-  },
-  auth: {
-    username: process.env.CVR_USER,
-    password: process.env.CVR_PASS
   }
+});
+
+cvrApi.interceptors.request.use(function(config) {
+  config.headers.Authorization = process.env.CVR_AUTH_TOKEN;
+
+  return config;
 });
 
 const query = {
