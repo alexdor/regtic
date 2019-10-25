@@ -1,9 +1,7 @@
 import os
 import uuid
-from enum import Enum
-
-import yaml
-from sqlalchemy import Column, String, create_engine, inspect
+import enum
+from sqlalchemy import Column, String, create_engine, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -26,7 +24,7 @@ Session = sessionmaker(db)
 base.metadata.create_all(db)
 
 
-class BAD_PERSON_TYPE(Enum):
+class BAD_PERSON_TYPE(enum.Enum):
     PEP = "PEP"
     SANCTION = "SANCTION"
 
@@ -35,7 +33,7 @@ class BadPerson(base):
     __tablename__ = "bad_persons"
     id = Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid.uuid4)
     full_name = Column(String)
-    type = Column(String)
+    type = Column(Enum(BAD_PERSON_TYPE))
     source = Column(String)
     address = Column(String)
 
@@ -48,9 +46,9 @@ def push_bad_person(full_name, list_type, source, address):
     try:
         session.add(bad_person)
         session.commit()
-    except:
+    except Exception as err:
         session.rollback()
-        raise
+        raise err
     finally:
         session.close()
 
@@ -71,8 +69,9 @@ def update_df(df, list_type):
             session.add(bad_person_obj)
 
         session.commit()
-    except:
+    except Exception as err:
         session.rollback()
+        raise err
     finally:
         session.close()
 
@@ -87,8 +86,9 @@ def read_bad_persons(list_type=None):
         else:
             bad_persons = session.query(BadPerson)
         session.commit()
-    except:
+    except Exception as err:
         session.rollback()
+        raise err
     finally:
         session.close()
 
@@ -103,8 +103,9 @@ def delete_bad_person(bad_person):
     try:
         session.delete(bad_person)
         session.commit()
-    except:
+    except Exception as err:
         session.rollback()
+        raise err
     finally:
         session.close()
 
@@ -130,7 +131,8 @@ def delete_all_bad_persons(list_type=None):
 
         for bad_person in bad_persons:
             session.delete(bad_person)
-    except:
+    except Exception as err:
         session.rollback()
+        raise err
     finally:
         session.close()
