@@ -41,7 +41,7 @@ environment:
   NODE_ENV: ${self:custom.enviroment}
   REGTIC_DATABASE_URL: ${self:custom.dbURL}
   SANCTIONS_LIST: ${self:custom.sanctionURL}
-
+  
 functions:
   pepworker:
     environment:
@@ -69,6 +69,7 @@ functions:
     package:
       include:
         - workers/pythondbtools
+
 # you can overwrite defaults here
 #  stage: dev
 #  region: us-east-1

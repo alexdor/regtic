@@ -6,7 +6,7 @@ const config = yml.parse(file);
 module.exports = {
   development: {
     client: "pg",
-    connection: (config.environment || {}).REGTIC_DATABASE_URL,
+    connection: process.env.REGTIC_DATABASE_URL || (config.custom || {}).dbURL,
     migrations: {
       directory: "migrations"
     },
