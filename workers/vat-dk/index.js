@@ -67,6 +67,7 @@ async function parseAndSaveResponse(responseData) {
       if (!company) return;
       await dbHelper.insertDataTransactionally(company);
     } catch (error) {
+      // TODO: Maybe use sentry here...
       console.log(error);
     }
   });
