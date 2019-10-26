@@ -9,6 +9,7 @@ service: regtic-main-service
 environment:
   NODE_ENV: development
   REGTIC_DATABASE_URL: postgres://admin:admin@localhost:5432/regtic
+  SANCTIONS_LIST: https://webgate.ec.europa.eu/europeaid/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content?token=n002wvni
 
 # Welcome to Serverless!
 #
@@ -75,12 +76,16 @@ functions:
           path: hellopython
     handler: workers/python-worker.hello
   sanctionworker:
-    runtime: python3.6
+    runtime: python3.7
     events:
       - http:
           method: get
           path: sanctionworker
-    handler: workers/sanctionworker.py
+    module: sanctionworker
+    handler: workers/sanctionworker/sanctionworker.run
+    package:
+      include:
+        - workers/pythondbtools
   hellonode:
     runtime: nodejs10.x
     events:
