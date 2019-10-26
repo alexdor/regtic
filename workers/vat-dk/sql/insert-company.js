@@ -1,3 +1,4 @@
+module.exports = `
 INSERT INTO
   companies(name, name_vector, address, vat, starting_date, country_code)
 VALUES
@@ -8,3 +9,4 @@ DO UPDATE SET
   vat = $3
 RETURNING
   id
+`;

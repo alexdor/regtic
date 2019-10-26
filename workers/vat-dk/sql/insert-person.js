@@ -1,3 +1,4 @@
+module.exports = `
 INSERT INTO
   persons (first_name, last_name, country_code)
 VALUES
@@ -10,3 +11,4 @@ DO UPDATE SET
   country_code = $3
 RETURNING
   id
+`;

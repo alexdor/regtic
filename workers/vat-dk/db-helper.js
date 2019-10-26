@@ -3,20 +3,14 @@ const fs = require("fs");
 const path = require("path");
 const { Pool } = require("pg");
 
+const insertCompanyQuery = require("./sql/insert-company");
+const insertPersonQuery = require("./sql/insert-person");
+const insertCompanyToPersonQuery = require("./sql/insert-company-to-person");
+const insertCompanyToCompanyQuery = require("./sql/insert-company-to-company");
+
 const pool = new Pool({
   connectionString: process.env.REGTIC_DATABASE_URL
 });
-
-// helper function to load external .sql files
-function sql(file) {
-  const fullPath = path.join(__dirname, "sql", file);
-  return fs.readFileSync(fullPath).toString();
-}
-
-const insertCompanyQuery = sql("insert-company.sql");
-const insertPersonQuery = sql("insert-person.sql");
-const insertCompanyToPersonQuery = sql("insert-company-to-person.sql");
-const insertCompanyToCompanyQuery = sql("insert-company-to-company.sql");
 
 // functions
 async function insertCompany(client, company) {
