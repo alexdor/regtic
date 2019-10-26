@@ -13,7 +13,7 @@ const pool = new Pool({
 });
 
 // functions
-async function insertCompany(client, company) {
+function insertCompany(client, company) {
   return client.query(insertCompanyQuery, [
     company.name,
     company.address,
@@ -23,7 +23,7 @@ async function insertCompany(client, company) {
   ]);
 }
 
-async function insertPerson(client, person) {
+function insertPerson(client, person) {
   return client.query(insertPersonQuery, [
     person.firstName,
     person.lastName,
@@ -31,15 +31,11 @@ async function insertPerson(client, person) {
   ]);
 }
 
-async function insertCompanyToPerson(client, companyId, personId) {
+function insertCompanyToPerson(client, companyId, personId) {
   return client.query(insertCompanyToPersonQuery, [companyId, personId]);
 }
 
-async function insertCompanyToCompany(
-  client,
-  motherCompanyId,
-  daugtherCompanyId
-) {
+function insertCompanyToCompany(client, motherCompanyId, daugtherCompanyId) {
   return client.query(insertCompanyToCompanyQuery, [
     motherCompanyId,
     daugtherCompanyId
