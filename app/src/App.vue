@@ -10,23 +10,25 @@
           :default-active="$route.path"
           :router="true"
         >
-          <img src="./assets/regtic-logo.svg" class="fit-to-width" />
-          <el-menu-item index="/"
-            ><i class="el-icon-menu"></i>Dashboard</el-menu-item
-          >
-          <el-menu-item index="/watchlist"
-            ><i class="el-icon-star-on"></i>Watchlist</el-menu-item
-          >
-          <el-menu-item index="not-added-yet"
-            ><i class="el-icon-s-finance"></i>Subscription</el-menu-item
-          >
+          <img
+            src="./assets/regtic-logo.svg"
+            class="fit-to-width"
+            alt="regtic logo"
+          />
+          <el-menu-item index="/">
+            <i class="el-icon-menu" aria-hidden="true"></i>Dashboard
+          </el-menu-item>
+          <el-menu-item index="/watchlist">
+            <i class="el-icon-star-on" aria-hidden="true"></i>Watchlist
+          </el-menu-item>
+          <el-menu-item index="not-added-yet">
+            <i class="el-icon-s-finance" aria-hidden="true"></i>Subscription
+          </el-menu-item>
         </el-menu>
       </el-aside>
       <el-container>
         <router-view></router-view>
-        <el-footer class="align-center">
-          Copyright © Regtic 2019
-        </el-footer>
+        <el-footer class="align-center">Copyright © Regtic 2019</el-footer>
       </el-container>
     </el-container>
   </div>
@@ -114,5 +116,7 @@ body {
   background-color: #fafafa;
   display: inline-table;
   min-height: calc(100% - 60px);
+  /* FIXME: this is a dirty fix and should be fixed properly in the feature */
+  width: 100%;
 }
 </style>
