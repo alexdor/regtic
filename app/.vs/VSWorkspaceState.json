@@ -1,12 +1,5 @@
 {
-  "ExpandedNodes": [
-    "",
-    "\\src",
-    "\\src\\assets",
-    "\\src\\components",
-    "\\src\\plugins",
-    "\\src\\views"
-  ],
-  "SelectedNode": "\\src\\components\\Topbar.vue",
+  "ExpandedNodes": ["", "\\src", "\\src\\components", "\\src\\views"],
+  "SelectedNode": "\\src\\router.ts",
   "PreviewInSolutionExplorer": false
 }

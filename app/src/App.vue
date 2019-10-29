@@ -46,7 +46,8 @@ export default {
   color: #2c3e50;
 }
 #app,
-.el-popper {
+.el-popper,
+.el-tooltip__popper {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
 }
 html,
@@ -105,5 +106,13 @@ body {
 }
 .el-footer {
   line-height: 60px;
+}
+.el-container {
+  overflow-y: auto;
+}
+.full-height {
+  background-color: #fafafa;
+  display: inline-table;
+  min-height: calc(100% - 60px);
 }
 </style>
