@@ -85,7 +85,7 @@ functions:
     handler: workers/vat-dk/index.scrollAndParse
     module: workers/vat-dk
     environment:
-      CVR_BASE_URL: ${env:CVR_BASE_URL, "https://shared-cvr.herokuapp.com/""}
+      CVR_BASE_URL: ${env:CVR_BASE_URL, "https://shared-cvr.herokuapp.com/"}
       CVR_AUTH_TOKEN: ${env:CVR_SECRET}
       REGTIC_DATABASE_URL: ${self:custom.dbURL}
 #
