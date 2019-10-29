@@ -8,8 +8,8 @@ exports.up = function(knex) {
 
 exports.down = function(knex) {
   return knex.schema.raw(`
-    DROP TYPE IF EXISTS COMPANY_STATUS;
     ALTER TABLE companies DROP COLUMN IF EXISTS status;
-     ALTER TABLE companies DROP COLUMN IF EXISTS status_notes;
+    ALTER TABLE companies DROP COLUMN IF EXISTS status_notes;
+    DROP TYPE IF EXISTS COMPANY_STATUS;
   `);
 };
