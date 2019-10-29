@@ -76,7 +76,7 @@ async function parseAndSaveResponse(responseData) {
 module.exports.scrollAndParse = async (event, context) => {
   try {
     const scrollRequestResponse = await scrollRequest({
-      scrollId: JSON.parse(event.body).scrollId
+      scrollId: (JSON.parse(event.body) || {}).scrollId
     });
 
     const data = scrollRequestResponse.data || {};
@@ -94,10 +94,14 @@ module.exports.scrollAndParse = async (event, context) => {
       })
     };
   } catch (error) {
+    console.error(error);
     // TODO: Use sentry here and don't retun the error to the consumer
     return {
       statusCode: 500,
-      body: JSON.stringify({ error, message: "unexpected_failure" })
+      body: JSON.stringify({
+        error: error.message,
+        message: "unexpected_failure"
+      })
     };
   }
 };

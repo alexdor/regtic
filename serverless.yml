@@ -1,17 +1,14 @@
-# For full config options, check the docs:
-#    docs.serverless.com
+# For full config options, check the docs: docs.serverless.com
 
 service: regtic-main-service
 # app and org for use with dashboard.serverless.com
 # app: regtic-app
 # org: regtic
-# app and org for use with dashboard.serverless.com
-#app: regtic-test-app
-#org: regtic
 
 provider:
   name: aws
   runtime: nodejs10.x
+  region: eu-north-1
 
 package:
   individually: true
@@ -20,9 +17,9 @@ plugins:
   - serverless-offline
   - serverless-python-requirements
 custom:
-  dbURL: postgres://admin:admin@localhost:5432/regtic
-  sanctionURL: https://webgate.ec.europa.eu/europeaid/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content?token=n002wvni
-  environment: development
+  version: /v1/
+  REGTIC_DATABASE_URL: ${env:REGTIC_DATABASE_URL, "postgres://admin:admin@localhost:5432/regtic"}
+  ENVIRONMENT: ${env:ENVIRONMENT, "development"}
   pythonRequirements:
     dockerizePip: true
     zip: true
@@ -38,67 +35,66 @@ custom:
     staticCacheMaxVersions: 10
 
 environment:
-  NODE_ENV: ${self:custom.enviroment}
-  REGTIC_DATABASE_URL: ${self:custom.dbURL}
-  SANCTIONS_LIST: ${self:custom.sanctionURL}
-  
+  ENVIRONMENT: ${self:custom.ENVIRONMENT}
+  NODE_ENV: ${self:custom.ENVIRONMENT}
+  REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
+
 functions:
+  #####
+  # Pep worker
+  #####
   pepworker:
-    environment:
-      REGTIC_DATABASE_URL: ${self:custom.dbURL}
     runtime: python3.7
     events:
       - http:
           method: get
-          path: pepworker
+          path: ${self:custom.version}pepworker
     handler: workers/pepworker/pepworker.run
     module: workers/pepworker
     package:
       include:
         - workers/pythondbtools
-  sanctionworker:
     environment:
-      SANCTIONS_LIST: ${self:custom.sanctionURL}
+      ENVIRONMENT: ${self:custom.ENVIRONMENT}
+      REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
+
+  #####
+  # Sanction worker
+  #####
+  sanctionworker:
     runtime: python3.7
     events:
       - http:
           method: get
-          path: sanctionworker
+          path: ${self:custom.version}sanctionworker
     handler: workers/sanctionworker/sanctionworker.run
     module: workers/sanctionworker
     package:
       include:
         - workers/pythondbtools
-  hellopython:
-    runtime: python3.6
-    events:
-      - http:
-          method: get
-          path: hellopython
-    handler: workers/python-worker.hello
-  hellonode:
-    runtime: nodejs10.x
-    events:
-      - http:
-          method: get
-          path: hellonode
-    handler: workers/nodejs-worker.hello
+    environment:
+      ENVIRONMENT: ${self:custom.ENVIRONMENT}
+      REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
+      SANCTIONS_LIST: https://webgate.ec.europa.eu/europeaid/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content?token=n002wvni
+
+  #####
+  # CVR worker
+  #####
   cvr-parse:
     runtime: nodejs10.x
     events:
       - http:
           method: post
-          path: cvr-parse
+          path: ${self:custom.version}cvr-parse
     handler: workers/vat-dk/index.scrollAndParse
+    module: workers/vat-dk
     environment:
-      CVR_BASE_URL: https://shared-cvr.herokuapp.com/
-      CVR_AUTH_TOKEN: null
-      REGTIC_DATABASE_URL: postgres://admin:admin@localhost:5432/regtic
-
-# you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
-
+      ENVIRONMENT: ${self:custom.ENVIRONMENT}
+      NODE_ENV: ${self:custom.ENVIRONMENT}
+      REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
+      CVR_BASE_URL: ${env:CVR_BASE_URL, "https://shared-cvr.herokuapp.com/"}
+      CVR_AUTH_TOKEN: ${env:CVR_AUTH_TOKEN}
+#
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
 #    - Effect: "Allow"
