@@ -61,14 +61,13 @@ function parse(hit) {
 
   const company = parseCompany(entry);
 
-  const isEntryValid = entry.deltagerRelation;
+  const isEntryValid = !!entry.deltagerRelation;
   if (!isEntryValid) return;
 
   entry.deltagerRelation.forEach(entity => {
     const hasDeltager = !!entity.deltager;
     const hasType = hasDeltager && entity.deltager.enhedstype;
-    const entityIsValid = hasDeltager && hasType;
-    if (!entityIsValid) return;
+    if (!hasType) return;
 
     const isPerson = entity.deltager.enhedstype === "PERSON";
     const isCompany = entity.deltager.enhedstype === "VIRKSOMHED";
