@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "npm run is-docker-running && concurrently --kill-others --prefix \"[{name}]\" --names \"docker,serverless,app\" --prefix-colors \"dim,blue,magenta\" \"npm run start-docker\" \"npm run start-serverless\" \"npm run start-app\"",
+    "start": "npm run is-docker-running && concurrently --kill-others --prefix \"[{name}]\" --names \"docker,serverless,app\" --prefix-colors \"dim,blue,magenta\" \"npm run start-docker\" \"npm run start-serverless\"",
+    "start-full": "npm run is-docker-running && concurrently --kill-others --prefix \"[{name}]\" --names \"docker,serverless,app\" --prefix-colors \"dim,blue,magenta\" \"npm run start-docker\" \"npm run start-serverless\" \"npm run start-app\"",
     "start-app": "cd app && npm run serve",
     "start-docker": "docker-compose up",
     "start-serverless": "serverless offline --noTimeout",
