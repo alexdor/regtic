@@ -66,7 +66,7 @@ function parse(hit) {
 
   entry.deltagerRelation.forEach(entity => {
     const hasDeltager = !!entity.deltager;
-    const hasType = hasDeltager ? !!entity.deltager.enhedstype : false;
+    const hasType = hasDeltager && entity.deltager.enhedstype;
     const entityIsValid = hasDeltager && hasType;
     if (!entityIsValid) return;
 
