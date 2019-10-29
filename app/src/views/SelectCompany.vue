@@ -4,7 +4,7 @@
     <el-main>
       <div>
         <h1>{{ name }}</h1>
-        <el-card v-for="company in results" v-bind:key="company">
+        <el-card v-for="company in results" v-bind:key="company.id">
           <span class="text-large">{{ company.name }}</span>
           <router-link :to="'/check/' + company.id">
             <el-button class="right-button" type="primary" icon="el-icon-check"
