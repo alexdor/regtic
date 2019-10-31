@@ -13,7 +13,7 @@
             class="item"
           >
             <el-dropdown trigger="click">
-              <i class="el-icon-bell el-dropdown-link"></i>
+              <i class="el-icon-bell el-dropdown-link" aria-hidden="true"></i>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item
                   v-for="msg in notifications"
@@ -28,7 +28,7 @@
               </el-dropdown-menu>
             </el-dropdown>
           </el-badge>
-          <i class="el-icon-bell" v-else></i>
+          <i class="el-icon-bell" v-else aria-hidden="true"></i>
           <el-divider direction="vertical"></el-divider>
           <el-dropdown trigger="click">
             <el-avatar
@@ -38,10 +38,10 @@
               src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
             ></el-avatar>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item icon="el-icon-s-tools"
+              <el-dropdown-item icon="el-icon-s-tools" aria-hidden="true"
                 >Settings</el-dropdown-item
               >
-              <el-dropdown-item icon="el-icon-s-home">Log out</el-dropdown-item>
+              <el-dropdown-item icon="el-icon-s-home" aria-hidden="true">Log out</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
