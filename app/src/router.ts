@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
-import CheckCompany from "./views/CheckCompany.vue";
+import CheckCompany from "@/views/CheckCompany.vue";
 
 Vue.use(Router);
 
@@ -16,29 +16,17 @@ export default new Router({
     {
       path: "/select-company/:name",
       name: "select-company",
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () =>
-        import(/* webpackChunkName: "selectCompany" */ "./views/SelectCompany.vue")
+      component: () => import("./views/SelectCompany.vue")
     },
     {
       path: "/check/:id",
       name: "check",
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () =>
-        import(/* webpackChunkName: "checkResult" */ "./views/CheckResult.vue")
+      component: () => import("./views/CheckResult.vue")
     },
     {
       path: "/watchlist",
       name: "watchlist",
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () =>
-        import(/* webpackChunkName: "watchlist" */ "./views/Watchlist.vue")
+      component: () => import("./views/Watchlist.vue")
     }
   ]
 });
