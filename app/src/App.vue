@@ -13,10 +13,10 @@
           <img class="logo" src="./assets/regtic-logo.png" alt="Regtic" />
           <div class="menu-divider" />
           <el-menu-item divided index="/">
-            <i class="el-icon-menu" aria-hidden="true"></i>Dashboard
+            <i class="el-icon-search" aria-hidden="true" />Search
           </el-menu-item>
           <el-menu-item index="/watchlist">
-            <i class="el-icon-star-on" aria-hidden="true"></i>Watchlist
+            <i class="el-icon-tickets" aria-hidden="true"></i>Watchlist
           </el-menu-item>
           <el-menu-item index="not-added-yet">
             <i class="el-icon-s-finance" aria-hidden="true"></i>Subscription
