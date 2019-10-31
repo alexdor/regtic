@@ -4,18 +4,15 @@
       <el-aside>
         <el-menu
           class="el-menu-vertical-demo"
-          background-color="#545c64"
-          text-color="#fff"
-          active-text-color="#409eff"
+          background-color="#345bcc"
+          text-color="rgba(255,255,255,.4)"
+          active-text-color="#fff"
           :default-active="$route.path"
           :router="true"
         >
-          <img
-            src="./assets/regtic-logo.svg"
-            class="fit-to-width"
-            alt="Regtic"
-          />
-          <el-menu-item index="/">
+          <img class="logo" src="./assets/regtic-logo.png" alt="Regtic" />
+          <div class="menu-divider" />
+          <el-menu-item divided index="/">
             <i class="el-icon-menu" aria-hidden="true"></i>Dashboard
           </el-menu-item>
           <el-menu-item index="/watchlist">
@@ -75,6 +72,9 @@ body {
   width: calc(100% - 60px);
   padding: 0 30px;
 }
+.el-aside {
+  width: 250px !important;
+}
 .el-main {
   background-color: #fafafa;
   box-shadow: inset 0 2px 6px -5px;
@@ -90,6 +90,14 @@ body {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+.el-menu-item:hover,
+.el-menu-item:focus {
+  color: #fff !important;
+  background-color: #345bcc !important;
+}
+.el-menu-item i {
+  color: inherit !important;
 }
 .align-center {
   text-align: center;
@@ -125,5 +133,23 @@ body {
   min-height: calc(100% - 60px);
   /* FIXME: this is a dirty fix and should be fixed properly in the feature */
   width: 100%;
+}
+.logo {
+  padding-top: 20px;
+  width: 150px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+.menu-divider {
+  display: block;
+  height: 1.5px;
+  width: 85%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: rgba(255, 255, 255, 0.3);
+  position: relative;
 }
 </style>
