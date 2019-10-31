@@ -17,14 +17,6 @@
             class="inline-input full-with"
             placeholder="Company name or CVR"
           ></el-input>
-          <!--<el-autocomplete
-      class="inline-input full-width"
-      v-model="state"
-      :fetch-suggestions="querySearchCompany"
-      placeholder="Company name or CVR"
-      :trigger-on-focus="false"
-      @select="handleSelect"
-    ></el-autocomplete>-->
         </div>
         <div class="vertical-spacing">
           <el-button
@@ -52,44 +44,9 @@ import Topbar from "@/components/Topbar.vue"; // @ is an alias to /src
 export default class Home extends Vue {
   data() {
     return {
-      //links: [],
       state: ""
     };
-  } /*,
-  methods: {
-    querySearchCompany(queryString, cb) {
-      var links = this.links;
-      var results = queryString
-        ? links.filter(this.createFilter(queryString))
-        : links;
-      // call callback function to return suggestions
-      cb(results);
-    },
-    createFilter(queryString) {
-      return link => {
-        return (
-          link.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-        );
-      };
-    },
-    loadAll() {
-      return [
-        { value: "vue", link: "https://github.com/vuejs/vue" },
-        { value: "element", link: "https://github.com/ElemeFE/element" },
-        { value: "cooking", link: "https://github.com/ElemeFE/cooking" },
-        { value: "mint-ui", link: "https://github.com/ElemeFE/mint-ui" },
-        { value: "vuex", link: "https://github.com/vuejs/vuex" },
-        { value: "vue-router", link: "https://github.com/vuejs/vue-router" },
-        { value: "babel", link: "https://github.com/babel/babel" }
-      ];
-    },
-    handleSelect(item) {
-      console.log(item);
-    }
-  },
-  mounted() {
-    this.links = this.loadAll();
-  }*/
+  }
 }
 </script>
 
