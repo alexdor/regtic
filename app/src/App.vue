@@ -13,7 +13,7 @@
           <img
             src="./assets/regtic-logo.svg"
             class="fit-to-width"
-            alt="regtic logo"
+            alt="Regtic"
           />
           <el-menu-item index="/">
             <i class="el-icon-menu" aria-hidden="true"></i>Dashboard
