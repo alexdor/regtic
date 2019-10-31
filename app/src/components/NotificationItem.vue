@@ -1,6 +1,6 @@
 <template>
   <el-row>
-    <el-col :span="3" class="center-icon">
+    <el-col :span="3" class="center-icon" :aria-label="data.type" :title="data.type">
       <i
         :class="
           'el-notification-icon el-icon-' +

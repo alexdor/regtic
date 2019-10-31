@@ -5,7 +5,7 @@
       <div class="col-center">
         <img
           src="../assets/undraw_detailed_analysis.svg"
-          alt=""
+          alt="Analysis illustration"
           class="fit-to-width"
         />
         <p class="justify-center">

@@ -2,19 +2,15 @@
   <div id="app">
     <el-container>
       <el-aside>
-        <el-menu
-          class="el-menu-vertical-demo"
-          background-color="#545c64"
-          text-color="#fff"
-          active-text-color="#409eff"
-          :default-active="$route.path"
-          :router="true"
-        >
-          <img
-            src="./assets/regtic-logo.svg"
-            class="fit-to-width"
-            alt="Regtic"
-          />
+        <el-menu class="el-menu-vertical-demo"
+                 background-color="#545c64"
+                 text-color="#fff"
+                 active-text-color="#409eff"
+                 :default-active="$route.path"
+                 :router="true">
+          <img src="./assets/regtic-logo.svg"
+               class="fit-to-width"
+               alt="Regtic logo" />
           <el-menu-item index="/">
             <i class="el-icon-menu" aria-hidden="true"></i>Dashboard
           </el-menu-item>
@@ -23,6 +19,9 @@
           </el-menu-item>
           <el-menu-item index="not-added-yet">
             <i class="el-icon-s-finance" aria-hidden="true"></i>Subscription
+          </el-menu-item>
+          <el-menu-item index="/about">
+            <i class="el-icon-info" aria-hidden="true"></i>About
           </el-menu-item>
         </el-menu>
       </el-aside>
