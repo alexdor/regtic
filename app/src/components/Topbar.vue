@@ -1,10 +1,7 @@
 <template>
   <el-header>
     <el-row>
-      <el-col :span="12">
-        <el-page-header @back="goBack" :content="title"></el-page-header>
-      </el-col>
-      <el-col :span="12" class="align-right">
+      <el-col :span="24" class="align-right">
         <div class="vertical-center">
           <el-badge
             v-if="notifications.length > 0"
@@ -41,7 +38,9 @@
               <el-dropdown-item icon="el-icon-s-tools" aria-hidden="true"
                 >Settings</el-dropdown-item
               >
-              <el-dropdown-item icon="el-icon-s-home" aria-hidden="true">Log out</el-dropdown-item>
+              <el-dropdown-item icon="el-icon-s-home" aria-hidden="true"
+                >Log out</el-dropdown-item
+              >
             </el-dropdown-menu>
           </el-dropdown>
         </div>
