@@ -11,17 +11,18 @@
       </p>
       <div class="vertical-spacing">
         <el-input
-          v-model="state"
+          v-model="searchStr"
           class="inline-input full-with"
           placeholder="Company name or CVR"
+          @keyup.native.enter="search()"
         ></el-input>
       </div>
       <div class="vertical-spacing">
         <el-button
           type="primary"
           class="full-width"
-          :disabled="state.length == 0"
-          @click.native="$router.push('/select-company/' + state)"
+          :disabled="!isSearchStrValid"
+          @click.native="search()"
           >Search</el-button
         >
       </div>
@@ -39,10 +40,16 @@ import Topbar from "@/components/Topbar.vue"; // @ is an alias to /src
   }
 })
 export default class Home extends Vue {
-  data() {
-    return {
-      state: ""
-    };
+  searchStr: string = "";
+
+  search(): void {
+    if (!this.isSearchStrValid) return;
+
+    this.$router.push(`/select-company/${this.searchStr}`);
+  }
+
+  get isSearchStrValid(): boolean {
+    return this.searchStr.length > 0;
   }
 }
 </script>
