@@ -20,7 +20,7 @@ export default new Router({
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () =>
-        import(/* webpackChunkName: "about" */ "./views/SelectCompany.vue")
+        import(/* webpackChunkName: "selectCompany" */ "./views/SelectCompany.vue")
     },
     {
       path: "/check/:id",
@@ -29,7 +29,7 @@ export default new Router({
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () =>
-        import(/* webpackChunkName: "about" */ "./views/CheckResult.vue")
+        import(/* webpackChunkName: "checkResult" */ "./views/CheckResult.vue")
     },
     {
       path: "/watchlist",
@@ -38,7 +38,7 @@ export default new Router({
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () =>
-        import(/* webpackChunkName: "about" */ "./views/Watchlist.vue")
+        import(/* webpackChunkName: "watchlist" */ "./views/Watchlist.vue")
     }
   ]
 });
