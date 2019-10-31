@@ -1,23 +1,18 @@
 <template>
   <div class="full-height">
-    <Topbar title="Select company" />
-    <el-main>
-      <div>
-        <h1>{{ name }}</h1>
-        <el-card v-for="company in results" v-bind:key="company.id">
-          <span class="text-large">{{ company.name }}</span>
-          <router-link :to="'/check/' + company.id">
-            <el-button class="right-button" type="primary" icon="el-icon-check"
-              >Check</el-button
-            >
-          </router-link>
-          <div class="body">
-            <p>{{ company.address }}</p>
-            <p>{{ company.vat }}</p>
-          </div>
-        </el-card>
+    <h1>{{ name }}</h1>
+    <el-card v-for="company in results" v-bind:key="company.id">
+      <span class="text-large">{{ company.name }}</span>
+      <router-link :to="'/check/' + company.id">
+        <el-button class="right-button" type="primary" icon="el-icon-check"
+          >Check</el-button
+        >
+      </router-link>
+      <div class="body">
+        <p>{{ company.address }}</p>
+        <p>{{ company.vat }}</p>
       </div>
-    </el-main>
+    </el-card>
   </div>
 </template>
 

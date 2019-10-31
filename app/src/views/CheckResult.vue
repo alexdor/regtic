@@ -1,100 +1,95 @@
 <template>
   <div class="full-height">
-    <Topbar :title="name" />
-    <el-main>
-      <div>
-        <el-row>
-          <el-col :span="18"><h1>Overview</h1></el-col>
-          <el-col :span="6" align="right">
-            <el-button type="info" icon="el-icon-collection-tag"
-              >Add to watchlist</el-button
+    <el-row>
+      <el-col :span="18"><h1>Overview</h1></el-col>
+      <el-col :span="6" align="right">
+        <el-button type="info" icon="el-icon-collection-tag"
+          >Add to watchlist</el-button
+        >
+        <el-button type="primary" icon="el-icon-download"
+          >Generate report</el-button
+        >
+      </el-col>
+    </el-row>
+    <el-row>
+      <el-col :span="12">
+        <el-card>
+          <div slot="header" class="clearfix">
+            <span>People</span>
+          </div>
+          <el-table
+            class="full-width"
+            :data="result.people"
+            :default-sort="{ prop: 'type', order: 'descending' }"
+          >
+            <el-table-column prop="full_name" label="Name" sortable>
+            </el-table-column>
+            <el-table-column
+              prop="type"
+              label="Status"
+              sortable
+              width="100"
+              align="center"
             >
-            <el-button type="primary" icon="el-icon-download"
-              >Generate report</el-button
-            >
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-card>
-              <div slot="header" class="clearfix">
-                <span>People</span>
-              </div>
-              <el-table
-                class="full-width"
-                :data="result.people"
-                :default-sort="{ prop: 'type', order: 'descending' }"
-              >
-                <el-table-column prop="full_name" label="Name" sortable>
-                </el-table-column>
-                <el-table-column
-                  prop="type"
-                  label="Status"
-                  sortable
-                  width="100"
-                  align="center"
+              <template slot-scope="scope">
+                <el-tooltip
+                  v-if="scope.row.type == 'pep'"
+                  class="item"
+                  :content="scope.row.source"
+                  placement="top"
+                  effect="dark"
                 >
-                  <template slot-scope="scope">
-                    <el-tooltip
-                      v-if="scope.row.type == 'pep'"
-                      class="item"
-                      :content="scope.row.source"
-                      placement="top"
-                      effect="dark"
-                    >
-                      <el-button
-                        circle
-                        size="mini"
-                        icon="el-icon-link"
-                        type="warning"
-                      ></el-button>
-                    </el-tooltip>
-                    <el-tooltip
-                      v-else-if="scope.row.type == 'sanction'"
-                      class="item"
-                      :content="scope.row.source"
-                      placement="top"
-                      effect="dark"
-                    >
-                      <el-button
-                        circle
-                        size="mini"
-                        icon="el-icon-link"
-                        type="danger"
-                      ></el-button>
-                    </el-tooltip>
-                    <el-button
-                      v-else
-                      circle
-                      size="mini"
-                      icon="el-icon-check"
-                      type="success"
-                    ></el-button>
-                  </template>
-                </el-table-column>
-              </el-table>
-            </el-card>
-          </el-col>
-          <el-col :span="12">
-            <el-card>
-              <div slot="header" class="clearfix">
-                <span>Companies</span>
-              </div>
-              <el-table
-                class="full-width"
-                :data="result.companies"
-                :default-sort="{ prop: 'type', order: 'descending' }"
-              >
-                <el-table-column prop="vat" label="VAT" sortable width="120">
-                </el-table-column>
-                <el-table-column prop="name" label="Name" sortable>
-                </el-table-column>
-              </el-table>
-            </el-card>
-          </el-col>
-        </el-row>
-      </div>
-    </el-main>
+                  <el-button
+                    circle
+                    size="mini"
+                    icon="el-icon-link"
+                    type="warning"
+                  ></el-button>
+                </el-tooltip>
+                <el-tooltip
+                  v-else-if="scope.row.type == 'sanction'"
+                  class="item"
+                  :content="scope.row.source"
+                  placement="top"
+                  effect="dark"
+                >
+                  <el-button
+                    circle
+                    size="mini"
+                    icon="el-icon-link"
+                    type="danger"
+                  ></el-button>
+                </el-tooltip>
+                <el-button
+                  v-else
+                  circle
+                  size="mini"
+                  icon="el-icon-check"
+                  type="success"
+                ></el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card>
+          <div slot="header" class="clearfix">
+            <span>Companies</span>
+          </div>
+          <el-table
+            class="full-width"
+            :data="result.companies"
+            :default-sort="{ prop: 'type', order: 'descending' }"
+          >
+            <el-table-column prop="vat" label="VAT" sortable width="120">
+            </el-table-column>
+            <el-table-column prop="name" label="Name" sortable>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 

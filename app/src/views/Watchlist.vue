@@ -1,67 +1,62 @@
 <template>
   <div class="full-height">
-    <Topbar title="Watchlist" />
-    <el-main>
-      <div>
-        <el-row>
-          <el-col :span="18"><h1>Watchlist</h1></el-col>
-          <el-col :span="6" align="right">
-            <el-button type="primary" icon="el-icon-download"
-              >Generate report</el-button
-            >
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12" v-for="company in items" v-bind:key="company.id">
-            <el-card>
-              <span class="text-large">{{ company.name }}</span>
-              <el-popover
-                placement="top"
-                width="200"
-                trigger="click"
-                v-model="company.deleteVisible"
+    <el-row>
+      <el-col :span="18"><h1>Watchlist</h1></el-col>
+      <el-col :span="6" align="right">
+        <el-button type="primary" icon="el-icon-download"
+          >Generate report</el-button
+        >
+      </el-col>
+    </el-row>
+    <el-row>
+      <el-col :span="12" v-for="company in items" v-bind:key="company.id">
+        <el-card>
+          <span class="text-large">{{ company.name }}</span>
+          <el-popover
+            placement="top"
+            width="200"
+            trigger="click"
+            v-model="company.deleteVisible"
+          >
+            <p>Are you sure to delete this?</p>
+            <div style="text-align: right; margin: 0">
+              <el-button
+                size="mini"
+                type="text"
+                @click="company.deleteVisible = false"
+                >cancel</el-button
               >
-                <p>Are you sure to delete this?</p>
-                <div style="text-align: right; margin: 0">
-                  <el-button
-                    size="mini"
-                    type="text"
-                    @click="company.deleteVisible = false"
-                    >cancel</el-button
-                  >
-                  <el-button
-                    type="danger"
-                    size="mini"
-                    @click="company.deleteVisible = false"
-                    >confirm</el-button
-                  >
-                </div>
-                <el-button
-                  slot="reference"
-                  class="right-button btn-margin-left"
-                  type="danger"
-                  icon="el-icon-delete"
-                  circle
-                ></el-button>
-              </el-popover>
-              <router-link :to="'/check/' + company.id">
-                <el-button
-                  class="right-button"
-                  type="primary"
-                  icon="el-icon-check"
-                  round
-                  >Check</el-button
-                >
-              </router-link>
-              <div class="body">
-                <p>{{ company.address }}</p>
-                <p>{{ company.vat }}</p>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-      </div>
-    </el-main>
+              <el-button
+                type="danger"
+                size="mini"
+                @click="company.deleteVisible = false"
+                >confirm</el-button
+              >
+            </div>
+            <el-button
+              slot="reference"
+              class="right-button btn-margin-left"
+              type="danger"
+              icon="el-icon-delete"
+              circle
+            ></el-button>
+          </el-popover>
+          <router-link :to="'/check/' + company.id">
+            <el-button
+              class="right-button"
+              type="primary"
+              icon="el-icon-check"
+              round
+              >Check</el-button
+            >
+          </router-link>
+          <div class="body">
+            <p>{{ company.address }}</p>
+            <p>{{ company.vat }}</p>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 

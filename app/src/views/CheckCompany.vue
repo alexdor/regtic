@@ -1,34 +1,31 @@
 <template>
   <div class="full-height">
-    <Topbar title="Check company" />
-    <el-main>
-      <div class="col-center">
-        <img
-          src="../assets/undraw_detailed_analysis.svg"
-          alt=""
-          class="fit-to-width"
-        />
-        <p class="justify-center">
-          Check your company relations with a click of a button. Simple, easy.
-        </p>
-        <div class="vertical-spacing">
-          <el-input
-            v-model="state"
-            class="inline-input full-with"
-            placeholder="Company name or CVR"
-          ></el-input>
-        </div>
-        <div class="vertical-spacing">
-          <el-button
-            type="primary"
-            class="full-width"
-            :disabled="state.length == 0"
-            @click.native="$router.push('/select-company/' + state)"
-            >Search</el-button
-          >
-        </div>
+    <div class="col-center">
+      <img
+        src="../assets/undraw_detailed_analysis.svg"
+        alt=""
+        class="fit-to-width"
+      />
+      <p class="justify-center">
+        Check your company relations with a click of a button. Simple, easy.
+      </p>
+      <div class="vertical-spacing">
+        <el-input
+          v-model="state"
+          class="inline-input full-with"
+          placeholder="Company name or CVR"
+        ></el-input>
       </div>
-    </el-main>
+      <div class="vertical-spacing">
+        <el-button
+          type="primary"
+          class="full-width"
+          :disabled="state.length == 0"
+          @click.native="$router.push('/select-company/' + state)"
+          >Search</el-button
+        >
+      </div>
+    </div>
   </div>
 </template>
 

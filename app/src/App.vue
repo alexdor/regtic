@@ -27,7 +27,10 @@
         </el-menu>
       </el-aside>
       <el-container>
-        <router-view></router-view>
+        <Topbar title="Watchlist" />
+        <el-main>
+          <router-view />
+        </el-main>
         <el-footer class="align-center">Copyright © Regtic 2019</el-footer>
       </el-container>
     </el-container>
@@ -35,9 +38,13 @@
 </template>
 
 <script>
+import Topbar from "@/components/Topbar.vue"; // @ is an alias to /src
+
 export default {
   name: "app",
-  components: {}
+  components: {
+    Topbar
+  }
 };
 </script>
 
