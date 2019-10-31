@@ -67,12 +67,10 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-//import Watchlist from "@/components/Watchlist.vue"; // @ is an alias to /src
 import Topbar from "@/components/Topbar.vue"; // @ is an alias to /src
 
 @Component({
   components: {
-    //Watchlist,
     Topbar
   }
 })

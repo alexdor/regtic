@@ -100,12 +100,10 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-//import CheckResult from "@/components/CheckResult.vue"; // @ is an alias to /src
 import Topbar from "@/components/Topbar.vue"; // @ is an alias to /src
 
 @Component({
   components: {
-    //CheckResult,
     Topbar
   }
 })

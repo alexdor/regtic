@@ -5,6 +5,7 @@
       <div class="col-center">
         <img
           src="../assets/undraw_detailed_analysis.svg"
+          alt=""
           class="fit-to-width"
         />
         <p class="justify-center">
@@ -41,12 +42,10 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-//  import CheckCompany from "@/components/CheckCompany.vue"; // @ is an alias to /src
 import Topbar from "@/components/Topbar.vue"; // @ is an alias to /src
 
 @Component({
   components: {
-    //CheckCompany,
     Topbar
   }
 })

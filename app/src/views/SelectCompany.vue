@@ -23,12 +23,10 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import SelectCompany from "@/components/SelectCompany.vue"; // @ is an alias to /src
 import Topbar from "@/components/Topbar.vue"; // @ is an alias to /src
 
 @Component({
   components: {
-    SelectCompany,
     Topbar
   }
 })
