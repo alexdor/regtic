@@ -1,0 +1,23 @@
+[psql]
+  dbname = "regtic"
+  host   = "localhost"
+  port   = 5432
+  user   = "admin"
+  pass   = "admin"
+  schema = "public"
+  blacklist = ["knex_migrations", "knex_migrations_lock"]
+  sslmode = "disable"
+
+#
+#  [[aliases.tables.company_to_company.columns]]
+#    name = "mother_company"
+#    alias = "Mother"
+#  [[aliases.tables.company_to_company.columns]]
+#    name = "daughter_company"
+#    alias = "Daughter"
+#  [[aliases.tables.company_to_person.columns]]
+#    name = "person"
+#    alias = "Owner"
+#  [[aliases.tables.company_to_person.columns]]
+#    name = "company"
+#    alias = "Comp"

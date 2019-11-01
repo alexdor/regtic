@@ -4,10 +4,11 @@
   "main": "index.js",
   "scripts": {
     "start": "concurrently --kill-others --prefix \"[{name}]\" --names \"webapp,backend\" --prefix-colors \"black,blue\" \"npm run start:webapp\" \"npm run start:backend\"",
-    "start:backend": "npm run is-docker-running && concurrently --kill-others --prefix \"[{name}]\" --names \"db,serverless,app\" --prefix-colors \"dim,blue,magenta\" \"npm run start:db\" \"npm run start:serverless\"",
+    "start:backend": "npm run is-docker-running && concurrently --kill-others --prefix \"[{name}]\" --names \"db,serverless,api\" --prefix-colors \"dim,blue,magenta\" \"npm run start:db\" \"npm run start:serverless\" \" npm run start:api\"",
     "start:webapp": "cd app && npm run serve",
     "start:db": "docker-compose up",
-    "start:serverless": "serverless offline --noTimeout",
+    "start:serverless": "serverless offline --showDuration --noTimeout",
+    "start:api": "cd api && make build && sam local start-api -p 3030",
     "is-docker-running": "docker ps > /dev/null",
     "lint:js": "eslint --fix .",
     "lint:py": "black .",
@@ -21,7 +22,6 @@
   "license": "ISC",
   "dependencies": {
     "@typescript-eslint/parser": "^2.5.0",
-    "aws-sam-local": "^0.2.11",
     "concurrently": "^5.0.0",
     "serverless-iam-roles-per-function": "^2.0.2",
     "typescript": "^3.6.4"

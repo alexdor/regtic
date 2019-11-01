@@ -16,7 +16,7 @@ The system is using the serverless framework, and has the following structure
 
 ## Initial setup
 
-1. Install [Docker](https://www.docker.com/), [Docker Compose](https://docs.docker.com/compose/install/), [NodeJS](https://nodejs.org/en/download/), and [Serverless](https://serverless.com/)
+1. Install [Docker](https://www.docker.com/), [Docker Compose](https://docs.docker.com/compose/install/), [NodeJS](https://nodejs.org/en/download/), [Serverless](https://serverless.com/), [Sam local](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) and [GO](https://golang.org/dl/)
 
 2. `$ git clone git@github.com:alexdor/regtic.git`
 
