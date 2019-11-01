@@ -13,7 +13,7 @@
         <el-input
           v-model="searchStr"
           class="inline-input full-with"
-          placeholder="Company name or CVR"
+          placeholder="Enter company name"
           @keyup.native.enter="search()"
         />
       </div>
