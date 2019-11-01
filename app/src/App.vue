@@ -23,12 +23,12 @@
           </el-menu-item>
         </el-menu>
       </el-aside>
-      <el-container>
+      <el-container direction="vertical">
         <Topbar title="Watchlist" />
         <el-main>
           <router-view />
+          <Footer />
         </el-main>
-        <el-footer class="align-center">Copyright © Regtic 2019</el-footer>
       </el-container>
     </el-container>
   </div>
@@ -36,10 +36,12 @@
 
 <script>
 import Topbar from "@/components/Topbar.vue"; // @ is an alias to /src
+import Footer from "@/components/Footer.vue"; // @ is an alias to /src
 
 export default {
   name: "app",
   components: {
+    Footer,
     Topbar
   }
 };
