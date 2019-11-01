@@ -1,7 +1,11 @@
 <template>
   <div class="full-height">
-    <h1>{{ name }}</h1>
-    <el-card v-for="company in results" v-bind:key="company.id">
+    <SearchInput :initialSearchStr="$route.params.name" />
+    <el-card
+      class="vertical-spacing"
+      v-for="company in results"
+      :key="company.id"
+    >
       <span class="text-large">{{ company.name }}</span>
       <router-link :to="'/check/' + company.id">
         <el-button class="right-button" type="primary" icon="el-icon-check"
@@ -18,8 +22,13 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import SearchInput from "@/components/SearchInput.vue";
 
-@Component({})
+@Component({
+  components: {
+    SearchInput
+  }
+})
 export default class Home extends Vue {
   data() {
     return {
@@ -129,5 +138,9 @@ a {
 
 .clearfix:after {
   clear: both;
+}
+
+.vertical-spacing {
+  margin: 20px 0;
 }
 </style>
