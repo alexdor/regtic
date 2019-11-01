@@ -15,7 +15,7 @@
           class="inline-input full-with"
           placeholder="Company name or CVR"
           @keyup.native.enter="search()"
-        ></el-input>
+        />
       </div>
       <div class="vertical-spacing">
         <el-button
@@ -23,8 +23,9 @@
           class="full-width"
           :disabled="!isSearchStrValid"
           @click.native="search()"
-          >Search</el-button
         >
+          Search
+        </el-button>
       </div>
     </div>
   </div>
@@ -49,7 +50,6 @@ export default class Home extends Vue {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 h3 {
   margin: 40px 0 0;
