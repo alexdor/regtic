@@ -1,0 +1,92 @@
+<template>
+  <div class="searchInput">
+    <el-input
+      v-model="searchStr"
+      class="inline-input full-with"
+      placeholder="Enter company name"
+      prefix-icon="el-icon-search"
+      @keyup.native.enter="search()"
+      clearable
+    />
+    <div v-if="includeButton" class="vertical-spacing">
+      <el-button
+        type="primary"
+        class="full-width"
+        :disabled="!isSearchStrValid"
+        @click.native="search()"
+      >
+        Search
+      </el-button>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { Component, Vue, Prop } from "vue-property-decorator";
+
+@Component
+export default class SearchInput extends Vue {
+  @Prop({ default: false })
+  includeButton!: boolean;
+
+  @Prop({ default: "" })
+  initialSearchStr!: string;
+
+  searchStr: string = "";
+
+  search(): void {
+    if (!this.isSearchStrValid) return;
+
+    this.$router.push(`/select-company/${this.searchStr}`);
+  }
+
+  get isSearchStrValid(): boolean {
+    return this.searchStr.length > 0;
+  }
+
+  mounted(): void {
+    const isInitialSearchStrValid = this.initialSearchStr.length > 0;
+    if (!isInitialSearchStrValid) return;
+
+    this.searchStr = this.initialSearchStr;
+  }
+}
+</script>
+
+<style scoped lang="scss">
+h3 {
+  margin: 40px 0 0;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+a {
+  color: #42b983;
+}
+
+.col-center {
+  max-width: 420px;
+  margin: auto;
+  margin-top: 100px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.justify-center {
+  text-align: center;
+}
+
+.vertical-spacing {
+  margin: 20px 0;
+}
+</style>

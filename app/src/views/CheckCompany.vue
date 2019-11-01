@@ -10,22 +10,7 @@
         Check your company relations with a click of a button. Simple, easy.
       </p>
       <div class="vertical-spacing">
-        <el-input
-          v-model="searchStr"
-          class="inline-input full-with"
-          placeholder="Enter company name"
-          @keyup.native.enter="search()"
-        />
-      </div>
-      <div class="vertical-spacing">
-        <el-button
-          type="primary"
-          class="full-width"
-          :disabled="!isSearchStrValid"
-          @click.native="search()"
-        >
-          Search
-        </el-button>
+        <SearchInput :includeButton="true" />
       </div>
     </div>
   </div>
@@ -33,20 +18,15 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import SearchInput from "@/components/SearchInput.vue";
 
-@Component({})
+@Component({
+  components: {
+    SearchInput
+  }
+})
 export default class CheckCompany extends Vue {
-  searchStr: string = "";
-
-  search(): void {
-    if (!this.isSearchStrValid) return;
-
-    this.$router.push(`/select-company/${this.searchStr}`);
-  }
-
-  get isSearchStrValid(): boolean {
-    return this.searchStr.length > 0;
-  }
+  test: string = "";
 }
 </script>
 
