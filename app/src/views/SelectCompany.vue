@@ -18,13 +18,8 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import Topbar from "@/components/Topbar.vue"; // @ is an alias to /src
 
-@Component({
-  components: {
-    Topbar
-  }
-})
+@Component({})
 export default class Home extends Vue {
   data() {
     return {
