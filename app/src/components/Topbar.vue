@@ -3,6 +3,7 @@
     <el-row>
       <el-col :span="24" class="align-right">
         <div class="vertical-center">
+          <!--
           <el-badge
             v-if="notifications.length > 0"
             :value="notifications.length"
@@ -27,6 +28,7 @@
           </el-badge>
           <i class="el-icon-bell" v-else aria-hidden="true"></i>
           <el-divider direction="vertical"></el-divider>
+          -->
           <el-dropdown trigger="click">
             <el-avatar
               shape="circle"
@@ -49,7 +51,7 @@
   </el-header>
 </template>
 <script>
-import NotificationItem from "@/components/NotificationItem.vue";
+// import NotificationItem from "@/components/NotificationItem.vue";
 
 export default {
   data() {
@@ -87,7 +89,7 @@ export default {
       ]
     };
   },
-  components: { NotificationItem },
+  // components: { NotificationItem },
   props: ["title"],
   created() {
     document.title = this.title;
@@ -100,7 +102,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .el-header {
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
