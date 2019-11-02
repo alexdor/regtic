@@ -1,24 +1,11 @@
 <template>
   <div class="full-height">
-    <SearchInput :initialSearchStr="searchStr" @search="search()" />
-    <div class="align-center" v-if="loading">
-      <VclTable class="loading-screen" :rows="17" :columns="5" />
-    </div>
-    <el-card
-      class="vertical-spacing"
-      v-for="company in results"
-      :key="company.id"
-    >
-      <span class="text-large">{{ company.name }}</span>
-      <router-link :to="'/company/' + company.id">
-        <el-button class="right-button" type="primary" icon="el-icon-check"
-          >Check</el-button
-        >
-      </router-link>
-      <div class="body">
-        <p>{{ company.address }}</p>
-        <p>{{ company.vat }}</p>
+    <el-card>
+      <SearchInput :initialSearchStr="searchStr" @search="search()" />
+      <div class="align-center" v-if="loading">
+        <VclTable class="loading-screen" :rows="15" :columns="10" />
       </div>
+      <SearchResultsTable class="vertical-spacing" v-else :data="results" />
     </el-card>
   </div>
 </template>
@@ -27,6 +14,7 @@
 import api from "@/utils/mockapi";
 import { Component, Vue } from "vue-property-decorator";
 import SearchInput from "@/components/SearchInput.vue";
+import SearchResultsTable from "@/components/SearchResultsTable.vue";
 //@ts-ignore
 import { VclTable } from "vue-content-loading";
 //@ts-ignore
@@ -34,6 +22,7 @@ import { VclTable } from "vue-content-loading";
 @Component({
   components: {
     SearchInput,
+    SearchResultsTable,
     VclTable
   }
 })
