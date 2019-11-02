@@ -9,7 +9,7 @@
     </el-table-column>
     <el-table-column prop="address" label="Address" />
     <el-table-column prop="vat" label="VAT" />
-    <el-table-column fixed="right" label="Operations">
+    <el-table-column fixed="right" width="90">
       <template slot-scope="scope">
         <router-link :to="'/company/' + scope.row.id">
           <el-button type="text">
