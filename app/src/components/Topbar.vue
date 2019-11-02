@@ -1,7 +1,10 @@
 <template>
   <el-header>
     <el-row>
-      <el-col :span="24" class="align-right">
+      <el-col :span="12">
+        <i v-if="includeGoBack" class="el-icon-back" @click="goBack" />
+      </el-col>
+      <el-col :span="12" class="align-right">
         <div class="vertical-center">
           <!--
           <el-badge
@@ -94,7 +97,7 @@ export default {
     };
   },
   // components: { NotificationItem },
-  props: ["title"],
+  props: ["title", "includeGoBack"],
   created() {
     document.title = this.title;
   },
@@ -125,6 +128,7 @@ export default {
   color: #606266;
   font-size: 1.5em;
   vertical-align: middle;
+  cursor: pointer;
 }
 
 .el-color-primary {
