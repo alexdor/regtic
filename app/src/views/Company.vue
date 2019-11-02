@@ -7,12 +7,22 @@
         </div>
       </el-col>
       <el-col :span="20" align="right">
-        <el-button type="info" icon="el-icon-collection-tag"
-          >Add to watchlist</el-button
+        <el-button
+          disabled
+          title="Coming soon..."
+          type="info"
+          icon="el-icon-collection-tag"
         >
-        <el-button type="primary" icon="el-icon-download"
-          >Generate report</el-button
+          Add to watchlist
+        </el-button>
+        <el-button
+          disabled
+          title="Coming soon..."
+          type="primary"
+          icon="el-icon-download"
         >
+          Generate report
+        </el-button>
       </el-col>
     </el-row>
     <el-row>
