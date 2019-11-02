@@ -53,82 +53,88 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
 }
+
 #app,
 .el-popper,
 .el-tooltip__popper {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
 }
+
 html,
 body {
   margin: 0;
   padding: 0;
   height: 100%;
 }
+
 #app,
 #app .el-container,
 #app .el-container .el-aside,
 #app .el-container .el-aside .el-menu {
   height: 100%;
 }
+
 .fit-to-width {
   width: calc(100% - 60px);
   padding: 0 30px;
 }
+
 .el-aside {
   width: 250px !important;
 }
+
 .el-main {
   background-color: #fafafa;
-  box-shadow: inset 0 2px 6px -5px;
   color: #858796;
 }
-.el-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
+
 .el-header .el-row {
   width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
 }
+
+.el-menu {
+  border-right: 0 !important;
+}
+
 .el-menu-item:hover,
 .el-menu-item:focus {
   color: #fff !important;
   background-color: #345bcc !important;
 }
+
 .el-menu-item i {
   color: inherit !important;
 }
+
 .align-center {
   text-align: center;
 }
+
 .align-right {
   text-align: right;
 }
-.el-header i {
-  color: #606266;
-  font-size: 1.5em;
-  vertical-align: middle;
-}
+
 .vertical-center {
   display: inline-flex;
   flex-direction: row;
   align-items: center;
 }
-.el-header .el-divider--vertical {
-  margin: 0 16px;
-}
+
 .el-autocomplete-suggestion li {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
 }
+
 .el-footer {
   line-height: 60px;
 }
+
 .el-container {
   overflow-y: auto;
 }
+
 .full-height {
   background-color: #fafafa;
   display: inline-table;
@@ -136,6 +142,7 @@ body {
   /* FIXME: this is a dirty fix and should be fixed properly in the feature */
   width: 100%;
 }
+
 .logo {
   padding-top: 20px;
   width: 150px;
@@ -143,6 +150,7 @@ body {
   margin-right: auto;
   display: block;
 }
+
 .menu-divider {
   display: block;
   height: 1.5px;

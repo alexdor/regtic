@@ -30,7 +30,7 @@
           <el-dropdown trigger="click">
             <el-avatar
               shape="circle"
-              :size="32"
+              :size="28"
               class="el-dropdown-link"
               src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
             ></el-avatar>
@@ -103,7 +103,23 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .el-header {
-  background-color: #fff;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  top: 0;
+  height: 60px;
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.el-header .el-divider--vertical {
+  margin: 0 16px;
+}
+
+.el-header i {
+  color: #606266;
+  font-size: 1.5em;
+  vertical-align: middle;
 }
 
 .el-color-primary {
