@@ -7,7 +7,7 @@
           background-color="#345bcc"
           text-color="rgba(255,255,255,.4)"
           active-text-color="#fff"
-          :default-active="$route.path"
+          default-active="/"
           :router="true"
         >
           <img class="logo" src="./assets/regtic-logo.png" alt="Regtic" />
@@ -15,10 +15,10 @@
           <el-menu-item divided index="/">
             <i class="el-icon-search" aria-hidden="true" />Search
           </el-menu-item>
-          <el-menu-item index="/watchlist">
+          <el-menu-item index="/watchlist" disabled title="coming soon...">
             <i class="el-icon-tickets" aria-hidden="true"></i>Watchlist
           </el-menu-item>
-          <el-menu-item index="not-added-yet">
+          <el-menu-item index="not-added-yet" disabled title="coming soon...">
             <i class="el-icon-s-finance" aria-hidden="true"></i>Subscription
           </el-menu-item>
         </el-menu>
