@@ -5,4 +5,8 @@ exports.up = function(knex) {
   `);
 };
 
-exports.down = function(knex) {};
+exports.down = function(knex) {
+  return knex.schema.raw(`
+    ALTER TABLE companies DROP IF EXISTS name_vector;
+  `);
+};
