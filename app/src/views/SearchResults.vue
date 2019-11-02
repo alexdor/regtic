@@ -10,7 +10,7 @@
       :key="company.id"
     >
       <span class="text-large">{{ company.name }}</span>
-      <router-link :to="'/check/' + company.id">
+      <router-link :to="'/company/' + company.id">
         <el-button class="right-button" type="primary" icon="el-icon-check"
           >Check</el-button
         >

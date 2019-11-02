@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
-import CheckCompany from "@/views/CheckCompany.vue";
+import Search from "@/views/Search.vue";
 
 Vue.use(Router);
 
@@ -11,17 +11,17 @@ export default new Router({
     {
       path: "/",
       name: "home",
-      component: CheckCompany
+      component: Search
     },
     {
-      path: "/select-company/:name",
-      name: "select-company",
-      component: () => import("./views/SelectCompany.vue")
+      path: "/search/:name",
+      name: "search",
+      component: () => import("./views/SearchResults.vue")
     },
     {
-      path: "/check/:id",
-      name: "check",
-      component: () => import("./views/CheckResult.vue")
+      path: "/company/:id",
+      name: "company",
+      component: () => import("./views/Company.vue")
     },
     {
       path: "/watchlist",

@@ -38,7 +38,7 @@ export default class SearchInput extends Vue {
     if (!this.isSearchStrValid) return;
 
     this.$emit("search");
-    this.$router.push(`/select-company/${this.searchStr}`);
+    this.$router.push(`/search/${this.searchStr}`);
   }
 
   get isSearchStrValid(): boolean {
