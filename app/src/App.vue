@@ -24,7 +24,7 @@
         </el-menu>
       </el-aside>
       <el-container direction="vertical">
-        <Topbar title="Watchlist" />
+        <Topbar :includeGoBack="includeGoBack" />
         <el-main>
           <router-view />
           <Footer />
@@ -43,6 +43,11 @@ export default {
   components: {
     Footer,
     Topbar
+  },
+  computed: {
+    includeGoBack: function() {
+      return this.$route.name === "company";
+    }
   }
 };
 </script>
