@@ -1,8 +1,8 @@
 <template>
   <div class="full-height">
     <el-row>
-      <el-col :span="4">
-        <div class="title">
+      <el-col :span="4" class="title-col">
+        <div class="title vertical-center">
           {{ name }}
         </div>
       </el-col>
@@ -27,7 +27,7 @@
     </el-row>
     <el-row>
       <el-col :span="12">
-        <el-card>
+        <el-card class="people-card">
           <div slot="header" class="clearfix">
             <span>People</span>
           </div>
@@ -87,7 +87,7 @@
         </el-card>
       </el-col>
       <el-col :span="12">
-        <el-card>
+        <el-card class="companies-card">
           <div slot="header" class="clearfix">
             <span>Companies</span>
           </div>
@@ -164,6 +164,11 @@ export default class Home extends Vue {
 </script>
 
 <style scoped lang="scss">
+.title-col {
+  height: 40px;
+  display: flex;
+}
+
 .title {
   font-size: 18px;
   font-weight: 700;
@@ -204,8 +209,12 @@ a {
   width: 100%;
 }
 
-.el-card {
-  margin: 10px;
+.people-card {
+  margin: 20px 10px 10px 0px;
+}
+
+.companies-card {
+  margin: 20px 0px 10px 10px;
 }
 
 .right-button {
