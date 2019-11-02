@@ -1,8 +1,12 @@
 <template>
   <div class="full-height">
     <el-row>
-      <el-col :span="18"><h1>Overview</h1></el-col>
-      <el-col :span="6" align="right">
+      <el-col :span="4">
+        <div class="title">
+          {{ name }}
+        </div>
+      </el-col>
+      <el-col :span="20" align="right">
         <el-button type="info" icon="el-icon-collection-tag"
           >Add to watchlist</el-button
         >
@@ -149,8 +153,12 @@ export default class Home extends Vue {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+.title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
 .text-large {
   display: inline-block;
   font-size: 18px;
