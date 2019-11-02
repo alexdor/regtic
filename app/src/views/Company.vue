@@ -3,7 +3,12 @@
     <el-row>
       <el-col :span="4" class="title-col">
         <div class="title vertical-center">
-          {{ name }}
+          <div v-if="loading" class="title-loading">
+            <VclCode />
+          </div>
+          <div v-else>
+            {{ name }}
+          </div>
         </div>
       </el-col>
       <el-col :span="20" align="right">
@@ -29,78 +34,86 @@
       <el-col :span="12">
         <el-card class="people-card">
           <div slot="header" class="clearfix">
-            <span>People</span>
+            People
           </div>
-          <el-table
-            class="full-width"
-            :data="result.people"
-            :default-sort="{ prop: 'type', order: 'descending' }"
-          >
-            <el-table-column prop="full_name" label="Name" sortable>
-            </el-table-column>
-            <el-table-column
-              prop="type"
-              label="Status"
-              sortable
-              width="100"
-              align="center"
+          <div v-if="loading">
+            <VclList v-for="index in 2" :key="index" />
+          </div>
+          <div v-else>
+            <el-table
+              class="full-width"
+              :data="people"
+              :default-sort="{ prop: 'type', order: 'descending' }"
             >
-              <template slot-scope="scope">
-                <el-tooltip
-                  v-if="scope.row.type == 'pep'"
-                  class="item"
-                  :content="scope.row.source"
-                  placement="top"
-                  effect="dark"
-                >
+              <el-table-column prop="name" label="Name" sortable />
+              <el-table-column
+                prop="type"
+                label="Status"
+                sortable
+                width="100"
+                align="center"
+              >
+                <template slot-scope="scope">
+                  <el-tooltip
+                    v-if="scope.row.type === 'warning'"
+                    class="item"
+                    :content="scope.row.source"
+                    placement="top"
+                    effect="dark"
+                  >
+                    <el-button
+                      circle
+                      size="mini"
+                      icon="el-icon-link"
+                      type="warning"
+                    ></el-button>
+                  </el-tooltip>
+                  <el-tooltip
+                    v-else-if="scope.row.type === 'bad'"
+                    class="item"
+                    :content="scope.row.source"
+                    placement="top"
+                    effect="dark"
+                  >
+                    <el-button
+                      circle
+                      size="mini"
+                      icon="el-icon-link"
+                      type="danger"
+                    ></el-button>
+                  </el-tooltip>
                   <el-button
+                    v-else
                     circle
                     size="mini"
-                    icon="el-icon-link"
-                    type="warning"
+                    icon="el-icon-check"
+                    type="success"
                   ></el-button>
-                </el-tooltip>
-                <el-tooltip
-                  v-else-if="scope.row.type == 'sanction'"
-                  class="item"
-                  :content="scope.row.source"
-                  placement="top"
-                  effect="dark"
-                >
-                  <el-button
-                    circle
-                    size="mini"
-                    icon="el-icon-link"
-                    type="danger"
-                  ></el-button>
-                </el-tooltip>
-                <el-button
-                  v-else
-                  circle
-                  size="mini"
-                  icon="el-icon-check"
-                  type="success"
-                ></el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
         </el-card>
       </el-col>
       <el-col :span="12">
         <el-card class="companies-card">
           <div slot="header" class="clearfix">
-            <span>Companies</span>
+            Companies
           </div>
-          <el-table
-            class="full-width"
-            :data="result.companies"
-            :default-sort="{ prop: 'type', order: 'descending' }"
-          >
-            <el-table-column prop="vat" label="VAT" sortable width="120">
-            </el-table-column>
-            <el-table-column prop="name" label="Name" sortable>
-            </el-table-column>
-          </el-table>
+          <div v-if="loading">
+            <VclList v-for="index in 2" :key="index" />
+          </div>
+          <div v-else>
+            <el-table
+              class="full-width"
+              :data="companies"
+              :default-sort="{ prop: 'type', order: 'descending' }"
+            >
+              <el-table-column prop="name" label="Name" sortable />
+              <el-table-column prop="vat" label="VAT" sortable width="120" />
+              <el-table-column prop="address" label="address" sortable />
+            </el-table>
+          </div>
         </el-card>
       </el-col>
     </el-row>
@@ -108,57 +121,59 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
+import api from "@/utils/mockapi";
+//@ts-ignore
+import { VclCode, VclList } from "vue-content-loading";
+//@ts-ignore
 
-@Component({})
-export default class Home extends Vue {
-  data() {
-    return {
-      name: "Regtic Demo",
-      id: this.$route.params.id,
-      typeSort: {
-        ok: 0,
-        pep: 1,
-        sanction: 2
-      },
-      result: {
-        companies: [
-          { vat: "DK-12345678", name: "Bad company example" },
-          { vat: "DK-23456789", name: "Other company demo" },
-          { vat: "DK-34567890", name: "Example company" }
-        ],
-        people: [
-          {
-            full_name: "John Doe",
-            source:
-              "EU Sanctions List 2019 (www.example.org/path-to-file) - 23/10/2019",
-            type: "sanction"
-          },
-          {
-            full_name: "Jane Doe",
-            source:
-              "FN Sanctions List 2019 (www.other.org/path-to-file) - 21/10/2019",
-            type: "sanction"
-          },
-          {
-            full_name: "James Doe",
-            source:
-              "EU Sanctions List 2019 (www.example.org/path-to-file) - 23/10/2019",
-            type: "sanction"
-          },
-          {
-            full_name: "Donald Trump",
-            source:
-              "EU PEP List 2019 (www.example.org/path-to-file) - 22/10/2019",
-            type: "pep"
-          },
-          { full_name: "John Doe", type: "ok" },
-          { full_name: "Jane Doe", type: "ok" },
-          { full_name: "James Doe", type: "ok" },
-          { full_name: "Donald Trump", type: "ok" }
-        ]
-      }
-    };
+@Component({
+  components: {
+    VclCode,
+    VclList
+  }
+})
+export default class Company extends Vue {
+  name: string = "";
+  vat: string = "";
+  address: string = "";
+  companies: {
+    id: string;
+    found: boolean;
+    name: string;
+    vat: string;
+    address: string;
+    country_code: string;
+    starting_date: number;
+  }[] = [];
+  people: any[] = [];
+  loading: boolean = true;
+
+  async created() {
+    const companyId = this.$route.params.id;
+    const { name, vat, address, companies, people } = await api.checkCompany(
+      companyId
+    );
+    this.name = name;
+    this.vat = vat;
+    this.address = address;
+    this.companies = companies;
+    this.people = this.parsePeopleArray(people);
+    this.loading = false;
+  }
+
+  parsePeopleArray(people: any) {
+    return [
+      ...people.bad.map((person: any) => {
+        return { ...person, type: "bad" };
+      }),
+      ...people.warning.map((person: any) => {
+        return { ...person, type: "warning" };
+      }),
+      ...people.good.map((person: any) => {
+        return { ...person, type: "good" };
+      })
+    ];
   }
 }
 </script>
@@ -231,5 +246,9 @@ a {
 
 .item:last-child {
   margin-bottom: 0;
+}
+
+.title-loading {
+  height: 30px;
 }
 </style>
