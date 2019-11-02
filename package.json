@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently --kill-others --prefix \"[{name}]\" --names \"webapp,backend\" --prefix-colors \"black,blue\" \"npm run start:webapp\" \"npm run start:backend\"",
-    "start:backend": "npm run is-docker-running && concurrently --kill-others --prefix \"[{name}]\" --names \"db,serverless,api\" --prefix-colors \"dim,blue,magenta\" \"npm run start:db\" \"npm run start:serverless\" \" npm run start:api\"",
+    "start": "concurrently -k --prefix \"[{name}]\" --names \"webapp,backend\" --prefix-colors \"black,blue\" \"npm run start:webapp\" \"npm run start:backend\"",
+    "start:backend": "npm run is-docker-running && concurrently -k --prefix \"[{name}]\" --names \"db,serverless,api\" --prefix-colors \"dim,blue,magenta\" \"npm run start:db\" \"npm run start:serverless\" \" npm run start:api\"",
     "start:webapp": "cd app && npm run serve",
     "start:db": "docker-compose up",
     "start:serverless": "serverless offline --showDuration --noTimeout",
     "start:api": "cd api && make build && sam local start-api -p 3030",
     "is-docker-running": "docker ps > /dev/null",
+    "db:reset": "docker-compose down -v && docker-compose pull && docker-compose up -d && sleep 5 && npm run db:migrate && npm run db:seed && docker-compose stop",
+    "db:seed": "concurrently -k \"npm run start:serverless\" \"cd database && npm i && sleep 5 && npm run seed-run\"",
+    "db:migrate": "cd database && npm run migrate-latest && cd ..",
     "lint:js": "eslint --fix .",
     "lint:py": "black .",
     "lint-staged": "lint-staged"
