@@ -79,8 +79,8 @@ export default {
           id: "5678-56789-01234-5678",
           found: false,
           name: "Regtic Law",
-          vat: "dk-asdok10",
-          address: "DK-56789012",
+          vat: "DK-56789012",
+          address: "Test Street 100",
           country_code: "ZZ",
           starting_date: Date.now()
         }

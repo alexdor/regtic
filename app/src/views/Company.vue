@@ -40,11 +40,7 @@
             <VclList v-for="index in 2" :key="index" />
           </div>
           <div v-else>
-            <el-table
-              class="full-width"
-              :data="people"
-              :default-sort="{ prop: 'type', order: 'descending' }"
-            >
+            <el-table class="full-width" :data="people">
               <el-table-column prop="name" label="Name" sortable />
               <el-table-column
                 prop="type"
@@ -64,7 +60,7 @@
                     <el-button
                       circle
                       size="mini"
-                      icon="el-icon-link"
+                      icon="el-icon-view"
                       type="warning"
                     ></el-button>
                   </el-tooltip>
@@ -78,7 +74,7 @@
                     <el-button
                       circle
                       size="mini"
-                      icon="el-icon-link"
+                      icon="el-icon-close"
                       type="danger"
                     ></el-button>
                   </el-tooltip>
@@ -104,14 +100,10 @@
             <VclList v-for="index in 2" :key="index" />
           </div>
           <div v-else>
-            <el-table
-              class="full-width"
-              :data="companies"
-              :default-sort="{ prop: 'type', order: 'descending' }"
-            >
+            <el-table class="full-width" :data="companies">
               <el-table-column prop="name" label="Name" sortable />
               <el-table-column prop="vat" label="VAT" sortable width="120" />
-              <el-table-column prop="address" label="address" sortable />
+              <el-table-column prop="address" label="Address" sortable />
             </el-table>
           </div>
         </el-card>
