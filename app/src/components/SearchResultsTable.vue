@@ -9,10 +9,10 @@
     </el-table-column>
     <el-table-column prop="address" label="Address" />
     <el-table-column prop="vat" label="VAT" />
-    <el-table-column fixed="right" width="90">
+    <el-table-column fixed="right" width="120">
       <template slot-scope="scope">
         <router-link :to="'/company/' + scope.row.id">
-          <el-button type="text">
+          <el-button type="primary" size="medium">
             Check
           </el-button>
         </router-link>
