@@ -35,14 +35,18 @@
               :size="28"
               class="el-dropdown-link"
               src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
-            ></el-avatar>
+            />
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item icon="el-icon-s-tools" aria-hidden="true"
-                >Settings</el-dropdown-item
+              <el-dropdown-item
+                icon="el-icon-s-tools"
+                aria-hidden="true"
+                disabled
               >
-              <el-dropdown-item icon="el-icon-s-home" aria-hidden="true"
-                >Log out</el-dropdown-item
-              >
+                Settings
+              </el-dropdown-item>
+              <el-dropdown-item icon="el-icon-s-home" aria-hidden="true">
+                Log out
+              </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
