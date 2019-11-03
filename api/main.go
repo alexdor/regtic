@@ -1,4 +1,4 @@
-//go:generate sqlboiler psql --wipe psql
+//go:generate sqlboiler psql
 package main
 
 import "fmt"
