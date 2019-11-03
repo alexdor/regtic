@@ -1504,7 +1504,7 @@ func testCompaniesSelect(t *testing.T) {
 }
 
 var (
-	companyDBTypes = map[string]string{`ID`: `uuid`, `Address`: `text`, `Vat`: `text`, `StartingDate`: `text`, `CountryCode`: `character varying`, `UpdatedAt`: `timestamp without time zone`, `CreatedAt`: `timestamp without time zone`, `Name`: `text`, `NameVector`: `tsvector`, `Status`: `enum.company_status('active','liquidation','dissolved','closed')`, `StatusNotes`: `text`}
+	companyDBTypes = map[string]string{`ID`: `uuid`, `Address`: `text`, `Vat`: `text`, `StartingDate`: `text`, `CountryCode`: `character varying`, `UpdatedAt`: `timestamp without time zone`, `CreatedAt`: `timestamp without time zone`, `Name`: `text`, `Status`: `enum.company_status('active','liquidation','dissolved','closed')`, `StatusNotes`: `text`, `NameVector`: `tsvector`}
 	_              = bytes.MinRead
 )
 

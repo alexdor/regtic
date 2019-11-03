@@ -29,6 +29,7 @@ type BadPersonsAlias struct {
 	BadPersonID string      `boil:"bad_person_id" json:"bad_person_id" toml:"bad_person_id" yaml:"bad_person_id"`
 	UpdatedAt   time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	CreatedAt   time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	NameVector  null.String `boil:"name_vector" json:"name_vector,omitempty" toml:"name_vector" yaml:"name_vector,omitempty"`
 
 	R *badPersonsAliasR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L badPersonsAliasL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -40,12 +41,14 @@ var BadPersonsAliasColumns = struct {
 	BadPersonID string
 	UpdatedAt   string
 	CreatedAt   string
+	NameVector  string
 }{
 	ID:          "id",
 	FullName:    "full_name",
 	BadPersonID: "bad_person_id",
 	UpdatedAt:   "updated_at",
 	CreatedAt:   "created_at",
+	NameVector:  "name_vector",
 }
 
 // Generated where
@@ -56,12 +59,14 @@ var BadPersonsAliasWhere = struct {
 	BadPersonID whereHelperstring
 	UpdatedAt   whereHelpertime_Time
 	CreatedAt   whereHelpertime_Time
+	NameVector  whereHelpernull_String
 }{
 	ID:          whereHelperstring{field: "\"bad_persons_aliases\".\"id\""},
 	FullName:    whereHelpernull_String{field: "\"bad_persons_aliases\".\"full_name\""},
 	BadPersonID: whereHelperstring{field: "\"bad_persons_aliases\".\"bad_person_id\""},
 	UpdatedAt:   whereHelpertime_Time{field: "\"bad_persons_aliases\".\"updated_at\""},
 	CreatedAt:   whereHelpertime_Time{field: "\"bad_persons_aliases\".\"created_at\""},
+	NameVector:  whereHelpernull_String{field: "\"bad_persons_aliases\".\"name_vector\""},
 }
 
 // BadPersonsAliasRels is where relationship names are stored.
@@ -85,8 +90,8 @@ func (*badPersonsAliasR) NewStruct() *badPersonsAliasR {
 type badPersonsAliasL struct{}
 
 var (
-	badPersonsAliasAllColumns            = []string{"id", "full_name", "bad_person_id", "updated_at", "created_at"}
-	badPersonsAliasColumnsWithoutDefault = []string{"full_name", "bad_person_id"}
+	badPersonsAliasAllColumns            = []string{"id", "full_name", "bad_person_id", "updated_at", "created_at", "name_vector"}
+	badPersonsAliasColumnsWithoutDefault = []string{"full_name", "bad_person_id", "name_vector"}
 	badPersonsAliasColumnsWithDefault    = []string{"id", "updated_at", "created_at"}
 	badPersonsAliasPrimaryKeyColumns     = []string{"id"}
 )

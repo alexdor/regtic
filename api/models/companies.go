@@ -32,9 +32,9 @@ type Company struct {
 	UpdatedAt    time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	CreatedAt    time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	Name         null.String `boil:"name" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
-	NameVector   null.String `boil:"name_vector" json:"name_vector,omitempty" toml:"name_vector" yaml:"name_vector,omitempty"`
 	Status       null.String `boil:"status" json:"status,omitempty" toml:"status" yaml:"status,omitempty"`
 	StatusNotes  null.String `boil:"status_notes" json:"status_notes,omitempty" toml:"status_notes" yaml:"status_notes,omitempty"`
+	NameVector   null.String `boil:"name_vector" json:"name_vector,omitempty" toml:"name_vector" yaml:"name_vector,omitempty"`
 
 	R *companyR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L companyL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -49,9 +49,9 @@ var CompanyColumns = struct {
 	UpdatedAt    string
 	CreatedAt    string
 	Name         string
-	NameVector   string
 	Status       string
 	StatusNotes  string
+	NameVector   string
 }{
 	ID:           "id",
 	Address:      "address",
@@ -61,9 +61,9 @@ var CompanyColumns = struct {
 	UpdatedAt:    "updated_at",
 	CreatedAt:    "created_at",
 	Name:         "name",
-	NameVector:   "name_vector",
 	Status:       "status",
 	StatusNotes:  "status_notes",
+	NameVector:   "name_vector",
 }
 
 // Generated where
@@ -77,9 +77,9 @@ var CompanyWhere = struct {
 	UpdatedAt    whereHelpertime_Time
 	CreatedAt    whereHelpertime_Time
 	Name         whereHelpernull_String
-	NameVector   whereHelpernull_String
 	Status       whereHelpernull_String
 	StatusNotes  whereHelpernull_String
+	NameVector   whereHelpernull_String
 }{
 	ID:           whereHelperstring{field: "\"companies\".\"id\""},
 	Address:      whereHelpernull_String{field: "\"companies\".\"address\""},
@@ -89,9 +89,9 @@ var CompanyWhere = struct {
 	UpdatedAt:    whereHelpertime_Time{field: "\"companies\".\"updated_at\""},
 	CreatedAt:    whereHelpertime_Time{field: "\"companies\".\"created_at\""},
 	Name:         whereHelpernull_String{field: "\"companies\".\"name\""},
-	NameVector:   whereHelpernull_String{field: "\"companies\".\"name_vector\""},
 	Status:       whereHelpernull_String{field: "\"companies\".\"status\""},
 	StatusNotes:  whereHelpernull_String{field: "\"companies\".\"status_notes\""},
+	NameVector:   whereHelpernull_String{field: "\"companies\".\"name_vector\""},
 }
 
 // CompanyRels is where relationship names are stored.
@@ -121,8 +121,8 @@ func (*companyR) NewStruct() *companyR {
 type companyL struct{}
 
 var (
-	companyAllColumns            = []string{"id", "address", "vat", "starting_date", "country_code", "updated_at", "created_at", "name", "name_vector", "status", "status_notes"}
-	companyColumnsWithoutDefault = []string{"address", "vat", "starting_date", "country_code", "name", "name_vector", "status", "status_notes"}
+	companyAllColumns            = []string{"id", "address", "vat", "starting_date", "country_code", "updated_at", "created_at", "name", "status", "status_notes", "name_vector"}
+	companyColumnsWithoutDefault = []string{"address", "vat", "starting_date", "country_code", "name", "status", "status_notes", "name_vector"}
 	companyColumnsWithDefault    = []string{"id", "updated_at", "created_at"}
 	companyPrimaryKeyColumns     = []string{"id"}
 )
@@ -529,7 +529,7 @@ func (companyL) LoadMotherCompanyCompanies(ctx context.Context, e boil.ContextEx
 		one := new(Company)
 		var localJoinCol string
 
-		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.NameVector, &one.Status, &one.StatusNotes, &localJoinCol)
+		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for companies")
 		}
@@ -644,7 +644,7 @@ func (companyL) LoadDaughterCompanyCompanies(ctx context.Context, e boil.Context
 		one := new(Company)
 		var localJoinCol string
 
-		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.NameVector, &one.Status, &one.StatusNotes, &localJoinCol)
+		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for companies")
 		}
@@ -759,7 +759,7 @@ func (companyL) LoadPersons(ctx context.Context, e boil.ContextExecutor, singula
 		one := new(Person)
 		var localJoinCol string
 
-		err = results.Scan(&one.ID, &one.FirstName, &one.LastName, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &localJoinCol)
+		err = results.Scan(&one.ID, &one.FirstName, &one.LastName, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.NameVector, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for persons")
 		}
