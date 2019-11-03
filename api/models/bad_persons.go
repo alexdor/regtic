@@ -24,34 +24,37 @@ import (
 
 // BadPerson is an object representing the database table.
 type BadPerson struct {
-	ID        string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	FullName  null.String `boil:"full_name" json:"full_name,omitempty" toml:"full_name" yaml:"full_name,omitempty"`
-	Type      null.String `boil:"type" json:"type,omitempty" toml:"type" yaml:"type,omitempty"`
-	Source    null.String `boil:"source" json:"source,omitempty" toml:"source" yaml:"source,omitempty"`
-	Address   null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
-	UpdatedAt time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	CreatedAt time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	ID         string      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	FullName   null.String `boil:"full_name" json:"full_name,omitempty" toml:"full_name" yaml:"full_name,omitempty"`
+	Type       null.String `boil:"type" json:"type,omitempty" toml:"type" yaml:"type,omitempty"`
+	Source     null.String `boil:"source" json:"source,omitempty" toml:"source" yaml:"source,omitempty"`
+	Address    null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
+	UpdatedAt  time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	CreatedAt  time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	NameVector null.String `boil:"name_vector" json:"name_vector,omitempty" toml:"name_vector" yaml:"name_vector,omitempty"`
 
 	R *badPersonR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L badPersonL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var BadPersonColumns = struct {
-	ID        string
-	FullName  string
-	Type      string
-	Source    string
-	Address   string
-	UpdatedAt string
-	CreatedAt string
+	ID         string
+	FullName   string
+	Type       string
+	Source     string
+	Address    string
+	UpdatedAt  string
+	CreatedAt  string
+	NameVector string
 }{
-	ID:        "id",
-	FullName:  "full_name",
-	Type:      "type",
-	Source:    "source",
-	Address:   "address",
-	UpdatedAt: "updated_at",
-	CreatedAt: "created_at",
+	ID:         "id",
+	FullName:   "full_name",
+	Type:       "type",
+	Source:     "source",
+	Address:    "address",
+	UpdatedAt:  "updated_at",
+	CreatedAt:  "created_at",
+	NameVector: "name_vector",
 }
 
 // Generated where
@@ -117,21 +120,23 @@ func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 }
 
 var BadPersonWhere = struct {
-	ID        whereHelperstring
-	FullName  whereHelpernull_String
-	Type      whereHelpernull_String
-	Source    whereHelpernull_String
-	Address   whereHelpernull_String
-	UpdatedAt whereHelpertime_Time
-	CreatedAt whereHelpertime_Time
+	ID         whereHelperstring
+	FullName   whereHelpernull_String
+	Type       whereHelpernull_String
+	Source     whereHelpernull_String
+	Address    whereHelpernull_String
+	UpdatedAt  whereHelpertime_Time
+	CreatedAt  whereHelpertime_Time
+	NameVector whereHelpernull_String
 }{
-	ID:        whereHelperstring{field: "\"bad_persons\".\"id\""},
-	FullName:  whereHelpernull_String{field: "\"bad_persons\".\"full_name\""},
-	Type:      whereHelpernull_String{field: "\"bad_persons\".\"type\""},
-	Source:    whereHelpernull_String{field: "\"bad_persons\".\"source\""},
-	Address:   whereHelpernull_String{field: "\"bad_persons\".\"address\""},
-	UpdatedAt: whereHelpertime_Time{field: "\"bad_persons\".\"updated_at\""},
-	CreatedAt: whereHelpertime_Time{field: "\"bad_persons\".\"created_at\""},
+	ID:         whereHelperstring{field: "\"bad_persons\".\"id\""},
+	FullName:   whereHelpernull_String{field: "\"bad_persons\".\"full_name\""},
+	Type:       whereHelpernull_String{field: "\"bad_persons\".\"type\""},
+	Source:     whereHelpernull_String{field: "\"bad_persons\".\"source\""},
+	Address:    whereHelpernull_String{field: "\"bad_persons\".\"address\""},
+	UpdatedAt:  whereHelpertime_Time{field: "\"bad_persons\".\"updated_at\""},
+	CreatedAt:  whereHelpertime_Time{field: "\"bad_persons\".\"created_at\""},
+	NameVector: whereHelpernull_String{field: "\"bad_persons\".\"name_vector\""},
 }
 
 // BadPersonRels is where relationship names are stored.
@@ -155,8 +160,8 @@ func (*badPersonR) NewStruct() *badPersonR {
 type badPersonL struct{}
 
 var (
-	badPersonAllColumns            = []string{"id", "full_name", "type", "source", "address", "updated_at", "created_at"}
-	badPersonColumnsWithoutDefault = []string{"full_name", "type", "source", "address"}
+	badPersonAllColumns            = []string{"id", "full_name", "type", "source", "address", "updated_at", "created_at", "name_vector"}
+	badPersonColumnsWithoutDefault = []string{"full_name", "type", "source", "address", "name_vector"}
 	badPersonColumnsWithDefault    = []string{"id", "updated_at", "created_at"}
 	badPersonPrimaryKeyColumns     = []string{"id"}
 )

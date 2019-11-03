@@ -677,7 +677,7 @@ func testBadPersonsAliasesSelect(t *testing.T) {
 }
 
 var (
-	badPersonsAliasDBTypes = map[string]string{`ID`: `uuid`, `FullName`: `text`, `BadPersonID`: `uuid`, `UpdatedAt`: `timestamp without time zone`, `CreatedAt`: `timestamp without time zone`}
+	badPersonsAliasDBTypes = map[string]string{`ID`: `uuid`, `FullName`: `text`, `BadPersonID`: `uuid`, `UpdatedAt`: `timestamp without time zone`, `CreatedAt`: `timestamp without time zone`, `NameVector`: `tsvector`}
 	_                      = bytes.MinRead
 )
 
