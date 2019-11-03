@@ -30,19 +30,19 @@ func GetBadPersons(ctx context.Context, vat string) ([]string, []error) {
 	var wg sync.WaitGroup
 	fmt.Println(sqlQuery)
 	wg.Add(1)
-	searchForBadPersons(ctx, ids, &badPersons, &errors, wg)
+	searchForBadPersons(ctx, ids, &badPersons, &errors, &wg)
 	wg.Wait()
 	return badPersons.items, nil
 }
 
-func searchForBadPersons(ctx context.Context, ids []string, badPersons *StringSlice, errors *ErrorSlice, wg sync.WaitGroup) {
+func searchForBadPersons(ctx context.Context, ids []string, badPersons *StringSlice, errors *ErrorSlice, wg *sync.WaitGroup) {
 	wg.Add(2)
 	go getDaughterCompanies(ctx, ids, badPersons, errors, wg)
 	go getOwners(ctx, ids, badPersons, errors, wg)
 	wg.Done()
 }
 
-func getDaughterCompanies(ctx context.Context, ids []string, badPersons *StringSlice, errors *ErrorSlice, group sync.WaitGroup) {
+func getDaughterCompanies(ctx context.Context, ids []string, badPersons *StringSlice, errors *ErrorSlice, group *sync.WaitGroup) {
 	defer group.Done()
 	companies, err := models.Companies(models.CompanyWhere.ID.IN(ids), qm.Load(models.CompanyRels.DaughterCompanyCompanies)).All(ctx, DB)
 	fmt.Println(companies)
@@ -68,7 +68,7 @@ var sqlQuery = "select b." + models.BadPersonColumns.FullName + " from " + model
 	models.TableNames.BadPersons + " as b on ( concat(p." + models.PersonColumns.FirstName + ", p." + models.PersonColumns.LastName + ") = " + models.BadPersonColumns.FullName +
 	" or concat(p." + models.PersonColumns.LastName + ", p." + models.PersonColumns.FirstName + ") = " + models.BadPersonColumns.FullName + " ))"
 
-func getOwners(ctx context.Context, ids []string, badPersons *StringSlice, errors *ErrorSlice, wg sync.WaitGroup) {
+func getOwners(ctx context.Context, ids []string, badPersons *StringSlice, errors *ErrorSlice, wg *sync.WaitGroup) {
 	defer wg.Done()
 	//companies , err := models.Companies(qm.WhereIn("company in ?",ids,qm.Load(models.CompanyRels.Persons)))..All(ctx,db.DB)
 	var badPersonList models.BadPersonSlice
