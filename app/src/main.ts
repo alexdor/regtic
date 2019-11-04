@@ -5,7 +5,13 @@ import store from "./store";
 import "./registerServiceWorker";
 import "./plugins/element.js";
 
+import DefaultLayout from "./layouts/Default.vue";
+import BlankLayout from "./layouts/Blank.vue";
+
 Vue.config.productionTip = false;
+
+Vue.component("default-layout", DefaultLayout);
+Vue.component("blank-layout", BlankLayout);
 
 new Vue({
   router,
