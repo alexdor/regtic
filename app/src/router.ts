@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Search from "@/views/Search.vue";
+import Frontpage from "@/views/Frontpage.vue";
 
 Vue.use(Router);
 
@@ -10,6 +11,12 @@ export default new Router({
   routes: [
     {
       path: "/",
+      name: "home",
+      meta: { layout: "blank" },
+      component: Frontpage
+    },
+    {
+      path: "/search",
       name: "home",
       component: Search
     },
