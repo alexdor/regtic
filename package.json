@@ -23,8 +23,7 @@
     "aws-sam-local": "^0.2.11",
     "concurrently": "^5.0.0",
     "serverless-iam-roles-per-function": "^2.0.2",
-    "typescript": "^3.6.4",
-    "vue-content-loading": "^1.6.0"
+    "typescript": "^3.6.4"
   },
   "devDependencies": {
     "@ljharb/eslint-config": "^14.1.0",
