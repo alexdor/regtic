@@ -115,7 +115,7 @@ functions:
     runtime: go1.x
     events:
       - http:
-          path: find_companies
+          path: ${self:custom.version}find_companies
           method: get
     module: api/find_companies
     environment:
