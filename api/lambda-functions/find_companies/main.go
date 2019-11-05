@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/alexdor/regtic/api/db"
 
@@ -16,12 +17,18 @@ type Response events.APIGatewayProxyResponse
 
 const unprocessableError = "{\"error\": \"Please provide a company name \"}"
 
-var headers = map[string]string{
-	"Content-Type":        "application/json",
-	"X-Regtic-Func-Reply": "find_companies_handler",
-}
+var origin = os.Getenv("ORIGIN")
 
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (Response, error) {
+	var headers = map[string]string{
+		"Content-Type":        "application/json",
+		"X-Regtic-Func-Reply": "find_companies_handler",
+	}
+
+	if request.Headers["Origin"] == origin {
+		headers["Access-Control-Allow-Origin"] = origin
+		headers["Access-Control-Allow-Credentials"] = "true"
+	}
 	companyName := request.QueryStringParameters["name"]
 	if len(companyName) == 0 {
 		return Response{StatusCode: 400, Body: unprocessableError}, nil
@@ -33,6 +40,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (Respon
 		fmt.Println(err)
 		return Response{StatusCode: 500}, err
 	}
+
 	body, err := json.Marshal(map[string]interface{}{
 		"companies": companies,
 	})
