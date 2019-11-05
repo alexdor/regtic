@@ -32,6 +32,9 @@ custom:
   version: /v1/
   REGTIC_DATABASE_URL: ${env:REGTIC_DATABASE_URL,  "postgres://admin:admin@localhost:5432/regtic"}
   ENVIRONMENT: ${env:ENVIRONMENT, "development"}
+  ORIGIN:
+    development: "http://localhost:8080"
+    production: "https://demo.regtic.com"
   pythonRequirements:
     dockerizePip: true
     zip: true
@@ -110,17 +113,33 @@ functions:
   #####
   # API
   #####
-  hellogo:
+  find_companies:
     handler: api/bin/find_companies
     runtime: go1.x
     events:
       - http:
           path: ${self:custom.version}find_companies
+          cors: true
           method: get
     module: api/find_companies
     environment:
       ENVIRONMENT: ${self:custom.ENVIRONMENT}
       REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
+      ORIGIN: ${self:custom.ORIGIN.${self:custom.ENVIRONMENT}}
+
+  validate_company:
+    handler: api/bin/validate_company
+    runtime: go1.x
+    events:
+      - http:
+          path: ${self:custom.version}validate_company
+          cors: true
+          method: get
+    module: api/validate_company
+    environment:
+      ENVIRONMENT: ${self:custom.ENVIRONMENT}
+      REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
+      ORIGIN: ${self:custom.ORIGIN.${self:custom.ENVIRONMENT}}
 #
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
