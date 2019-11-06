@@ -75,8 +75,11 @@ func getDaughterCompanies(ctx context.Context, companies *models.CompanySlice, r
 	motherCompanies := models.CompanySlice{}
 	for _, company := range *companies {
 		mCompanies, err := company.MotherCompanyCompanies(qm.Load(models.CompanyRels.Persons), qm.Load(models.CompanyRels.MotherCompanyCompanies)).All(ctx, DB)
+		if err != nil {
+			writeError(err, response, locks)
+			continue
+		}
 		motherCompanies = append(motherCompanies, mCompanies...)
-		writeError(err, response, locks)
 	}
 	wg.Add(1)
 	traverseThroughTheCompany(ctx, &motherCompanies, response, locks, wg)
@@ -117,7 +120,7 @@ func searchForBadPersons(ctx context.Context, persons *models.PersonSlice, respo
 			qm.Where(badPersonWhereClause, person.FullName),
 		).All(ctx, DB)
 
-		noRows := errors.As(err, &sql.ErrNoRows)
+		noRows := errors.Is(err, sql.ErrNoRows)
 		if !noRows && err != nil {
 			writeError(err, response, locks)
 		}
@@ -145,7 +148,7 @@ func searchForBadPersons(ctx context.Context, persons *models.PersonSlice, respo
 }
 
 func writeError(err error, response *ValidationResponse, locks *validationLocks) {
-	if err != nil {
+	if !errors.Is(err, sql.ErrNoRows) {
 		locks.errors.Lock()
 		response.Errors = append(response.Errors, err)
 		locks.errors.Unlock()
