@@ -1,7 +1,8 @@
+import enum
 import os
 import uuid
-import enum
-from sqlalchemy import Column, String, create_engine, Enum
+
+from sqlalchemy import Column, Enum, String, create_engine
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -62,7 +63,7 @@ def update_df(df, list_type):
         for index, bad_person in df.iterrows():
             bad_person_obj = BadPerson(
                 full_name=bad_person["full_name"],
-                type=bad_person["type"],
+                type=list_type,
                 source=bad_person["source"],
                 address=bad_person["address"],
             )
