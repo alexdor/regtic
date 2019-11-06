@@ -739,7 +739,7 @@ func testPersonsSelect(t *testing.T) {
 }
 
 var (
-	personDBTypes = map[string]string{`ID`: `uuid`, `FirstName`: `text`, `LastName`: `text`, `CountryCode`: `character varying`, `UpdatedAt`: `timestamp without time zone`, `CreatedAt`: `timestamp without time zone`, `NameVector`: `tsvector`}
+	personDBTypes = map[string]string{`ID`: `uuid`, `FirstName`: `text`, `LastName`: `text`, `CountryCode`: `character varying`, `UpdatedAt`: `timestamp without time zone`, `CreatedAt`: `timestamp without time zone`, `NameVector`: `tsvector`, `FullName`: `text`}
 	_             = bytes.MinRead
 )
 

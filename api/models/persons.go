@@ -31,6 +31,7 @@ type Person struct {
 	UpdatedAt   time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	CreatedAt   time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	NameVector  null.String `boil:"name_vector" json:"name_vector,omitempty" toml:"name_vector" yaml:"name_vector,omitempty"`
+	FullName    null.String `boil:"full_name" json:"full_name,omitempty" toml:"full_name" yaml:"full_name,omitempty"`
 
 	R *personR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L personL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -44,6 +45,7 @@ var PersonColumns = struct {
 	UpdatedAt   string
 	CreatedAt   string
 	NameVector  string
+	FullName    string
 }{
 	ID:          "id",
 	FirstName:   "first_name",
@@ -52,6 +54,7 @@ var PersonColumns = struct {
 	UpdatedAt:   "updated_at",
 	CreatedAt:   "created_at",
 	NameVector:  "name_vector",
+	FullName:    "full_name",
 }
 
 // Generated where
@@ -64,6 +67,7 @@ var PersonWhere = struct {
 	UpdatedAt   whereHelpertime_Time
 	CreatedAt   whereHelpertime_Time
 	NameVector  whereHelpernull_String
+	FullName    whereHelpernull_String
 }{
 	ID:          whereHelperstring{field: "\"persons\".\"id\""},
 	FirstName:   whereHelpernull_String{field: "\"persons\".\"first_name\""},
@@ -72,6 +76,7 @@ var PersonWhere = struct {
 	UpdatedAt:   whereHelpertime_Time{field: "\"persons\".\"updated_at\""},
 	CreatedAt:   whereHelpertime_Time{field: "\"persons\".\"created_at\""},
 	NameVector:  whereHelpernull_String{field: "\"persons\".\"name_vector\""},
+	FullName:    whereHelpernull_String{field: "\"persons\".\"full_name\""},
 }
 
 // PersonRels is where relationship names are stored.
@@ -95,8 +100,8 @@ func (*personR) NewStruct() *personR {
 type personL struct{}
 
 var (
-	personAllColumns            = []string{"id", "first_name", "last_name", "country_code", "updated_at", "created_at", "name_vector"}
-	personColumnsWithoutDefault = []string{"first_name", "last_name", "country_code", "name_vector"}
+	personAllColumns            = []string{"id", "first_name", "last_name", "country_code", "updated_at", "created_at", "name_vector", "full_name"}
+	personColumnsWithoutDefault = []string{"first_name", "last_name", "country_code", "name_vector", "full_name"}
 	personColumnsWithDefault    = []string{"id", "updated_at", "created_at"}
 	personPrimaryKeyColumns     = []string{"id"}
 )

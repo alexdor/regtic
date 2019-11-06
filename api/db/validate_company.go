@@ -103,7 +103,7 @@ func getOwners(ctx context.Context, companies *models.CompanySlice, response *Va
 	}
 }
 
-var badPersonWhereClause = models.BadPersonColumns.NameVector + "@@ plainto_tsquery('simple', ? && ?)"
+var badPersonWhereClause = models.BadPersonColumns.NameVector + "@@ plainto_tsquery('simple', ? )"
 
 func searchForBadPersons(ctx context.Context, persons *models.PersonSlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
 	defer wg.Done()
@@ -114,7 +114,7 @@ func searchForBadPersons(ctx context.Context, persons *models.PersonSlice, respo
 	for _, person := range *persons {
 		//TODO: add aliases, score and sorting
 		badPersons, err := models.BadPersons(
-			qm.Where(badPersonWhereClause, person.FirstName, person.LastName),
+			qm.Where(badPersonWhereClause, person.FullName),
 		).All(ctx, DB)
 
 		noRows := errors.As(err, &sql.ErrNoRows)
