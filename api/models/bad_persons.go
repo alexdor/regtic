@@ -26,7 +26,7 @@ import (
 type BadPerson struct {
 	ID         string      `boil:"id" json:"id" toml:"id" yaml:"id"`
 	FullName   null.String `boil:"full_name" json:"full_name,omitempty" toml:"full_name" yaml:"full_name,omitempty"`
-	Type       null.String `boil:"type" json:"type,omitempty" toml:"type" yaml:"type,omitempty"`
+	Type       string      `boil:"type" json:"type" toml:"type" yaml:"type"`
 	Source     null.String `boil:"source" json:"source,omitempty" toml:"source" yaml:"source,omitempty"`
 	Address    null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
 	UpdatedAt  time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
@@ -122,7 +122,7 @@ func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 var BadPersonWhere = struct {
 	ID         whereHelperstring
 	FullName   whereHelpernull_String
-	Type       whereHelpernull_String
+	Type       whereHelperstring
 	Source     whereHelpernull_String
 	Address    whereHelpernull_String
 	UpdatedAt  whereHelpertime_Time
@@ -131,7 +131,7 @@ var BadPersonWhere = struct {
 }{
 	ID:         whereHelperstring{field: "\"bad_persons\".\"id\""},
 	FullName:   whereHelpernull_String{field: "\"bad_persons\".\"full_name\""},
-	Type:       whereHelpernull_String{field: "\"bad_persons\".\"type\""},
+	Type:       whereHelperstring{field: "\"bad_persons\".\"type\""},
 	Source:     whereHelpernull_String{field: "\"bad_persons\".\"source\""},
 	Address:    whereHelpernull_String{field: "\"bad_persons\".\"address\""},
 	UpdatedAt:  whereHelpertime_Time{field: "\"bad_persons\".\"updated_at\""},
@@ -170,8 +170,6 @@ type (
 	// BadPersonSlice is an alias for a slice of pointers to BadPerson.
 	// This should generally be used opposed to []BadPerson.
 	BadPersonSlice []*BadPerson
-	// BadPersonHook is the signature for custom BadPerson hook methods
-	BadPersonHook func(context.Context, boil.ContextExecutor, *BadPerson) error
 
 	badPersonQuery struct {
 		*queries.Query
@@ -199,176 +197,6 @@ var (
 	_ = qmhelper.Where
 )
 
-var badPersonBeforeInsertHooks []BadPersonHook
-var badPersonBeforeUpdateHooks []BadPersonHook
-var badPersonBeforeDeleteHooks []BadPersonHook
-var badPersonBeforeUpsertHooks []BadPersonHook
-
-var badPersonAfterInsertHooks []BadPersonHook
-var badPersonAfterSelectHooks []BadPersonHook
-var badPersonAfterUpdateHooks []BadPersonHook
-var badPersonAfterDeleteHooks []BadPersonHook
-var badPersonAfterUpsertHooks []BadPersonHook
-
-// doBeforeInsertHooks executes all "before insert" hooks.
-func (o *BadPerson) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range badPersonBeforeInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *BadPerson) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range badPersonBeforeUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *BadPerson) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range badPersonBeforeDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *BadPerson) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range badPersonBeforeUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterInsertHooks executes all "after Insert" hooks.
-func (o *BadPerson) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range badPersonAfterInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterSelectHooks executes all "after Select" hooks.
-func (o *BadPerson) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range badPersonAfterSelectHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpdateHooks executes all "after Update" hooks.
-func (o *BadPerson) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range badPersonAfterUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *BadPerson) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range badPersonAfterDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *BadPerson) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range badPersonAfterUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// AddBadPersonHook registers your hook function for all future operations.
-func AddBadPersonHook(hookPoint boil.HookPoint, badPersonHook BadPersonHook) {
-	switch hookPoint {
-	case boil.BeforeInsertHook:
-		badPersonBeforeInsertHooks = append(badPersonBeforeInsertHooks, badPersonHook)
-	case boil.BeforeUpdateHook:
-		badPersonBeforeUpdateHooks = append(badPersonBeforeUpdateHooks, badPersonHook)
-	case boil.BeforeDeleteHook:
-		badPersonBeforeDeleteHooks = append(badPersonBeforeDeleteHooks, badPersonHook)
-	case boil.BeforeUpsertHook:
-		badPersonBeforeUpsertHooks = append(badPersonBeforeUpsertHooks, badPersonHook)
-	case boil.AfterInsertHook:
-		badPersonAfterInsertHooks = append(badPersonAfterInsertHooks, badPersonHook)
-	case boil.AfterSelectHook:
-		badPersonAfterSelectHooks = append(badPersonAfterSelectHooks, badPersonHook)
-	case boil.AfterUpdateHook:
-		badPersonAfterUpdateHooks = append(badPersonAfterUpdateHooks, badPersonHook)
-	case boil.AfterDeleteHook:
-		badPersonAfterDeleteHooks = append(badPersonAfterDeleteHooks, badPersonHook)
-	case boil.AfterUpsertHook:
-		badPersonAfterUpsertHooks = append(badPersonAfterUpsertHooks, badPersonHook)
-	}
-}
-
 // One returns a single badPerson record from the query.
 func (q badPersonQuery) One(ctx context.Context, exec boil.ContextExecutor) (*BadPerson, error) {
 	o := &BadPerson{}
@@ -383,10 +211,6 @@ func (q badPersonQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Ba
 		return nil, errors.Wrap(err, "models: failed to execute a one query for bad_persons")
 	}
 
-	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
-		return o, err
-	}
-
 	return o, nil
 }
 
@@ -397,14 +221,6 @@ func (q badPersonQuery) All(ctx context.Context, exec boil.ContextExecutor) (Bad
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to BadPerson slice")
-	}
-
-	if len(badPersonAfterSelectHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
-				return o, err
-			}
-		}
 	}
 
 	return o, nil
@@ -523,13 +339,6 @@ func (badPersonL) LoadBadPersonsAliases(ctx context.Context, e boil.ContextExecu
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for bad_persons_aliases")
 	}
 
-	if len(badPersonsAliasAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
 	if singular {
 		object.R.BadPersonsAliases = resultSlice
 		for _, foreign := range resultSlice {
@@ -661,10 +470,6 @@ func (o *BadPerson) Insert(ctx context.Context, exec boil.ContextExecutor, colum
 		}
 	}
 
-	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
-		return err
-	}
-
 	nzDefaults := queries.NonZeroDefaultSet(badPersonColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
@@ -727,7 +532,7 @@ func (o *BadPerson) Insert(ctx context.Context, exec boil.ContextExecutor, colum
 		badPersonInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(ctx, exec)
+	return nil
 }
 
 // Update uses an executor to update the BadPerson.
@@ -741,9 +546,6 @@ func (o *BadPerson) Update(ctx context.Context, exec boil.ContextExecutor, colum
 	}
 
 	var err error
-	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
-		return 0, err
-	}
 	key := makeCacheKey(columns, nil)
 	badPersonUpdateCacheMut.RLock()
 	cache, cached := badPersonUpdateCache[key]
@@ -796,7 +598,7 @@ func (o *BadPerson) Update(ctx context.Context, exec boil.ContextExecutor, colum
 		badPersonUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
+	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
@@ -877,10 +679,6 @@ func (o *BadPerson) Upsert(ctx context.Context, exec boil.ContextExecutor, updat
 		if o.CreatedAt.IsZero() {
 			o.CreatedAt = currTime
 		}
-	}
-
-	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
-		return err
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(badPersonColumnsWithDefault, o)
@@ -984,7 +782,7 @@ func (o *BadPerson) Upsert(ctx context.Context, exec boil.ContextExecutor, updat
 		badPersonUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(ctx, exec)
+	return nil
 }
 
 // Delete deletes a single BadPerson record with an executor.
@@ -992,10 +790,6 @@ func (o *BadPerson) Upsert(ctx context.Context, exec boil.ContextExecutor, updat
 func (o *BadPerson) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no BadPerson provided for delete")
-	}
-
-	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), badPersonPrimaryKeyMapping)
@@ -1014,10 +808,6 @@ func (o *BadPerson) Delete(ctx context.Context, exec boil.ContextExecutor) (int6
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for bad_persons")
-	}
-
-	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	return rowsAff, nil
@@ -1050,14 +840,6 @@ func (o BadPersonSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor
 		return 0, nil
 	}
 
-	if len(badPersonBeforeDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
-	}
-
 	var args []interface{}
 	for _, obj := range o {
 		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), badPersonPrimaryKeyMapping)
@@ -1080,14 +862,6 @@ func (o BadPersonSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for bad_persons")
-	}
-
-	if len(badPersonAfterDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
 	}
 
 	return rowsAff, nil

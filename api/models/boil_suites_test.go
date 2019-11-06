@@ -81,13 +81,6 @@ func TestCount(t *testing.T) {
 	t.Run("Persons", testPersonsCount)
 }
 
-func TestHooks(t *testing.T) {
-	t.Run("BadPersons", testBadPersonsHooks)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesHooks)
-	t.Run("Companies", testCompaniesHooks)
-	t.Run("Persons", testPersonsHooks)
-}
-
 func TestInsert(t *testing.T) {
 	t.Run("BadPersons", testBadPersonsInsert)
 	t.Run("BadPersons", testBadPersonsInsertWhitelist)

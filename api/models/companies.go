@@ -131,8 +131,6 @@ type (
 	// CompanySlice is an alias for a slice of pointers to Company.
 	// This should generally be used opposed to []Company.
 	CompanySlice []*Company
-	// CompanyHook is the signature for custom Company hook methods
-	CompanyHook func(context.Context, boil.ContextExecutor, *Company) error
 
 	companyQuery struct {
 		*queries.Query
@@ -160,176 +158,6 @@ var (
 	_ = qmhelper.Where
 )
 
-var companyBeforeInsertHooks []CompanyHook
-var companyBeforeUpdateHooks []CompanyHook
-var companyBeforeDeleteHooks []CompanyHook
-var companyBeforeUpsertHooks []CompanyHook
-
-var companyAfterInsertHooks []CompanyHook
-var companyAfterSelectHooks []CompanyHook
-var companyAfterUpdateHooks []CompanyHook
-var companyAfterDeleteHooks []CompanyHook
-var companyAfterUpsertHooks []CompanyHook
-
-// doBeforeInsertHooks executes all "before insert" hooks.
-func (o *Company) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range companyBeforeInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *Company) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range companyBeforeUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *Company) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range companyBeforeDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *Company) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range companyBeforeUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterInsertHooks executes all "after Insert" hooks.
-func (o *Company) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range companyAfterInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterSelectHooks executes all "after Select" hooks.
-func (o *Company) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range companyAfterSelectHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpdateHooks executes all "after Update" hooks.
-func (o *Company) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range companyAfterUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *Company) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range companyAfterDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *Company) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range companyAfterUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// AddCompanyHook registers your hook function for all future operations.
-func AddCompanyHook(hookPoint boil.HookPoint, companyHook CompanyHook) {
-	switch hookPoint {
-	case boil.BeforeInsertHook:
-		companyBeforeInsertHooks = append(companyBeforeInsertHooks, companyHook)
-	case boil.BeforeUpdateHook:
-		companyBeforeUpdateHooks = append(companyBeforeUpdateHooks, companyHook)
-	case boil.BeforeDeleteHook:
-		companyBeforeDeleteHooks = append(companyBeforeDeleteHooks, companyHook)
-	case boil.BeforeUpsertHook:
-		companyBeforeUpsertHooks = append(companyBeforeUpsertHooks, companyHook)
-	case boil.AfterInsertHook:
-		companyAfterInsertHooks = append(companyAfterInsertHooks, companyHook)
-	case boil.AfterSelectHook:
-		companyAfterSelectHooks = append(companyAfterSelectHooks, companyHook)
-	case boil.AfterUpdateHook:
-		companyAfterUpdateHooks = append(companyAfterUpdateHooks, companyHook)
-	case boil.AfterDeleteHook:
-		companyAfterDeleteHooks = append(companyAfterDeleteHooks, companyHook)
-	case boil.AfterUpsertHook:
-		companyAfterUpsertHooks = append(companyAfterUpsertHooks, companyHook)
-	}
-}
-
 // One returns a single company record from the query.
 func (q companyQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Company, error) {
 	o := &Company{}
@@ -344,10 +172,6 @@ func (q companyQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Comp
 		return nil, errors.Wrap(err, "models: failed to execute a one query for companies")
 	}
 
-	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
-		return o, err
-	}
-
 	return o, nil
 }
 
@@ -358,14 +182,6 @@ func (q companyQuery) All(ctx context.Context, exec boil.ContextExecutor) (Compa
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to Company slice")
-	}
-
-	if len(companyAfterSelectHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
-				return o, err
-			}
-		}
 	}
 
 	return o, nil
@@ -548,13 +364,6 @@ func (companyL) LoadMotherCompanyCompanies(ctx context.Context, e boil.ContextEx
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for companies")
 	}
 
-	if len(companyAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
 	if singular {
 		object.R.MotherCompanyCompanies = resultSlice
 		for _, foreign := range resultSlice {
@@ -663,13 +472,6 @@ func (companyL) LoadDaughterCompanyCompanies(ctx context.Context, e boil.Context
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for companies")
 	}
 
-	if len(companyAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
 	if singular {
 		object.R.DaughterCompanyCompanies = resultSlice
 		for _, foreign := range resultSlice {
@@ -778,13 +580,6 @@ func (companyL) LoadPersons(ctx context.Context, e boil.ContextExecutor, singula
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for persons")
 	}
 
-	if len(personAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
 	if singular {
 		object.R.Persons = resultSlice
 		for _, foreign := range resultSlice {
@@ -1284,10 +1079,6 @@ func (o *Company) Insert(ctx context.Context, exec boil.ContextExecutor, columns
 		}
 	}
 
-	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
-		return err
-	}
-
 	nzDefaults := queries.NonZeroDefaultSet(companyColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
@@ -1350,7 +1141,7 @@ func (o *Company) Insert(ctx context.Context, exec boil.ContextExecutor, columns
 		companyInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(ctx, exec)
+	return nil
 }
 
 // Update uses an executor to update the Company.
@@ -1364,9 +1155,6 @@ func (o *Company) Update(ctx context.Context, exec boil.ContextExecutor, columns
 	}
 
 	var err error
-	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
-		return 0, err
-	}
 	key := makeCacheKey(columns, nil)
 	companyUpdateCacheMut.RLock()
 	cache, cached := companyUpdateCache[key]
@@ -1419,7 +1207,7 @@ func (o *Company) Update(ctx context.Context, exec boil.ContextExecutor, columns
 		companyUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
+	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
@@ -1500,10 +1288,6 @@ func (o *Company) Upsert(ctx context.Context, exec boil.ContextExecutor, updateO
 		if o.CreatedAt.IsZero() {
 			o.CreatedAt = currTime
 		}
-	}
-
-	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
-		return err
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(companyColumnsWithDefault, o)
@@ -1607,7 +1391,7 @@ func (o *Company) Upsert(ctx context.Context, exec boil.ContextExecutor, updateO
 		companyUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(ctx, exec)
+	return nil
 }
 
 // Delete deletes a single Company record with an executor.
@@ -1615,10 +1399,6 @@ func (o *Company) Upsert(ctx context.Context, exec boil.ContextExecutor, updateO
 func (o *Company) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no Company provided for delete")
-	}
-
-	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), companyPrimaryKeyMapping)
@@ -1637,10 +1417,6 @@ func (o *Company) Delete(ctx context.Context, exec boil.ContextExecutor) (int64,
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for companies")
-	}
-
-	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	return rowsAff, nil
@@ -1673,14 +1449,6 @@ func (o CompanySlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) 
 		return 0, nil
 	}
 
-	if len(companyBeforeDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
-	}
-
 	var args []interface{}
 	for _, obj := range o {
 		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), companyPrimaryKeyMapping)
@@ -1703,14 +1471,6 @@ func (o CompanySlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for companies")
-	}
-
-	if len(companyAfterDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
 	}
 
 	return rowsAff, nil
