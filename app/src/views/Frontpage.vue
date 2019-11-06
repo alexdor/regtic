@@ -74,38 +74,40 @@
     background-size: cover;
     background-position-x: center;
     width: 100%;
-    height: 600px;
+    height: 30vh;
     -webkit-mask-image: -webkit-gradient(linear, left 20%, left 100%, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
   }
 
   .banner .logo {
     zoom: 4;
-    max-width: 100%;
+    max-width: 15vh; /* We make use of the max-width constraint to make sure the image does not overflow outside of the banner area, as the banner height is now using a relative metric. */
+    width: 25vw;
+    padding-top: 0.5vh;
   }
 
   .content {
     max-width: 940px;
     margin: auto;
-    width: calc(100% - 60px);
+    width: calc(100% - 60px); /* 30px spacing left and right of the content section, in case the screen width is too low. */
   }
 
   .el-row {
     width: 100%;
-    margin-top: 16px;
+    margin-top: 1rem;
   }
 
   .extra-padding {
-    padding: 0 8px;
+    padding: 0 0.5rem;
   }
 
   .el-row .el-col {
-    padding: 8px;
+    padding: 0.5rem;
     text-align: center;
   }
 
   .el-card i {
-    font-size: 48px;
-    margin-top: 16px;
+    font-size: 3rem;
+    margin-top: 1rem;
   }
 
   .el-col a {
@@ -118,6 +120,6 @@
   }
 
   li {
-    margin-bottom: 5px;
+    margin-bottom: 0.25rem;
   }
 </style>
