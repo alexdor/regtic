@@ -561,7 +561,7 @@ func (companyL) LoadPersons(ctx context.Context, e boil.ContextExecutor, singula
 		one := new(Person)
 		var localJoinCol string
 
-		err = results.Scan(&one.ID, &one.FirstName, &one.LastName, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.NameVector, &localJoinCol)
+		err = results.Scan(&one.ID, &one.FirstName, &one.LastName, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.NameVector, &one.FullName, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for persons")
 		}
