@@ -1,7 +1,7 @@
 <template>
   <div class="full-height">
     <el-card>
-      <SearchInput :initialSearchStr="searchStr" @search="search()" />
+      <SearchInput :initialSearchStr="initialSearchStr" @search="search" />
       <div class="align-center" v-if="loading">
         <VclTable class="loading-screen" :rows="15" :columns="10" />
       </div>
@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import api from "@/utils/mockapi";
+import api from "@/utils/api";
 import { Component, Vue } from "vue-property-decorator";
 import SearchInput from "@/components/SearchInput.vue";
 import SearchResultsTable from "@/components/SearchResultsTable.vue";
@@ -28,17 +28,17 @@ import { VclTable } from "vue-content-loading";
 })
 export default class SelectCompany extends Vue {
   loading: boolean = true;
-  searchStr: string = "";
+  initialSearchStr: string = "";
   results: { name: string; id: string; address: string; vat: string }[] = [];
 
   created() {
-    this.searchStr = this.$route.params.name;
-    this.search();
+    this.initialSearchStr = this.$route.params.name;
+    this.search(this.initialSearchStr);
   }
 
-  async search() {
+  async search(searchStr: string) {
     this.loading = true;
-    this.results = await api.findCompanies(this.searchStr);
+    this.results = await api.findCompanies(searchStr);
     this.loading = false;
   }
 }
