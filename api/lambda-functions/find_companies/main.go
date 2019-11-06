@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 
@@ -16,6 +18,7 @@ import (
 type Response events.APIGatewayProxyResponse
 
 const unprocessableError = "{\"error\": \"Please provide a company name \"}"
+const notFound = "{\"error\": \"Company name provided doesn't exist in the database \"}"
 
 var origin = os.Getenv("ORIGIN")
 
@@ -36,6 +39,9 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (Respon
 
 	companies, err := db.FindCompany(ctx, companyName)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return Response{StatusCode: 404, Body: notFound}, nil
+		}
 		// TODO: Replace with sentry
 		fmt.Println(err)
 		return Response{StatusCode: 500}, err
