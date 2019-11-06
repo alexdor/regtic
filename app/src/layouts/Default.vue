@@ -7,7 +7,7 @@
                active-text-color="#fff"
                default-active="/"
                :router="true">
-        <img class="logo" src="../assets/regtic-logo.png" alt="Regtic" />
+        <img class="logo" src="../assets/regtic-logo.png" alt="Regtic logo" />
         <div class="menu-divider" />
         <el-menu-item divided index="/search">
           <i class="el-icon-search" aria-hidden="true" />Search
