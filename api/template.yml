@@ -2,6 +2,8 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: A hello world application.
 Globals:
+  Function:
+    Timeout: 1500
   Api:
     Cors:
       AllowMethods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
@@ -32,6 +34,7 @@ Resources:
           ORIGIN: "http://localhost:8080"
       Events:
         Vote:
+          Type: Api
           Properties:
             Path: /v1/validate_company
             Method: get
