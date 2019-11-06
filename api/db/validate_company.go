@@ -127,7 +127,7 @@ func getOwners(ctx context.Context, companies *models.CompanySlice, response *Va
 
 var badPersonWhereClause = models.BadPersonColumns.NameVector + " @@ plainto_tsquery('simple', ? )"
 var badPersonSelect = "*, ts_rank(" + models.BadPersonColumns.NameVector + ", plainto_tsquery('simple', $1)) as rank"
-var badPersonOrderBy = "rank desc " //+ models.BadPersonColumns.Type + " desc"
+var badPersonOrderBy = "rank desc, " + models.BadPersonColumns.Type + " desc"
 
 func searchForBadPersons(ctx context.Context, persons models.PersonSlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
 	defer wg.Done()
