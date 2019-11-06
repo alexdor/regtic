@@ -1,14 +1,14 @@
 <template>
   <el-table :data="data">
-    <el-table-column label="Name">
+    <el-table-column label="Name" show-overflow-tooltip>
       <template slot-scope="scope">
         <span class="name">
           {{ scope.row.name }}
         </span>
       </template>
     </el-table-column>
-    <el-table-column prop="address" label="Address" />
-    <el-table-column prop="vat" label="VAT" />
+    <el-table-column prop="address" label="Address" show-overflow-tooltip />
+    <el-table-column prop="vat" label="VAT" width="150" show-overflow-tooltip />
     <el-table-column fixed="right" width="120">
       <template slot-scope="scope">
         <router-link :to="'/company/' + scope.row.id">

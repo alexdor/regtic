@@ -1,17 +1,17 @@
 <template>
   <div class="full-height">
     <el-row>
-      <el-col :span="4" class="title-col">
+      <el-col :span="14" class="title-col">
         <div class="title vertical-center">
           <div v-if="loading" class="title-loading">
-            <VclCode />
+            <VclCode height="40" />
           </div>
           <div v-else>
             {{ name }}
           </div>
         </div>
       </el-col>
-      <el-col :span="20" align="right">
+      <el-col :span="10" align="right">
         <el-button
           disabled
           title="Coming soon..."
@@ -114,7 +114,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import api from "@/utils/mockapi";
+import api from "@/utils/api";
 //@ts-ignore
 import { VclCode, VclList } from "vue-content-loading";
 //@ts-ignore
@@ -143,9 +143,11 @@ export default class Company extends Vue {
 
   async created() {
     const companyId = this.$route.params.id;
-    const { name, vat, address, companies, people } = await api.checkCompany(
-      companyId
-    );
+    const {
+      info: { name, vat, address },
+      companies,
+      people
+    } = await api.validateCompany(companyId);
     this.name = name;
     this.vat = vat;
     this.address = address;
@@ -155,17 +157,22 @@ export default class Company extends Vue {
   }
 
   parsePeopleArray(people: any) {
-    return [
-      ...people.bad.map((person: any) => {
-        return { ...person, type: "bad" };
-      }),
-      ...people.warning.map((person: any) => {
-        return { ...person, type: "warning" };
-      }),
-      ...people.good.map((person: any) => {
-        return { ...person, type: "good" };
-      })
-    ];
+    const goodPeople = people.good
+      ? people.good.map((person: any) => {
+          return { name: person.full_name, ...person, type: "good" };
+        })
+      : [];
+    const warningPeople = people.warning
+      ? people.warning.map((person: any) => {
+          return { name: person.full_name, ...person, type: "warning" };
+        })
+      : [];
+    const badPeople = people.bad
+      ? people.bad.map((person: any) => {
+          return { name: person.full_name, ...person, type: "bad" };
+        })
+      : [];
+    return [...badPeople, ...warningPeople, ...goodPeople];
   }
 }
 </script>
