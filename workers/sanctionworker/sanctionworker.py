@@ -54,17 +54,11 @@ def select_fields(tree):
         else:
             address.append("None")
 
-        # returned_cols = ["full_name", "type", "source", "address"]
-
     sanctions_df = pd.DataFrame(
         {"full_name": wholeName, "type": type, "source": source, "address": address}
     )
 
     return sanctions_df
-
-
-def remove_sanction_from_db():
-    dbtools.delete_all_bad_persons(list_type=BAD_PERSON_TYPE.SANCTION)
 
 
 def add_new_sanction_to_db(df):
