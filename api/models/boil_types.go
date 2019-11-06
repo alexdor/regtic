@@ -51,6 +51,12 @@ func makeCacheKey(cols boil.Columns, nzDefaults []string) string {
 	return str
 }
 
+// Enum values for bad_person_type
+const (
+	BadPersonTypePEP      = "PEP"
+	BadPersonTypeSANCTION = "SANCTION"
+)
+
 // Enum values for company_status
 const (
 	CompanyStatusActive      = "active"

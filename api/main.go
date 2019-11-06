@@ -1,4 +1,4 @@
-//go:generate sqlboiler psql
+//go:generate sqlboiler psql --no-hooks
 package main
 
 import "fmt"
