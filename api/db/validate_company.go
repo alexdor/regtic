@@ -11,9 +11,10 @@ import (
 )
 
 type validationLocks struct {
-	companies sync.Mutex
-	people    sync.Mutex
-	errors    sync.Mutex
+	companies  sync.Mutex
+	people     sync.Mutex
+	errors     sync.Mutex
+	companyMap map[string]struct{}
 }
 type People struct {
 	Bad     models.BadPersonSlice `json:"bad"`
@@ -40,7 +41,9 @@ func ValidateCompany(ctx context.Context, id string) (*ValidationResponse, error
 		return &response, err
 	}
 
-	locks := &validationLocks{}
+	locks := &validationLocks{
+		companyMap: make(map[string]struct{}),
+	}
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
@@ -61,12 +64,12 @@ func unique(response ValidationResponse) {
 
 func traverseThroughTheCompany(ctx context.Context, companies *models.CompanySlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
 	wg.Add(2)
-	go getDaughterCompanies(ctx, companies, response, locks, wg)
+	go getMotherCompanies(ctx, companies, response, locks, wg)
 	go getOwners(ctx, companies, response, locks, wg)
 	wg.Done()
 }
 
-func getDaughterCompanies(ctx context.Context, companies *models.CompanySlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
+func getMotherCompanies(ctx context.Context, companies *models.CompanySlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	if companies == nil || len(*companies) == 0 {
@@ -79,6 +82,22 @@ func getDaughterCompanies(ctx context.Context, companies *models.CompanySlice, r
 			writeError(err, response, locks)
 			continue
 		}
+		//Search for companies that have already been traversed and drop them from the list
+		locks.companies.Lock()
+		companiesFound := 0
+		for i := 0; i+companiesFound < len(mCompanies); i++ {
+			if _, seen := locks.companyMap[mCompanies[i].ID]; !seen {
+				locks.companyMap[mCompanies[i].ID] = struct{}{}
+				continue
+			}
+			companiesFound++
+			mCompanies[i] = mCompanies[len(mCompanies)-companiesFound]
+			i--
+		}
+		if companiesFound > 0 {
+			mCompanies = mCompanies[:len(mCompanies)-companiesFound]
+		}
+		locks.companies.Unlock()
 		motherCompanies = append(motherCompanies, mCompanies...)
 	}
 	wg.Add(1)
@@ -102,27 +121,33 @@ func getOwners(ctx context.Context, companies *models.CompanySlice, response *Va
 			continue
 		}
 		wg.Add(1)
-		go searchForBadPersons(ctx, &persons, response, locks, wg)
+		go searchForBadPersons(ctx, persons, response, locks, wg)
 	}
 }
 
-var badPersonWhereClause = models.BadPersonColumns.NameVector + "@@ plainto_tsquery('simple', ? )"
+var badPersonWhereClause = models.BadPersonColumns.NameVector + " @@ plainto_tsquery('simple', ? )"
+var badPersonSelect = "*, ts_rank(" + models.BadPersonColumns.NameVector + ", plainto_tsquery('simple', $1)) as rank"
+var badPersonOrderBy = "rank desc " //+ models.BadPersonColumns.Type + " desc"
 
-func searchForBadPersons(ctx context.Context, persons *models.PersonSlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
+func searchForBadPersons(ctx context.Context, persons models.PersonSlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
 	defer wg.Done()
-	if persons == nil || len(*persons) == 0 {
+	if len(persons) == 0 {
 		return
 	}
 	peopleResponse := People{}
-	for _, person := range *persons {
+	for _, person := range persons {
 		//TODO: add aliases, score and sorting
 		badPersons, err := models.BadPersons(
+			qm.Select(badPersonSelect),
 			qm.Where(badPersonWhereClause, person.FullName),
+			qm.Limit(1),
+			qm.OrderBy(badPersonOrderBy),
 		).All(ctx, DB)
 
 		noRows := errors.Is(err, sql.ErrNoRows)
 		if !noRows && err != nil {
 			writeError(err, response, locks)
+			continue
 		}
 
 		if noRows || len(badPersons) == 0 {
