@@ -40,7 +40,7 @@
 
 <script lang="ts">
   import { Component, Vue, Prop } from "vue-property-decorator";
-  import Footer from "@/components/Footer.vue"; // @ is an alias to /src
+  import Footer from "@/components/Footer.vue";
 
   @Component({
     components: {
