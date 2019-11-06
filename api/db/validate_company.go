@@ -2,32 +2,29 @@ package db
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"sync"
 
-	"github.com/alexdor/regtic/api/interfaces"
 	"github.com/alexdor/regtic/api/models"
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
 type validationLocks struct {
-	companies sync.RWMutex
-	people    struct {
-		bad     sync.RWMutex
-		warning sync.RWMutex
-		good    sync.RWMutex
-	}
-	errors sync.Mutex
+	companies sync.Mutex
+	people    sync.Mutex
+	errors    sync.Mutex
 }
-
+type People struct {
+	Bad     models.BadPersonSlice `json:"bad"`
+	Warning models.BadPersonSlice `json:"warning"`
+	Good    models.PersonSlice    `json:"good"`
+}
 type ValidationResponse struct {
 	Info      models.Company      `json:"info"`
 	Companies models.CompanySlice `json:"companies"`
-	People    struct {
-		Bad     []interfaces.BadPersonJson `json:"bad"`
-		Warning []interfaces.BadPersonJson `json:"warning"`
-		Good    []interfaces.PersonJson    `json:"good"`
-	} `json:"people"`
-	Errors []error `json:"errors"`
+	People    People              `json:"people"`
+	Errors    []error             `json:"errors"`
 }
 
 func ValidateCompany(ctx context.Context, id string) (*ValidationResponse, error) {
@@ -47,7 +44,7 @@ func ValidateCompany(ctx context.Context, id string) (*ValidationResponse, error
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
-	searchForBadPersons(ctx, &models.CompanySlice{company}, &response, locks, wg)
+	traverseThroughTheCompany(ctx, &models.CompanySlice{company}, &response, locks, wg)
 
 	response.Info = *company
 
@@ -62,15 +59,15 @@ func unique(response ValidationResponse) {
 	return
 }
 
-func searchForBadPersons(ctx context.Context, companies *models.CompanySlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
+func traverseThroughTheCompany(ctx context.Context, companies *models.CompanySlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
 	wg.Add(2)
 	go getDaughterCompanies(ctx, companies, response, locks, wg)
 	go getOwners(ctx, companies, response, locks, wg)
 	wg.Done()
 }
 
-func getDaughterCompanies(ctx context.Context, companies *models.CompanySlice, response *ValidationResponse, locks *validationLocks, group *sync.WaitGroup) {
-	defer group.Done()
+func getDaughterCompanies(ctx context.Context, companies *models.CompanySlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
+	defer wg.Done()
 
 	if companies == nil || len(*companies) == 0 {
 		return
@@ -81,36 +78,69 @@ func getDaughterCompanies(ctx context.Context, companies *models.CompanySlice, r
 		motherCompanies = append(motherCompanies, mCompanies...)
 		writeError(err, response, locks)
 	}
-	group.Add(1)
-	searchForBadPersons(ctx, &motherCompanies, response, locks, group)
+	wg.Add(1)
+	traverseThroughTheCompany(ctx, &motherCompanies, response, locks, wg)
 
 	locks.companies.Lock()
 	response.Companies = append(response.Companies, motherCompanies...)
 	locks.companies.Unlock()
 }
 
-//TODO: Add aliases to this query
-var sqlQuery = "select b." + models.BadPersonColumns.FullName + " from " + models.TableNames.Companies +
-	" companies as c where company.id in $1 inner join " + models.TableNames.CompanyToPerson + " as cp on c." + models.CompanyColumns.ID + " = cp.person_id inner join " +
-	models.TableNames.Persons + " as p on p." + models.PersonColumns.ID + " = cp.person_id inner join on " +
-	models.TableNames.BadPersons + " as b on ( concat(p." + models.PersonColumns.FirstName + ", p." + models.PersonColumns.LastName + ") = " + models.BadPersonColumns.FullName +
-	" or concat(p." + models.PersonColumns.LastName + ", p." + models.PersonColumns.FirstName + ") = " + models.BadPersonColumns.FullName + " ))"
-
 func getOwners(ctx context.Context, companies *models.CompanySlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
 	defer wg.Done()
-	//companies , err := models.Companies(qm.WhereIn("company in ?",ids,qm.Load(models.CompanyRels.Persons)))..All(ctx,db.DB)
-	//var badPersonList models.BadPersonSlice
-	//
-	//err := models.NewQuery(qm.SQL(sqlQuery, ids)).Bind(ctx, DB, &badPersonList)
-	//writeError(err, response, locks)
-	//if badPersonList != nil {
-	//badPersons.Lock()
-	//for i := range badPersonList {
-	//	if badPersonList[i].FullName.Valid {
-	//		badPersons.items = append(badPersons.items, badPersonList[i].FullName.String)
-	//	}
-	//}
-	//}
+	if companies == nil || len(*companies) == 0 {
+		return
+	}
+
+	for _, company := range *companies {
+		persons, err := company.Persons().All(ctx, DB)
+		if err != nil {
+			writeError(err, response, locks)
+			continue
+		}
+		wg.Add(1)
+		go searchForBadPersons(ctx, &persons, response, locks, wg)
+	}
+}
+
+var badPersonWhereClause = models.BadPersonColumns.NameVector + "@@ plainto_tsquery('simple', ? && ?)"
+
+func searchForBadPersons(ctx context.Context, persons *models.PersonSlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
+	defer wg.Done()
+	if persons == nil || len(*persons) == 0 {
+		return
+	}
+	peopleResponse := People{}
+	for _, person := range *persons {
+		//TODO: add aliases, score and sorting
+		badPersons, err := models.BadPersons(
+			qm.Where(badPersonWhereClause, person.FirstName, person.LastName),
+		).All(ctx, DB)
+
+		noRows := errors.As(err, &sql.ErrNoRows)
+		if !noRows && err != nil {
+			writeError(err, response, locks)
+		}
+
+		if noRows || len(badPersons) == 0 {
+			peopleResponse.Good = append(peopleResponse.Good, person)
+			continue
+		}
+
+		//TODO: Get all the matches and not just the first one
+		switch badPersons[0].Type {
+		case models.BadPersonTypePEP:
+			peopleResponse.Warning = append(peopleResponse.Warning, badPersons[0])
+		case models.BadPersonTypeSANCTION:
+			peopleResponse.Bad = append(peopleResponse.Bad, badPersons[0])
+		}
+	}
+
+	locks.people.Lock()
+	response.People.Good = append(response.People.Good, peopleResponse.Good...)
+	response.People.Warning = append(response.People.Warning, peopleResponse.Warning...)
+	response.People.Bad = append(response.People.Bad, peopleResponse.Bad...)
+	locks.people.Unlock()
 
 }
 
