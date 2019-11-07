@@ -18,6 +18,7 @@ updated_at      (Now)  (publicationDate)
 created_at      (Now)  ()
 """
 
+
 def parse_file():
     try:
         access_token = os.environ['SANCTIONS_LIST']
@@ -29,20 +30,27 @@ def parse_file():
     file.close()
     return ET.fromstring(data)
 
+
 def select_fields(tree):
     wholeName = []
+    alias = []
     type = []
     source = []
     address = []
     sanctions_export = '{http://eu.europa.ec/fpi/fsd/export}'
 
     for sanctionEntity in tree.findall(sanctions_export + 'sanctionEntity'):
-        nameAlias = sanctionEntity.find(sanctions_export + 'nameAlias')
-        regulationSummary = nameAlias.find(sanctions_export + 'regulationSummary')
-        birthdate = sanctionEntity.find(sanctions_export + 'birthdate')
+        nameAlias = sanctionEntity.findall(sanctions_export + 'nameAlias')
+        # citizenship
+        regulationSummary = nameAlias[0].find(sanctions_export + 'regulationSummary') #1
+        birthdate = sanctionEntity.find(sanctions_export + 'birthdate') #1
+        wholeName.append(nameAlias[0].attrib['wholeName'])
+        person_alias = []
+        for i in nameAlias:
+            person_alias.append(i.attrib['wholeName'])
 
-        wholeName.append(nameAlias.attrib['wholeName'])
-        type.append(BAD_PERSON_TYPE.PEP)
+        alias.append(person_alias)
+        type.append("SANCTION")
         source.append(regulationSummary.attrib['publicationUrl'])
         if birthdate is not None:
             address.append(f"{birthdate.attrib['place']}, {birthdate.attrib['city']}, {birthdate.attrib['region']}, {birthdate.attrib['zipCode']}")
@@ -53,12 +61,14 @@ def select_fields(tree):
 
     sanctions_df = pd.DataFrame(
         {'full_name': wholeName,
+         'alias': alias,
          'type': type,
          'source': source,
          'address': address
          })
 
     return sanctions_df
+
 
 def remove_sanction_from_db():
     dbtools.delete_all_bad_persons(list_type=BAD_PERSON_TYPE.SANCTION)
