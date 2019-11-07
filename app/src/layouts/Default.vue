@@ -32,7 +32,7 @@
 
 <script>
   import Topbar from "@/components/Topbar.vue";
-  import Footer from "@/components/Footer.vue"; // @ is an alias to /src
+  import Footer from "@/components/Footer.vue";
 
   export default {
     components: {
