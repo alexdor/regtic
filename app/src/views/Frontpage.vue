@@ -62,6 +62,8 @@
 </script>
 
 <style scoped lang="scss">
+  $side-spacing: 30px; /* The spacing left/right of the content section, in case the screen width is too low. */
+
   .wrapper {
     background-color: #345bcc;
     min-height: 100%;
@@ -85,10 +87,46 @@
     padding-top: 0.5vh;
   }
 
+  /* Default content styling, for quite small screens (tablets) */
   .content {
-    max-width: 940px;
+    max-width: 640px;
     margin: auto;
-    width: calc(100% - 60px); /* 30px spacing left and right of the content section, in case the screen width is too low. */
+    width: calc(100% - #{$side-spacing} * 2); /* Adding spacing left and right of the content section, in case the screen width is too low. */
+  }
+
+  /* Default content styling, for small screens (phones) */
+  @media screen and (max-width: 800px) {
+    .content {
+      min-width: 400px;
+      zoom: 0.8; /* Zoom to make the buttons appear less squished. */
+    }
+  }
+
+  /* Default content styling, for small-ish medium screens (tablets) */
+  @media screen and (min-width: 1200px) {
+    .content {
+      min-width: 940px;
+    }
+  }
+
+  /* Default content styling, for normal screens (laptop, desktop) */
+  @media screen and (min-width: 1600px) {
+    .content {
+      min-width: 1200px;
+      zoom: 1.25;
+    }
+  }
+
+  /* Default content styling, for large screens (desktop) */
+  @media screen and (min-width: 3600px) {
+    .content {
+      min-width: 1800px;
+      zoom: 2;
+    }
+
+    .el-card i {
+      zoom: 2.5; /* Button icons are enlarged on large screens. */
+    }
   }
 
   .el-row {
