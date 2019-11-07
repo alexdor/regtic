@@ -42,7 +42,9 @@
   }
 </script>
 
-<style>
+<style lang="scss">
+  $footer-height: 60px; /* Height of the footer element */
+
   #app {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -50,8 +52,8 @@
   }
 
   .fit-to-width {
-    width: calc(100% - 60px);
-    padding: 0 30px;
+    width: calc(100% - 4rem); /* Adding spacing to the left/right of the given element, in case it'll otherwise hit the left/right edges of its outer container. Makes it so the total width of the element is still 100%. */
+    padding: 0 2rem;
   }
 
   .el-aside {
@@ -103,7 +105,7 @@
   }
 
   .el-footer {
-    line-height: 60px;
+    line-height: $footer-height;
   }
 
   .el-container {
@@ -113,7 +115,7 @@
   .full-height {
     background-color: #fafafa;
     display: inline-table;
-    min-height: calc(100% - 60px);
+    min-height: calc(100% - #{$footer-height});
     /* FIXME: this is a dirty fix and should be fixed properly in the feature */
     width: 100%;
   }
