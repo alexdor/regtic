@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 function getURLFromConf() {
   const yml = require("yaml");
   const fs = require("fs");
