@@ -83,7 +83,7 @@
   }
 
   .el-menu-item i {
-    color: inherit !important;
+    color: inherit;
   }
 
   .align-center {
@@ -121,8 +121,8 @@
   }
 
   .logo {
-    padding-top: 20px;
-    width: 150px;
+    padding-top: 1.25rem;
+    width: 60%;
     margin-left: auto;
     margin-right: auto;
     display: block;
@@ -132,10 +132,7 @@
     display: block;
     height: 1.5px;
     width: 85%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin: 1.25rem auto;
     background-color: rgba(255, 255, 255, 0.3);
     position: relative;
   }
