@@ -65,6 +65,9 @@
       "parser": "@typescript-eslint/parser"
     }
   },
+  "eslintIgnore": [
+    "node_modules/*"
+  ],
   "postcss": {
     "plugins": {
       "autoprefixer": {}
