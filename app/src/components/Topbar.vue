@@ -44,12 +44,11 @@
                 icon="el-icon-s-tools"
                 aria-hidden="true"
                 disabled
+                >Settings</el-dropdown-item
               >
-                Settings
-              </el-dropdown-item>
-              <el-dropdown-item icon="el-icon-s-home" aria-hidden="true">
-                Log out
-              </el-dropdown-item>
+              <el-dropdown-item icon="el-icon-s-home" aria-hidden="true"
+                >Log out</el-dropdown-item
+              >
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -61,9 +60,11 @@
 // import NotificationItem from "@/components/NotificationItem.vue";
 
 export default {
+  // components: { NotificationItem },
+  props: ["title", "includeGoBack"],
   data() {
     return {
-      notification_types: {
+      notificationTypes: {
         status: { color: "primary", icon: "document" },
         add: { color: "success", icon: "plus" },
         warn: { color: "warning", icon: "alarm-clock" }
@@ -96,8 +97,6 @@ export default {
       ]
     };
   },
-  // components: { NotificationItem },
-  props: ["title", "includeGoBack"],
   created() {
     document.title = this.title;
   },

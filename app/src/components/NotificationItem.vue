@@ -4,35 +4,35 @@
       <i
         :class="
           'el-notification-icon el-icon-' +
-            notification_types[data.type].icon +
+            notificationTypes[data.type].icon +
             ' el-color-' +
-            notification_types[data.type].color
+            notificationTypes[data.type].color
         "
       ></i>
     </el-col>
     <el-col :span="21">
       <p>
-        <b>{{ data.boldText }}</b
-        >{{ data.text }}
+        <b>{{ data.boldText }}</b>
+        {{ data.text }}
       </p>
     </el-col>
   </el-row>
 </template>
 <script>
 export default {
+  props: {
+    data: {
+      type: Object
+    }
+  },
   data() {
     return {
-      notification_types: {
+      notificationTypes: {
         status: { color: "primary", icon: "document" },
         add: { color: "success", icon: "plus" },
         warn: { color: "warning", icon: "alarm-clock" }
       }
     };
-  },
-  props: {
-    data: {
-      type: Object
-    }
   }
 };
 </script>

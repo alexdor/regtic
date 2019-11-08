@@ -6,9 +6,7 @@
           <div v-if="loading" class="title-loading">
             <VclCode height="40" />
           </div>
-          <div v-else>
-            {{ name }}
-          </div>
+          <div v-else>{{ name }}</div>
         </div>
       </el-col>
       <el-col :span="10" align="right">
@@ -17,25 +15,21 @@
           title="Coming soon..."
           type="info"
           icon="el-icon-collection-tag"
+          >Add to watchlist</el-button
         >
-          Add to watchlist
-        </el-button>
         <el-button
           disabled
           title="Coming soon..."
           type="primary"
           icon="el-icon-download"
+          >Generate report</el-button
         >
-          Generate report
-        </el-button>
       </el-col>
     </el-row>
     <el-row>
       <el-col :span="12">
         <el-card class="people-card">
-          <div slot="header" class="clearfix">
-            People
-          </div>
+          <div slot="header" class="clearfix">People</div>
           <div v-if="loading">
             <VclList v-for="index in 2" :key="index" />
           </div>
@@ -93,9 +87,7 @@
       </el-col>
       <el-col :span="12">
         <el-card class="companies-card">
-          <div slot="header" class="clearfix">
-            Companies
-          </div>
+          <div slot="header" class="clearfix">Companies</div>
           <div v-if="loading">
             <VclList v-for="index in 2" :key="index" />
           </div>
@@ -115,9 +107,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import api from "@/utils/api";
-//@ts-ignore
 import { VclCode, VclList } from "vue-content-loading";
-//@ts-ignore
 
 @Component({
   components: {
@@ -126,9 +116,9 @@ import { VclCode, VclList } from "vue-content-loading";
   }
 })
 export default class Company extends Vue {
-  name: string = "";
-  vat: string = "";
-  address: string = "";
+  name = "";
+  vat = "";
+  address = "";
   companies: {
     id: string;
     found: boolean;
@@ -139,7 +129,7 @@ export default class Company extends Vue {
     starting_date: number;
   }[] = [];
   people: any[] = [];
-  loading: boolean = true;
+  loading = true;
 
   async created() {
     const companyId = this.$route.params.id;

@@ -5,8 +5,8 @@
       class="inline-input full-with"
       placeholder="Enter company name"
       prefix-icon="el-icon-search"
-      @keyup.native.enter="search()"
       clearable
+      @keyup.native.enter="search()"
     />
     <div v-if="includeButton" class="vertical-spacing">
       <el-button
@@ -14,9 +14,8 @@
         class="full-width"
         :disabled="!isSearchStrValid"
         @click.native="search()"
+        >Search</el-button
       >
-        Search
-      </el-button>
     </div>
   </div>
 </template>
@@ -32,7 +31,7 @@ export default class SearchInput extends Vue {
   @Prop({ default: "" })
   initialSearchStr!: string;
 
-  searchStr: string = "";
+  searchStr = "";
 
   search(): void {
     if (!this.isSearchStrValid) return;

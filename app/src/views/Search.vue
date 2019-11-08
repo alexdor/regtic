@@ -3,14 +3,14 @@
     <div class="col-center">
       <img
         src="../assets/undraw_detailed_analysis.svg"
-        alt=""
+        alt
         class="fit-to-width"
       />
       <p class="justify-center">
         Check your company relations with a click of a button. Simple, easy.
       </p>
       <div class="vertical-spacing">
-        <SearchInput :includeButton="true" />
+        <SearchInput :include-button="true" />
       </div>
     </div>
   </div>
@@ -26,7 +26,7 @@ import SearchInput from "@/components/SearchInput.vue";
   }
 })
 export default class CheckCompany extends Vue {
-  test: string = "";
+  test = "";
 }
 </script>
 
