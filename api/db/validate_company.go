@@ -75,9 +75,9 @@ func getMotherCompanies(ctx context.Context, companies *models.CompanySlice, res
 	if companies == nil || len(*companies) == 0 {
 		return
 	}
-	motherCompanies := models.CompanySlice{}
+	aggregatedMotherCompanies := models.CompanySlice{}
 	for _, company := range *companies {
-		mCompanies, err := company.MotherCompanyCompanies(qm.Load(models.CompanyRels.Persons), qm.Load(models.CompanyRels.MotherCompanyCompanies)).All(ctx, DB)
+		motherCompanies, err := company.MotherCompanyCompanies(qm.Load(models.CompanyRels.Persons), qm.Load(models.CompanyRels.MotherCompanyCompanies)).All(ctx, DB)
 		if err != nil {
 			writeError(err, response, locks)
 			continue
@@ -85,26 +85,27 @@ func getMotherCompanies(ctx context.Context, companies *models.CompanySlice, res
 		//Search for companies that have already been traversed and drop them from the list
 		locks.companies.Lock()
 		companiesFound := 0
-		for i := 0; i+companiesFound < len(mCompanies); i++ {
-			if _, seen := locks.companyMap[mCompanies[i].ID]; !seen {
-				locks.companyMap[mCompanies[i].ID] = struct{}{}
+		for i := 0; i+companiesFound < len(motherCompanies); i++ {
+			_, parsedAlready := locks.companyMap[motherCompanies[i].ID]
+			if !parsedAlready {
+				locks.companyMap[motherCompanies[i].ID] = struct{}{}
 				continue
 			}
 			companiesFound++
-			mCompanies[i] = mCompanies[len(mCompanies)-companiesFound]
+			motherCompanies[i] = motherCompanies[len(motherCompanies)-companiesFound]
 			i--
 		}
 		if companiesFound > 0 {
-			mCompanies = mCompanies[:len(mCompanies)-companiesFound]
+			motherCompanies = motherCompanies[:len(motherCompanies)-companiesFound]
 		}
 		locks.companies.Unlock()
-		motherCompanies = append(motherCompanies, mCompanies...)
+		aggregatedMotherCompanies = append(aggregatedMotherCompanies, motherCompanies...)
 	}
 	wg.Add(1)
-	traverseThroughTheCompany(ctx, &motherCompanies, response, locks, wg)
+	traverseThroughTheCompany(ctx, &aggregatedMotherCompanies, response, locks, wg)
 
 	locks.companies.Lock()
-	response.Companies = append(response.Companies, motherCompanies...)
+	response.Companies = append(response.Companies, aggregatedMotherCompanies...)
 	locks.companies.Unlock()
 }
 
@@ -169,7 +170,6 @@ func searchForBadPersons(ctx context.Context, persons models.PersonSlice, respon
 	response.People.Warning = append(response.People.Warning, peopleResponse.Warning...)
 	response.People.Bad = append(response.People.Bad, peopleResponse.Bad...)
 	locks.people.Unlock()
-
 }
 
 func writeError(err error, response *ValidationResponse, locks *validationLocks) {
