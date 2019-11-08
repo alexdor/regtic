@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/alexdor/regtic/api/interfaces"
-
 	"github.com/alexdor/regtic/api/models"
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
