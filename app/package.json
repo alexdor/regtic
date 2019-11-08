@@ -49,7 +49,6 @@
       "eslint:recommended",
       "plugin:@typescript-eslint/eslint-recommended",
       "plugin:@typescript-eslint/recommended",
-      "plugin:@typescript-eslint/recommended-requiring-type-checking",
       "prettier",
       "prettier/@typescript-eslint",
       "plugin:vue/recommended",
@@ -63,8 +62,7 @@
       "@typescript-eslint/explicit-function-return-type": "off"
     },
     "parserOptions": {
-      "parser": "@typescript-eslint/parser",
-      "project": "tsconfig.json"
+      "parser": "@typescript-eslint/parser"
     }
   },
   "postcss": {
