@@ -105,10 +105,23 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
-import api from "@/utils/api";
+import { Component, Vue } from "vue-property-decorator";
 import { VclCode, VclList } from "vue-content-loading";
+import api, {
+  People,
+  Company as CompanyType,
+  CommonPersonFields
+} from "../utils/api";
 
+type PersonType = "good" | "warning" | "bad";
+interface ViewPerson extends CommonPersonFields {
+  type: PersonType;
+  source?: string;
+  name: string;
+  first_name?: string;
+  last_name?: string;
+  country_code?: string;
+}
 @Component({
   components: {
     VclCode,
@@ -119,16 +132,8 @@ export default class Company extends Vue {
   name = "";
   vat = "";
   address = "";
-  companies: {
-    id: string;
-    found: boolean;
-    name: string;
-    vat: string;
-    address: string;
-    country_code: string;
-    starting_date: number;
-  }[] = [];
-  people: any[] = [];
+  companies: CompanyType[] = [];
+  people: ViewPerson[] = [];
   loading = true;
 
   async created() {
@@ -146,22 +151,26 @@ export default class Company extends Vue {
     this.loading = false;
   }
 
-  parsePeopleArray(people: any) {
-    const goodPeople = people.good
-      ? people.good.map((person: any) => {
-          return { name: person.full_name, ...person, type: "good" };
-        })
-      : [];
-    const warningPeople = people.warning
-      ? people.warning.map((person: any) => {
-          return { name: person.full_name, ...person, type: "warning" };
-        })
-      : [];
-    const badPeople = people.bad
-      ? people.bad.map((person: any) => {
-          return { name: person.full_name, ...person, type: "bad" };
-        })
-      : [];
+  parsePeopleArray(people: People): ViewPerson[] {
+    // TODO: Make this less verbose
+    const goodPeople = (people.good || []).map(person => ({
+      name: person.full_name,
+      ...person,
+      type: "good" as PersonType
+    }));
+
+    const warningPeople = (people.warning || []).map(person => ({
+      name: person.full_name,
+      ...person,
+      type: "warning" as PersonType
+    }));
+
+    const badPeople = (people.bad || []).map(person => ({
+      name: person.full_name,
+      ...person,
+      type: "bad" as PersonType
+    }));
+
     return [...badPeople, ...warningPeople, ...goodPeople];
   }
 }
