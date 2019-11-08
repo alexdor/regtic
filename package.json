@@ -8,7 +8,7 @@
     "start:webapp": "cd app && npm run serve",
     "start:db": "docker-compose up",
     "start:serverless": "serverless offline --showDuration --noTimeout",
-    "start:api": "cd api && make build && sam local start-api -p 3030",
+    "start:api": "cd api && make build && sam local start-api -p 3030 --docker-network host ",
     "is-docker-running": "docker ps > /dev/null",
     "db:reset": "docker-compose down -v && docker-compose pull && docker-compose up -d && sleep 5 && npm run db:migrate && npm run db:seed && docker-compose stop",
     "db:seed": "concurrently -k \"npm run start:serverless\" \"cd database && npm i && sleep 5 && npm run seed-run\"",
