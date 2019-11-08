@@ -1,11 +1,11 @@
 <template>
   <div class="full-height">
     <el-card>
-      <SearchInput :initialSearchStr="initialSearchStr" @search="search" />
-      <div class="align-center" v-if="loading">
+      <SearchInput :initial-search-str="initialSearchStr" @search="search" />
+      <div v-if="loading" class="align-center">
         <VclTable class="loading-screen" :rows="15" :columns="10" />
       </div>
-      <SearchResultsTable class="vertical-spacing" v-else :data="results" />
+      <SearchResultsTable v-else class="vertical-spacing" :data="results" />
     </el-card>
   </div>
 </template>
@@ -15,9 +15,7 @@ import api from "@/utils/api";
 import { Component, Vue } from "vue-property-decorator";
 import SearchInput from "@/components/SearchInput.vue";
 import SearchResultsTable from "@/components/SearchResultsTable.vue";
-//@ts-ignore
 import { VclTable } from "vue-content-loading";
-//@ts-ignore
 
 @Component({
   components: {
@@ -27,8 +25,8 @@ import { VclTable } from "vue-content-loading";
   }
 })
 export default class SelectCompany extends Vue {
-  loading: boolean = true;
-  initialSearchStr: string = "";
+  loading = true;
+  initialSearchStr = "";
   results: { name: string; id: string; address: string; vat: string }[] = [];
 
   created() {
