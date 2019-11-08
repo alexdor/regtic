@@ -15,6 +15,8 @@ help:
 
 functions := $(shell find lambda-functions -name \*main.go | awk -F'/' '{print $$2}')
 
+dev:
+	@eval reflex -d fancy -r '\.go$' -s -- sh -c 'echo "\n\nRestarting server\n\n"; make build
 build: ## Build golang binaries
 	export GO111MODULE=on
 	@for function in $(functions) ; do \
