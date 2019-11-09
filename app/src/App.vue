@@ -1,21 +1,21 @@
 <template>
   <div id="app">
-    <component :is="layout">
+    <component :is="layout" :show-go-back="showGoBack">
       <router-view />
     </component>
   </div>
 </template>
 
 <script>
-const default_layout = "default";
+const defaultLayout = "default";
 export default {
-  name: "app",
+  name: "App",
   computed: {
-    includeGoBack: function() {
+    showGoBack: function() {
       return this.$route.name === "company";
     },
     layout() {
-      return (this.$route.meta.layout || default_layout) + "-layout";
+      return (this.$route.meta.layout || defaultLayout) + "-layout";
     }
   }
 };
