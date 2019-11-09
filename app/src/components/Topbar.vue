@@ -2,7 +2,7 @@
   <el-header>
     <el-row>
       <el-col :span="12">
-        <i v-if="includeGoBack" class="el-icon-back" @click="goBack" />
+        <i v-if="showGoBack" class="el-icon-back" @click="goBack" />
       </el-col>
       <el-col :span="12" class="align-right">
         <div class="vertical-center">
@@ -61,7 +61,8 @@
 
 export default {
   // components: { NotificationItem },
-  props: ["title", "includeGoBack"],
+  name: "TopBar",
+  props: ["title", "showGoBack"],
   data() {
     return {
       notificationTypes: {

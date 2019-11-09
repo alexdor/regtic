@@ -1,7 +1,5 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Search from "@/views/Search.vue";
-import Frontpage from "@/views/Frontpage.vue";
 
 Vue.use(Router);
 
@@ -13,16 +11,16 @@ export default new Router({
       path: "/",
       name: "home",
       meta: { layout: "blank" },
-      component: Frontpage
+      component: () => import("./views/Frontpage.vue")
     },
     {
       path: "/search",
-      name: "home",
-      component: Search
+      name: "search",
+      component: () => import("./views/Search.vue")
     },
     {
       path: "/search/:name",
-      name: "search",
+      name: "search-name",
       component: () => import("./views/SearchResults.vue")
     },
     {
