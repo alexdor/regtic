@@ -1,11 +1,12 @@
-import enum
 import os
 import uuid
-
-from sqlalchemy import Column, Enum, String, create_engine
-from sqlalchemy.dialects.postgresql import UUID
+import enum
+from datetime import datetime
+from sqlalchemy import Column, String, create_engine, Enum
+from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import or_
 
 """
 id              (UUID)
@@ -37,6 +38,7 @@ class BadPerson(base):
     type = Column(Enum(BAD_PERSON_TYPE))
     source = Column(String)
     address = Column(String)
+    updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 def push_bad_person(full_name, list_type, source, address):
@@ -75,6 +77,75 @@ def update_df(df, list_type):
         raise err
     finally:
         session.close()
+
+
+def upsert_df(df, list_type):
+    time_now = datetime.utcnow()
+
+    # Get persons from database
+    session = Session()
+
+    inserted_ids = []
+    updated_ids = []
+    deleted_ids = []
+
+    for _, person in df.iterrows():
+        query_person = (
+            session.query(BadPerson)
+            .filter(BadPerson.type == list_type)
+            .filter(BadPerson.full_name == person["full_name"])
+            .filter(
+                or_(BadPerson.address == person["address"], BadPerson.address.is_(None))
+            )
+            .one_or_none()
+        )
+
+        if query_person is None:
+            bad_person_obj = BadPerson(
+                full_name=person["full_name"],
+                type=person["type"],
+                source=person["source"],
+                address=person["address"],
+            )
+
+            session.add(bad_person_obj)
+            inserted_ids.append(bad_person_obj.id)
+        else:
+            updated_ids.append(query_person.id)
+            query_person.updated_at = time_now
+
+    session.commit()
+
+    removed_persons = (
+        session.query(BadPerson)
+        .filter(BadPerson.type == list_type)
+        .filter(BadPerson.updated_at < time_now)
+        .all()
+    )
+
+    for person in removed_persons:
+        deleted_ids.append(person.id)
+
+    updates_trigger(updated_ids)
+    inserts_trigger(inserted_ids)
+    deletes_trigger(deleted_ids)
+
+    return f"inserted: {len(inserted_ids)} updated: {len(updated_ids)} deleted: {len(deleted_ids)}"
+
+
+def updates_trigger(UUIDS):
+    # Do cool stuff
+    return 1
+
+
+def inserts_trigger(UUIDS):
+    # Do cool stuff
+    return 1
+
+
+def deletes_trigger(UUIDS):
+    # Do cool stuff
+    return 1
 
 
 def read_bad_persons(list_type=None):

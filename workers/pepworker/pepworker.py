@@ -44,6 +44,7 @@ def parse_pep_xlsx(link):
     names_df["address"] = None
     names_df["full_name"] = names_df["first_name"] + " " + names_df["sur_name"]
     names_df = names_df[returned_cols]
+    names_df.drop_duplicates(keep="first", inplace=True)
     return names_df
 
 
@@ -53,6 +54,11 @@ def remove_pep_from_db():
 
 def add_new_pep_to_db(df):
     dbtools.update_df(df, list_type=BAD_PERSON_TYPE.PEP)
+
+
+def upsert_new_pep_to_db(df):
+    result_string = dbtools.upsert_df(df, list_type=BAD_PERSON_TYPE.PEP)
+    return result_string
 
 
 def run(event, context):
@@ -73,7 +79,25 @@ def run(event, context):
         }
 
 
+def upsert_run(event, context):
+    try:
+        file_link = get_link_to_file()
+        parsed_df = parse_pep_xlsx(file_link)
+        result_string = upsert_new_pep_to_db(parsed_df)
+        return {
+            "statusCode": 200,
+            "body": f'{{"data": "pepworker finished", "message": {result_string}}}',
+            "headers": {"Content-Type": "application/json"},
+        }
+    except Exception as err:
+        return {
+            "statusCode": 500,
+            "body": f'\{"error": "pepworker failed, error:{traceback.format_exc()}"\}',
+            "headers": {"Content-Type": "application/json"},
+        }
+
+
 if __name__ == "__main__":
     file_link = get_link_to_file()
     parsed_df = parse_pep_xlsx(file_link)
-    add_new_pep_to_db(parsed_df)
+    upsert_new_pep_to_db(parsed_df)
