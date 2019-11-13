@@ -23,6 +23,14 @@ module.exports = {
   rules: {
     "@typescript-eslint/explicit-function-return-type": "off"
   },
+  overrides: [
+    {
+      files: ["workers/**/*.js"],
+      rules: {
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    }
+  ],
   parserOptions: {
     ecmaVersion: 2018,
     project: "tsconfig.json",
