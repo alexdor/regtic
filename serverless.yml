@@ -7,19 +7,34 @@ service: regtic-main-service
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: python3.7
   region: eu-north-1
 
 package:
   individually: true
+  exclude:
+    - ./app/**
+    - ./webapp/**
+    - docker-compose
+    - .eslint*
+    - README.md
+    - .editorconfig
+    # - ./api/**
+    # - database
+    # include:
+    #   - ./api/bin/**
 
 plugins:
   - serverless-offline
   - serverless-python-requirements
+  - serverless-iam-roles-per-function
 custom:
   version: /v1/
-  REGTIC_DATABASE_URL: ${env:REGTIC_DATABASE_URL, "postgres://admin:admin@localhost:5432/regtic"}
+  REGTIC_DATABASE_URL: ${env:REGTIC_DATABASE_URL,  "postgres://admin:admin@localhost:5432/regtic"}
   ENVIRONMENT: ${env:ENVIRONMENT, "development"}
+  ORIGIN:
+    development: "http://localhost:8080"
+    production: "https://demo.regtic.com"
   pythonRequirements:
     dockerizePip: true
     zip: true
@@ -94,6 +109,37 @@ functions:
       REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
       CVR_BASE_URL: ${env:CVR_BASE_URL, "https://shared-cvr.herokuapp.com/"}
       CVR_AUTH_TOKEN: ${env:CVR_AUTH_TOKEN}
+
+  #####
+  # API
+  #####
+  find_companies:
+    handler: api/bin/find_companies
+    runtime: go1.x
+    events:
+      - http:
+          path: ${self:custom.version}find_companies
+          cors: true
+          method: get
+    module: api/find_companies
+    environment:
+      ENVIRONMENT: ${self:custom.ENVIRONMENT}
+      REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
+      ORIGIN: ${self:custom.ORIGIN.${self:custom.ENVIRONMENT}}
+
+  validate_company:
+    handler: api/bin/validate_company
+    runtime: go1.x
+    events:
+      - http:
+          path: ${self:custom.version}validate_company
+          cors: true
+          method: get
+    module: api/validate_company
+    environment:
+      ENVIRONMENT: ${self:custom.ENVIRONMENT}
+      REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
+      ORIGIN: ${self:custom.ORIGIN.${self:custom.ENVIRONMENT}}
 #
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:

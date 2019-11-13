@@ -1,6 +1,6 @@
+import enum
 import os
 import uuid
-import enum
 from sqlalchemy import Column, String, create_engine, Enum, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base

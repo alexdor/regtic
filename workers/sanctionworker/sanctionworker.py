@@ -1,11 +1,12 @@
-import xml.etree.ElementTree as ET
-import urllib.request
-import pandas as pd
+import os
 import traceback
+import urllib.request
+import xml.etree.ElementTree as ET
+
+import pandas as pd
+
 from workers.pythondbtools import dbtools
 from workers.pythondbtools.dbtools import BAD_PERSON_TYPE
-import os
-
 
 
 """
@@ -21,7 +22,7 @@ created_at      (Now)  ()
 
 def parse_file():
     try:
-        access_token = os.environ['SANCTIONS_LIST']
+        access_token = os.environ["SANCTIONS_LIST"]
     except:
         access_token = "https://webgate.ec.europa.eu/europeaid/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content?token=n002wvni"
 
@@ -37,7 +38,7 @@ def select_fields(tree):
     type = []
     source = []
     address = []
-    sanctions_export = '{http://eu.europa.ec/fpi/fsd/export}'
+    sanctions_export = "{http://eu.europa.ec/fpi/fsd/export}"
 
     for sanctionEntity in tree.findall(sanctions_export + 'sanctionEntity'):
         nameAlias = sanctionEntity.findall(sanctions_export + 'nameAlias')
@@ -50,14 +51,14 @@ def select_fields(tree):
             person_alias.append(i.attrib['wholeName'])
 
         alias.append(person_alias)
-        type.append("SANCTION")
+        type.append(BAD_PERSON_TYPE.SANCTION)
         source.append(regulationSummary.attrib['publicationUrl'])
         if birthdate is not None:
-            address.append(f"{birthdate.attrib['place']}, {birthdate.attrib['city']}, {birthdate.attrib['region']}, {birthdate.attrib['zipCode']}")
+            address.append(
+                f"{birthdate.attrib['place']}, {birthdate.attrib['city']}, {birthdate.attrib['region']}, {birthdate.attrib['zipCode']}"
+            )
         else:
             address.append("None")
-
-        # returned_cols = ["full_name", "type", "source", "address"]
 
     sanctions_df = pd.DataFrame(
         {'full_name': wholeName,
@@ -69,10 +70,8 @@ def select_fields(tree):
 
     return sanctions_df
 
-
 def remove_sanction_from_db():
     dbtools.delete_all_bad_persons(list_type=BAD_PERSON_TYPE.SANCTION)
-
 
 def add_new_sanction_to_db(df):
     dbtools.update_df(df, list_type=BAD_PERSON_TYPE.SANCTION)
@@ -91,7 +90,9 @@ def run(event, context):
     except Exception as err:
         return {
             "statusCode": 500,
-            "body": '{"error": "sanctionworker failed, error: ' + traceback.format_exc() + '"}',
+            "body": '{"error": "sanctionworker failed, error: '
+            + traceback.format_exc()
+            + '"}',
             "headers": {"Content-Type": "application/json"},
         }
 

@@ -3,15 +3,20 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently --kill-others --prefix \"[{name}]\" --names \"webapp,backend\" --prefix-colors \"black,blue\" \"npm run start:webapp\" \"npm run start:backend\"",
-    "start:backend": "npm run is-docker-running && concurrently --kill-others --prefix \"[{name}]\" --names \"db,serverless,app\" --prefix-colors \"dim,blue,magenta\" \"npm run start:db\" \"npm run start:serverless\"",
+    "start": "concurrently -k --prefix \"[{name}]\" --names \"webapp,backend\" --prefix-colors \"black,blue\" \"npm run start:webapp\" \"npm run start:backend\"",
+    "start:backend": "npm run is-docker-running && concurrently -k --prefix \"[{name}]\" --names \"db,serverless,api\" --prefix-colors \"dim,blue,magenta\" \"npm run start:db\" \"npm run start:serverless\" \" npm run start:api\"",
     "start:webapp": "cd app && npm run serve",
     "start:db": "docker-compose up",
-    "start:serverless": "serverless offline --noTimeout",
+    "start:serverless": "serverless offline --showDuration --noTimeout",
+    "start:api": "cd api && make build && sam local start-api -p 3030 --docker-network host ",
     "is-docker-running": "docker ps > /dev/null",
+    "db:reset": "docker-compose down -v && docker-compose pull && docker-compose up -d && sleep 5 && npm run db:migrate && npm run db:seed && docker-compose stop",
+    "db:seed": "concurrently -k \"npm run start:serverless\" \"cd database && npm i && sleep 5 && npm run seed-run\"",
+    "db:migrate": "cd database && npm run migrate-latest && cd ..",
     "lint:js": "eslint --fix .",
     "lint:py": "black .",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "postinstall": "cd app && npm ci; cd ../database && npm ci"
   },
   "repository": {
     "type": "git",
@@ -20,15 +25,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@typescript-eslint/parser": "^2.5.0",
-    "aws-sam-local": "^0.2.11",
     "concurrently": "^5.0.0",
     "serverless-iam-roles-per-function": "^2.0.2",
-    "typescript": "^3.6.4"
+    "typescript": "^3.7.2"
   },
   "devDependencies": {
-    "@ljharb/eslint-config": "^14.1.0",
-    "@typescript-eslint/eslint-plugin": "^2.5.0",
+    "@ljharb/eslint-config": "^15.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.6.1",
+    "@typescript-eslint/parser": "^2.5.0",
     "@vue/eslint-config-prettier": "^5.0.0",
     "@vue/eslint-config-typescript": "^4.0.0",
     "eslint": "^6.5.1",
@@ -40,7 +44,7 @@
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "eslint-plugin-vue": "^5.2.3",
+    "eslint-plugin-vue": "^6.0.0",
     "husky": "^3.0.9",
     "lint-staged": "^9.4.2",
     "prettier": "^1.18.2",
@@ -67,7 +71,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint-staged"
+      "pre-commit": "npm run lint-staged",
+      "post-merge": "npm ci "
     }
   }
 }
