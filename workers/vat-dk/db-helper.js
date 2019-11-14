@@ -19,7 +19,8 @@ function insertCompany(client, company) {
     company.address,
     company.vat,
     company.startingDate,
-    company.countryCode
+    company.countryCode,
+    company.type
   ]);
 }
 
