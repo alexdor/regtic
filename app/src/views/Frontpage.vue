@@ -49,46 +49,38 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import Footer from "@/components/Footer.vue";
+  import Footer from "@/components/Footer.vue";
 
-@Component({
-  components: {
-    Footer
-  }
-})
-export default class Frontpage extends Vue {
-  buttons: {
-    icon: string;
-    text: string;
-    destination: string;
-    classes: string;
-  }[] = [];
-  newsletter_email = "";
+  export default {
+    components: {
+      Footer
+    },
 
-  created() {
-    this.buttons = [
-      {
-        icon: "el-icon-user",
-        text: "Sign in",
-        destination: "/search",
-        classes: ""
-      },
-      {
-        icon: "el-icon-info",
-        text: "About us",
-        destination: "/",
-        classes: "disabled"
-      },
-      {
-        icon: "el-icon-s-finance",
-        text: "Pricing",
-        destination: "/",
-        classes: "disabled"
-      }
-    ];
+    data: function () {
+      return {
+        buttons: [
+          {
+            icon: "el-icon-user",
+            text: "Sign in",
+            destination: "/search",
+            classes: ""
+          },
+          {
+            icon: "el-icon-info",
+            text: "About us",
+            destination: "/",
+            classes: "disabled"
+          },
+          {
+            icon: "el-icon-s-finance",
+            text: "Pricing",
+            destination: "/",
+            classes: "disabled"
+          }
+        ]
+      };
+    }
   }
-}
 </script>
 
 <style scoped lang="scss">
