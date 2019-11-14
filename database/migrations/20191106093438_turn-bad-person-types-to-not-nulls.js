@@ -6,6 +6,6 @@ exports.up = function(knex) {
 
 exports.down = function(knex) {
   return knex.schema.raw(`
-    ALTER TABLE bad_persons ALTER COLUMN type DROP NOT NUL;
+    ALTER TABLE bad_persons ALTER COLUMN type DROP NOT NULL;
   `);
 };
