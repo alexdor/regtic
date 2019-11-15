@@ -51,7 +51,9 @@
 <script lang="ts">
   import Footer from "@/components/Footer.vue";
 
-  export default {
+ import Vue from "vue"
+
+  export default Vue.extend({
     components: {
       Footer
     },
@@ -80,7 +82,7 @@
         ]
       };
     }
-  }
+  })
 </script>
 
 <style scoped lang="scss">
