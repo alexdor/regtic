@@ -32,7 +32,7 @@
           <i class="el-icon-bell" v-else aria-hidden="true"></i>
           <el-divider direction="vertical"></el-divider>
           -->
-          <el-dropdown trigger="click">
+          <!--<el-dropdown trigger="click">
             <el-avatar
               shape="circle"
               :size="28"
@@ -50,7 +50,7 @@
                 >Log out</el-dropdown-item
               >
             </el-dropdown-menu>
-          </el-dropdown>
+          </el-dropdown>-->
         </div>
       </el-col>
     </el-row>
@@ -111,7 +111,6 @@ export default {
 
 <style scoped lang="scss">
 .el-header {
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   top: 0;
   height: 60px;
   z-index: 1;

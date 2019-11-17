@@ -32,6 +32,11 @@ export default new Router({
       path: "/watchlist",
       name: "watchlist",
       component: () => import("./views/Watchlist.vue")
+    },
+    {
+      path: "/company_test",
+      name: "company_page",
+      component: () => import("./views/CompanyPage.vue")
     }
   ]
 });

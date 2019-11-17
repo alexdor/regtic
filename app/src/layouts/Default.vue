@@ -45,8 +45,11 @@ $footer-height: 60px; /* Height of the footer element */
   padding: 0 2rem;
 }
 
-.el-main {
+.el-header, .el-main {
   background-color: #fafafa;
+}
+
+.el-main {
   color: #858796;
 }
 
