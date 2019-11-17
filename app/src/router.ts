@@ -37,6 +37,11 @@ export default new Router({
       path: "/company_test",
       name: "company_page",
       component: () => import("./views/CompanyPage.vue")
+    },
+    {
+      path: "/person_test",
+      name: "person_page",
+      component: () => import("./views/PersonPage.vue")
     }
   ]
 });
