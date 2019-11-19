@@ -6,6 +6,8 @@ VALUES
 ON CONFLICT
   (vat) WHERE type IS NOT NULL
 DO UPDATE SET
+  name = $1,
+  address = $2,
   type = $6
 RETURNING
   id
