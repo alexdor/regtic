@@ -102,7 +102,7 @@ exports.down = function(knex) {
     DROP TABLE bad_companies_addresses;
     DROP TABLE bad_persons_addresses;
     DROP TABLE bad_companies;
-    DROP INDEX IF EXISTS     bad_persons_aliases_bad_person_id_full_name_uniqueness;
+    DROP INDEX IF EXISTS bad_persons_aliases_bad_person_id_full_name_uniqueness;
     DROP TYPE IF EXISTS ADDRESS_TYPE;
   `);
 };
