@@ -56,7 +56,8 @@ function parseCompany(company) {
     ),
     countryCode: company.virksomhedMetadata.nyesteBeliggenhedsadresse.landekode,
     vat: "DK-" + company.cvrNummer.toString().padStart(8, "0"),
-    startingDate: company.virksomhedMetadata.stiftelsesDato
+    startingDate: company.virksomhedMetadata.stiftelsesDato,
+    type: company.virksomhedMetadata.nyesteVirksomhedsform.kortBeskrivelse
   };
 }
 

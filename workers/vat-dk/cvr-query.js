@@ -5,9 +5,7 @@ module.exports = {
   _source: [
     "Vrvirksomhed.cvrNummer",
     "Vrvirksomhed.navne",
-    "Vrvirksomhed.virksomhedMetadata.nyesteNavn.navn",
-    "Vrvirksomhed.virksomhedMetadata.nyesteBeliggenhedsadresse",
-    "Vrvirksomhed.virksomhedMetadata.stiftelsesDato",
+    "Vrvirksomhed.virksomhedMetadata",
     "Vrvirksomhed.deltagerRelation.deltager",
     "Vrvirksomhed.deltagerRelation.organisationer"
   ],
