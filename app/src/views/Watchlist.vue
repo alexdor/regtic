@@ -9,14 +9,14 @@
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span="12" v-for="company in items" v-bind:key="company.id">
+      <el-col v-for="company in items" :key="company.id" :span="12">
         <el-card>
           <span class="text-large">{{ company.name }}</span>
           <el-popover
+            v-model="company.deleteVisible"
             placement="top"
             width="200"
             trigger="click"
-            v-model="company.deleteVisible"
           >
             <p>Are you sure to delete this?</p>
             <div style="text-align: right; margin: 0">

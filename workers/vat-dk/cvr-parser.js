@@ -11,6 +11,12 @@ function getName(entity) {
   return entityNameObj ? entityNameObj.navn : null;
 }
 
+function getCompanyName(company) {
+  return company.virksomhedMetadata.nyesteNavn
+    ? company.virksomhedMetadata.nyesteNavn.navn
+    : company.navne.slice(-1)[0];
+}
+
 function getCountryCode(entity) {
   const entityLocationObj = entity.beliggenhedsadresse.find(
     ba => !ba.periode.gyldigTil
@@ -44,7 +50,7 @@ function parseMotherCompany(motherCompany) {
 
 function parseCompany(company) {
   return {
-    name: company.virksomhedMetadata.nyesteNavn.navn,
+    name: getCompanyName(company),
     address: addressToString(
       company.virksomhedMetadata.nyesteBeliggenhedsadresse
     ),
@@ -66,13 +72,17 @@ function parse(hit) {
   if (!isEntryValid) return;
 
   entry.deltagerRelation.forEach(entity => {
+    const isTypeOfOwner = !!entity.organisationer.hovedtype === "REGISTER";
+    if (!isTypeOfOwner) return;
+
     const hasDeltager = !!entity.deltager;
     const hasType = hasDeltager && entity.deltager.enhedstype;
     if (!hasType) return;
 
     const isPerson = entity.deltager.enhedstype === "PERSON";
-    const isCompany = entity.deltager.enhedstype === "VIRKSOMHED";
     if (isPerson) persons.push(parsePerson(entity.deltager));
+
+    const isCompany = entity.deltager.enhedstype === "VIRKSOMHED";
     if (isCompany) motherCompanies.push(parseMotherCompany(entity.deltager));
   });
 

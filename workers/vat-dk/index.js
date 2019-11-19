@@ -2,6 +2,7 @@
 const axios = require("axios");
 const cvrParser = require("./cvr-parser");
 const dbHelper = require("./db-helper");
+const cvrQuery = require("./cvr-query");
 
 // configurations
 const cvrApi = axios.create({
@@ -18,36 +19,17 @@ cvrApi.interceptors.request.use(function(config) {
   return config;
 });
 
-const query = {
-  size: 200,
-  _source: [
-    "Vrvirksomhed.cvrNummer",
-    "Vrvirksomhed.virksomhedMetadata.nyesteNavn.navn",
-    "Vrvirksomhed.virksomhedMetadata.nyesteBeliggenhedsadresse",
-    "Vrvirksomhed.virksomhedMetadata.stiftelsesDato",
-    "Vrvirksomhed.deltagerRelation.deltager",
-    "Vrvirksomhed.deltagerRelation.organisationer"
-  ],
-  query: {
-    bool: {
-      must: [{ exists: { field: "Vrvirksomhed.cvrNummer" } }],
-      must_not: [
-        { exists: { field: "Vrvirksomhed.livsforloeb.periode.gyldigTil" } }
-      ]
-    }
-  }
-};
-
-async function scrollRequest(config = {}) {
+function scrollRequest(config = {}) {
   const scrollTimeout = config.scrollTimeout ? config.scrollTimeout : "2m";
   const isFirstRequest = !config.scrollId;
   const request = isFirstRequest
     ? cvrApi.post(
         `/cvr-permanent/virksomhed/_search?scroll=${scrollTimeout}`,
-        query
+        cvrQuery
       )
     : cvrApi.post("/_search/scroll", {
         scroll: scrollTimeout,
+        // eslint-disable-next-line @typescript-eslint/camelcase
         scroll_id: config.scrollId
       });
   return request;
@@ -73,7 +55,7 @@ async function parseAndSaveResponse(responseData) {
   });
 }
 
-module.exports.scrollAndParse = async (event, context) => {
+module.exports.scrollAndParse = async event => {
   try {
     const scrollRequestResponse = await scrollRequest({
       scrollId: (JSON.parse(event.body) || {}).scrollId
