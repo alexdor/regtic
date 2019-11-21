@@ -1,3 +1,12 @@
+[[headers]]
+  for = "*.svg"
+  [headers.values]
+    Content-Type = "image/svg+xml; charset=utf-8"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.regtic.com/:splat"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

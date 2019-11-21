@@ -3,8 +3,11 @@ package interfaces
 import (
 	"time"
 
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/volatiletech/null"
 )
+
+type Response events.APIGatewayProxyResponse
 
 type PersonJson struct {
 	ID          string       `boil:"id" json:"id" toml:"id" yaml:"id"`

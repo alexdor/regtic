@@ -1,8 +1,43 @@
 //go:generate sqlboiler psql --no-hooks
 package main
 
-import "fmt"
+import (
+	"context"
+	"os"
+	"strings"
+
+	"github.com/alexdor/regtic/api/handlers"
+	"github.com/alexdor/regtic/api/interfaces"
+	"github.com/aws/aws-lambda-go/events"
+
+	"github.com/aws/aws-lambda-go/lambda"
+)
+
+var origin = os.Getenv("ORIGIN")
+
+func Router(ctx context.Context, request events.APIGatewayProxyRequest) (interfaces.Response, error) {
+	var headers = map[string]string{
+		"Content-Type": "application/json",
+	}
+
+	if request.Headers["Origin"] == origin {
+		headers["Access-Control-Allow-Origin"] = origin
+		headers["Access-Control-Allow-Credentials"] = "true"
+	}
+	// TODO: Improve this
+	switch {
+	case strings.Contains(request.Path, "find_companies"):
+		return handlers.FindCompanies(ctx, request, headers)
+	case strings.Contains(request.Path, "validate_company"):
+		return handlers.ValidateCompanyHandler(ctx, request, headers)
+	}
+
+	return interfaces.Response{
+		StatusCode: 404,
+		Headers:    headers,
+	}, nil
+}
 
 func main() {
-	fmt.Println("")
+	lambda.Start(Router)
 }
