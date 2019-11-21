@@ -23,16 +23,21 @@ export default {
 
 <style>
 #app,
-.el-popper,
-.el-tooltip__popper {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-}
-
 html,
 body {
   margin: 0;
   padding: 0;
   height: 100%;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+}
+
+.el-notification__group {
+  width: 230px;
+}
+
+.el-notification__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #app,
