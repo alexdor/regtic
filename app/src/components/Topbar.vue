@@ -98,9 +98,6 @@ export default {
       ]
     };
   },
-  created() {
-    document.title = this.title;
-  },
   methods: {
     goBack() {
       history.back();
