@@ -20,7 +20,5 @@ dev:
 
 build: ## Build golang binaries
 	export GO111MODULE=on
-	@for function in $(functions) ; do \
-		go mod tidy ;\
-		env GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o bin/$$function lambda-functions/$$function/main.go ; \
-	done
+	go mod tidy
+	env GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o bin/main ./main.go

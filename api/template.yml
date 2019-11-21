@@ -13,7 +13,7 @@ Resources:
   FindCompanies:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: bin/find_companies
+      Handler: bin/main
       Runtime: go1.x
       Environment:
         Variables:
@@ -28,7 +28,7 @@ Resources:
   ValidateCompany:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: bin/validate_company
+      Handler: bin/main
       Runtime: go1.x
       Environment:
         Variables:
