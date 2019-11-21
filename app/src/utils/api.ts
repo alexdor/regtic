@@ -10,12 +10,16 @@ const api = axios.create({
 });
 
 api.interceptors.response.use(undefined, (error: any) => {
-  if (!error.response) return Promise.reject(error);
+  const isNetworkError = !error.status;
+  const errorTitle = isNetworkError
+    ? "Network error"
+    : `${error.config.method.toUpperCase()} ${error.config.url}`;
+  const errorMessage = isNetworkError ? "Unkown network error" : error.message;
 
   Notification.error({
     duration: 4000,
-    title: `${error.config.method.toUpperCase()} ${error.config.url}`,
-    message: error.message,
+    title: errorTitle,
+    message: errorMessage,
     position: "bottom-right"
   });
 
