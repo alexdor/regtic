@@ -3,3 +3,4 @@ pandas==0.25.2
 requests==2.20.0
 beautifulsoup4==4.8.1
 psycopg2==2.8.4
+xlrd==1.2.0
