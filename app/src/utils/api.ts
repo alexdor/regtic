@@ -1,6 +1,5 @@
 import axios from "axios";
 
-console.log(process.env);
 const api = axios.create({
   baseURL: process.env.API_URL || "http://localhost:3030/",
   timeout: 200000,
