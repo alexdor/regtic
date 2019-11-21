@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Notification } from "element-ui";
 
 const api = axios.create({
   baseURL: process.env.VUE_APP_API_URL || "http://localhost:3030/",
@@ -6,6 +7,19 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json"
   }
+});
+
+api.interceptors.response.use(undefined, (error: any) => {
+  if (!error.response) return Promise.reject(error);
+
+  Notification.error({
+    duration: 4000,
+    title: `${error.config.method.toUpperCase()} ${error.config.url}`,
+    message: error.message,
+    position: "bottom-right"
+  });
+
+  return Promise.reject(error);
 });
 
 export default {
