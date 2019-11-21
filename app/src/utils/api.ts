@@ -14,7 +14,7 @@ api.interceptors.response.use(undefined, (error: any) => {
   const errorTitle = isNetworkError
     ? "Network error"
     : `${error.config.method.toUpperCase()} ${error.config.url}`;
-  const errorMessage = isNetworkError ? "Unkown network error" : error.message;
+  const errorMessage = isNetworkError ? "There was an unexpected network error, please verify that you are connected to the internet and refresh the page" : error.message;
 
   Notification.error({
     duration: 4000,
