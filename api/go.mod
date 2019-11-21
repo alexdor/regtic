@@ -2,7 +2,7 @@ module github.com/alexdor/regtic/api
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.3.3 // indirect
-	github.com/aws/aws-lambda-go v1.13.2
+	github.com/aws/aws-lambda-go v1.13.3
 	github.com/friendsofgo/errors v0.9.2 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
