@@ -11,27 +11,27 @@ export default new Router({
       path: "/",
       name: "home",
       meta: { layout: "blank" },
-      component: () => import("./views/Frontpage.vue")
+      component: () => import("@/views/Frontpage.vue")
     },
     {
       path: "/search",
       name: "search",
-      component: () => import("./views/Search.vue")
+      component: () => import("@/views/Search.vue")
     },
     {
       path: "/search/:name",
       name: "search-name",
-      component: () => import("./views/SearchResults.vue")
+      component: () => import("@/views/SearchResults.vue")
     },
     {
       path: "/company/:id",
       name: "company",
-      component: () => import("./views/Company.vue")
+      component: () => import("@/views/Company.vue")
     },
     {
       path: "/watchlist",
       name: "watchlist",
-      component: () => import("./views/Watchlist.vue")
+      component: () => import("@/views/Watchlist.vue")
     }
   ]
 });
