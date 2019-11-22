@@ -34,7 +34,7 @@
       <el-container>
         <el-row class="extra-padding">
           <h2><i class="el-icon-message" /> Stay notified</h2>
-          <el-input v-model="newsletter_email" placeholder="Your e-mail">
+          <el-input v-model="newsletterEmail" placeholder="Your e-mail">
             <el-button
               slot="append"
               icon="el-icon-message"
@@ -62,7 +62,7 @@
     
     data: function () {
       return {
-        newsletter_email: "",
+        newsletterEmail: "",
         buttons: [
           {
             icon: "el-icon-user",
@@ -88,7 +88,7 @@
 
     methods: {
       async sendMailToSlack() {
-        api.sendMailToSlack(this.newsletter_email);
+        api.sendMailToSlack(this.newsletterEmail);
       }
     }
   })
