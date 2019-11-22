@@ -140,6 +140,20 @@ functions:
       ENVIRONMENT: ${self:custom.ENVIRONMENT}
       REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
       ORIGIN: ${self:custom.ORIGIN.${self:custom.ENVIRONMENT}}
+
+  send_mail_to_slack:
+    handler: api/bin/send_mail_to_slack
+    runtime: go1.x
+    events:
+      - http:
+          path: ${self:custom.version}send_mail_to_slack
+          cors: true
+          method: get
+    module: api/send_mail_to_slack
+    environment:
+      ENVIRONMENT: ${self:custom.ENVIRONMENT}
+      REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
+      ORIGIN: ${self:custom.ORIGIN.${self:custom.ENVIRONMENT}}
 #
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
