@@ -3,6 +3,10 @@ function sleep(ms: number) {
 }
 
 export default {
+  async sendMailToSlack(email: string) {
+    await sleep(1000);
+    return "";
+  },
   async findCompanies(searchStr: string) {
     await sleep(2000);
     return [

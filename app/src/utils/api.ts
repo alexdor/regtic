@@ -36,6 +36,11 @@ export default {
     return api
       .get(`v1/validate_company?id=${id}`)
       .then((res: { data: CheckCompanyData }) => res.data);
+  },
+  sendMailToSlack(email: string) {
+    return api
+      .get(`v1/send_mail_to_slack?email=${email}`)
+      .then((res: { data: string }) => res.data);
   }
 };
 
