@@ -16,7 +16,7 @@
     "lint:js": "eslint --fix .",
     "lint:py": "black .",
     "lint-staged": "lint-staged",
-    "postinstall": "cd app && npm ci; cd ../database && npm ci"
+    "postinstall": "cd app && npm ci; cd ../database && npm ci && cd ../workers/vat-dk && npm i"
   },
   "repository": {
     "type": "git",
