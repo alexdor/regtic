@@ -30,6 +30,8 @@ func Router(ctx context.Context, request events.APIGatewayProxyRequest) (interfa
 		return handlers.FindCompanies(ctx, request, headers)
 	case strings.Contains(request.Path, "validate_company"):
 		return handlers.ValidateCompanyHandler(ctx, request, headers)
+  case strings.Contains(request.Path, "send_mail_to_slack"):
+    return handlers.SendMailToSlack(ctx, request, headers)
 	}
 
 	return interfaces.Response{
