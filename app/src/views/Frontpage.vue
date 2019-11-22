@@ -63,7 +63,7 @@
         buttons: [
           {
             icon: "el-icon-user",
-            text: "Sign in",
+            text: "View demo",
             destination: "/search",
             classes: ""
           },
@@ -111,10 +111,12 @@ $side-spacing: 30px; /* The spacing left/right of the content section, in case t
 }
 
 .banner .logo {
-  zoom: 4;
-  max-width: 15vh; /* We make use of the max-width constraint to make sure the image does not overflow outside of the banner area, as the banner height is now using a relative metric. */
-  width: 25vw;
+  max-width: 60vh; /* We make use of the max-width constraint to make sure the image does not overflow outside of the banner area, as the banner height is now using a relative metric. */
+  width: 50vw;
   padding-top: 0.5vh;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
 }
 
 /* Default content styling, for quite small screens (tablets) */
