@@ -39,6 +39,7 @@
               slot="append"
               icon="el-icon-message"
               title="Receive e-mails from us"
+              v-on:click="sendMailToSlack"
             ></el-button>
           </el-input>
         </el-row>
@@ -50,6 +51,7 @@
 
 <script lang="ts">
   import Footer from "@/components/Footer.vue";
+  import api from "@/utils/api";
 
  import Vue from "vue"
 
@@ -57,9 +59,10 @@
     components: {
       Footer
     },
-
+    
     data: function () {
       return {
+        newsletter_email: "",
         buttons: [
           {
             icon: "el-icon-user",
@@ -81,6 +84,12 @@
           }
         ]
       };
+    },
+
+    methods: {
+      async sendMailToSlack() {
+        api.sendMailToSlack(this.newsletter_email);
+      }
     }
   })
 </script>
