@@ -67,7 +67,7 @@ def select_fields(tree):
         wholeName.append(nameAlias[0].attrib['wholeName'])
 
         for i in birthdate_list:
-            type_l.append(ADDRESS_TYPE.BIRTHPLACE)
+            type_l.append(ADDRESS_TYPE.birthplace)
             street_l.append('')
             poBox_l.append('')
             city_l.append(i.attrib['city'])
@@ -80,7 +80,7 @@ def select_fields(tree):
                 country_l.append(i.attrib['countryIso2Code'])
 
         for i in address_list:
-            type_l.append(ADDRESS_TYPE.ADDRESS)
+            type_l.append(ADDRESS_TYPE.address)
             street_l.append(i.attrib['street'])
             poBox_l.append(i.attrib['poBox'])
             city_l.append(i.attrib['city'])
@@ -120,25 +120,6 @@ def select_fields(tree):
         subject_type.append(subjectType.attrib['classificationCode'])
         source.append(regulationSummary.attrib['publicationUrl'])
 
-    ''''
-    print("address_type: " + str(len(address_type)))
-    print("citizenship_code: " + str(len(citizenship_code)))
-    print("citizenship_region: " + str(len(citizenship_region)))
-    print("street: " + str(len(street)))
-    print("poBox: " + str(len(poBox)))
-    print("city: " + str(len(city)))
-    print("zipCode: " + str(len(zipCode)))
-    print("region: " + str(len(region)))
-    print("place: " + str(len(place)))
-
-    print("subject_type: " + str(len(subject_type)))
-    print("country: " + str(len(country)))
-    print("type: " + str(len(type)))
-    print("wholeName: " + str(len(wholeName)))
-    print("alias: " + str(len(alias)))
-    print("source: " + str(len(source)))
-    '''
-
     sanctions_df = pd.DataFrame(
         {'address_type': address_type,
          'citizenship_code': citizenship_code,
@@ -156,25 +137,6 @@ def select_fields(tree):
          'alias': alias,
          'source': source
          })
-
-    '''
-    print("address_type: " + str(address_type))
-    print("citizenship_code: " + str(citizenship_code))
-    print("citizenship_region: " + str(citizenship_region))
-    print("street: " + str(street))
-    print("poBox: " + str(poBox))
-    print("city: " + str(city))
-    print("zipCode: " + str(zipCode))
-    print("region: " + str(region))
-    print("place: " + str(place))
-
-    print("subject_type: " + str(subject_type))
-    print("country: " + str(country))
-    print("type: " + str(type))
-    print("wholeName: " + str(wholeName))
-    print("alias: " + str(alias))
-    print("source: " + str(source))
-    '''
 
     return sanctions_df
 

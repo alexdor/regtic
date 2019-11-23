@@ -21,8 +21,8 @@ class BAD_PERSON_TYPE(enum.Enum):
 
 
 class ADDRESS_TYPE(enum.Enum):
-    BIRTHPLACE = "birthplace"
-    ADDRESS = "address"
+    birthplace = "birthplace"
+    address = "address"
 
 
 class BadPerson(base):
@@ -91,27 +91,8 @@ class BadPersonAddresses(base):
 def update_df(df, list_type):
     session = Session()
 
-    """
-    sanctions_df = pd.DataFrame(
-        {'address_type': address_type,
-         'citizenship_code': citizenship_code,
-         'street': street,
-         'poBox': poBox,
-         'city': city,
-         'zipCode': zipCode,
-         'region': region,
-         'place': place,
-         'entity': subject_type,
-         'country': country,
-         'type': type,
-         'full_name': wholeName,
-         'alias': alias,
-         'source': source
-         })
-    """
-
     try:
-        delete_all_bad_persons_in_session(session, list_type)
+        #delete_all_bad_persons_in_session(session, list_type)
 
         if list_type == BAD_PERSON_TYPE.SANCTION:
 
@@ -173,7 +154,7 @@ def update_df(df, list_type):
                     session.commit()
 
                     for i in range(len(bad_person["street"])):
-                        if session.query(BadPersonAddresses).filter_by(street=bad_person["street"][i], city=bad_person["city"][i], zip_code=bad_person["zipCode"][i], region=bad_person["region"][i], place=bad_person["place"][i], po_box=bad_person["poBox"][i], country_code=bad_person["country"][i], type=bad_person["address_type"][i].value, bad_person_id=bad_person_obj.id) is None:
+                        if session.query(BadPersonAddresses).filter_by(street=bad_person["street"][i], city=bad_person["city"][i], zip_code=bad_person["zipCode"][i], region=bad_person["region"][i], place=bad_person["place"][i], po_box=bad_person["poBox"][i], country_code=bad_person["country"][i], bad_person_id=bad_person_obj.id).first() is None:
                             bad_person_address_obj = BadPersonAddresses(
                                 street=bad_person["street"][i],
                                 city=bad_person["city"][i],
@@ -186,9 +167,9 @@ def update_df(df, list_type):
                                 bad_person_id=bad_person_obj.id,
                             )
                             session.add(bad_person_address_obj)
+
                     session.commit()
 
-                session.commit()
         else:
             for index, bad_person in df.iterrows():
                 bad_person_obj = BadPerson(
