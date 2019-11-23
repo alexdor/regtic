@@ -7,7 +7,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 db_uri = os.environ["REGTIC_DATABASE_URL"]
-# db_uri = "postgres://admin:admin@localhost:5432/regtic"
 
 base = declarative_base()
 db = create_engine(db_uri)
@@ -92,7 +91,7 @@ def update_df(df, list_type):
     session = Session()
 
     try:
-        #delete_all_bad_persons_in_session(session, list_type)
+        delete_all_bad_persons_in_session(session, list_type)
 
         if list_type == BAD_PERSON_TYPE.SANCTION:
 
@@ -101,7 +100,6 @@ def update_df(df, list_type):
                 if bad_person["entity"] == "E":
                     bad_company_obj = BadCompany(
                         name=bad_person["full_name"],
-                        # address=bad_person["address"],
                         source=bad_person["source"],
                         citizenship_region=bad_person["citizenship_region"],
                         citizenship_country_code=bad_person["citizenship_code"],
@@ -138,7 +136,6 @@ def update_df(df, list_type):
                         full_name=bad_person["full_name"],
                         type=bad_person["type"],
                         source=bad_person["source"],
-                        #address=bad_person["address"],
                         citizenship_country_code=bad_person["citizenship_code"]
                     )
                     session.add(bad_person_obj)
@@ -233,7 +230,7 @@ def delete_all_bad_persons_in_session(session=None, list_type=None):
         session.delete(bad_person)
 
 
-def delete_all_bad_persons(list_type=None):  # Not sure about this
+def delete_all_bad_persons(list_type=None):
     session = Session()
 
     try:

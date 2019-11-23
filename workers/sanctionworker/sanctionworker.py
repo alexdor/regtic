@@ -92,7 +92,6 @@ def select_fields(tree):
             else:
                 country_l.append(i.attrib['countryIso2Code'])
 
-        # Maybe if citizenship is empty -> insert a "ZZ" instead of leaving an empty array position ('[]')
         for i in citizenship_list:
             if i.attrib['countryIso2Code'] == "00" or i.attrib['countryIso2Code'] == "":
                 country_arr.append("ZZ")
