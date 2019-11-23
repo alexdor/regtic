@@ -29,18 +29,19 @@ api.interceptors.response.use(undefined, error => {
 });
 
 export default {
+  apiVersion: "v1",
   findCompanies(searchStr: string) {
     return api
-      .get(`v1/find_companies?name=${searchStr}`)
+      .get(`${this.apiVersion}/find_companies?name=${searchStr}`)
       .then((res: { data: FindCompaniesData }) => res.data.companies);
   },
   validateCompany(id: string) {
     return api
-      .get(`v1/validate_company?id=${id}`)
+      .get(`${this.apiVersion}/validate_company?id=${id}`)
       .then((res: { data: CheckCompanyData }) => res.data);
   },
   signup(email: string) {
-    return api.get(`v1/signup?email=${email}`);
+    return api.get(`${this.apiVersion}/signup?email=${email}`);
   }
 };
 
