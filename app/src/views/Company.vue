@@ -111,7 +111,7 @@ import api, {
   People,
   Company as CompanyType,
   CommonPersonFields
-} from "../utils/api";
+} from "../utils/mockapi";
 
 type PersonType = "good" | "warning" | "bad";
 interface ViewPerson extends CommonPersonFields {

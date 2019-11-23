@@ -2,51 +2,77 @@
   <el-aside>
     <el-menu
       class="el-menu-vertical-demo"
-      background-color="#345bcc"
       text-color="rgba(255,255,255,.4)"
       active-text-color="#fff"
       default-active="/"
       :router="true"
     >
-      <el-menu-item index="/" class="logo">
-        <img class="full" src="../assets/regtic-logo.png" alt="Regtic logo" />
-        <img class="small" src="../assets/regtic-logo-small.png" alt="Regtic logo" />
-      </el-menu-item>
-      <div class="menu-divider" />
-      <el-menu-item index="/search" title="Search">
-        <i class="el-icon-search" aria-hidden="true" /><span>Search</span>
-      </el-menu-item>
-      <el-menu-item index="/watchlist" disabled title="Watchlist - coming soon...">
-        <i class="el-icon-tickets" aria-hidden="true"></i><span>Watchlist</span>
-      </el-menu-item>
-      <el-menu-item index="not-added-yet" disabled title="Subscription - coming soon...">
-        <i class="el-icon-s-finance" aria-hidden="true"></i><span>Subscription</span>
-      </el-menu-item>
+      <img src="../assets/regtic.png" class="logo" alt="Regtic logo" />
+      <div class="user-info">
+        <span class="user-name text-bold">Jeff Hendriks</span>
+        <span class="user-email text-gray">example@example.com</span>
+      </div>
+      <div class="menu-items">
+        <el-menu-item index="/search" title="Search">
+          <i class="el-icon-search" aria-hidden="true" /><span>Search</span>
+        </el-menu-item>
+        <el-menu-item index="/watchlist" disabled title="Watchlist - coming soon...">
+          <i class="el-icon-tickets" aria-hidden="true"></i><span>Watchlist</span>
+        </el-menu-item>
+        <el-menu-item index="not-added-yet" disabled title="Subscription - coming soon...">
+          <i class="el-icon-s-finance" aria-hidden="true"></i><span>Subscription</span>
+        </el-menu-item>
+      </div>
     </el-menu>
   </el-aside>
 </template>
 
 <style lang="scss" scoped>
-.el-aside {
-  width: 250px !important;
-}
+  $sidebar-bg: #F5F6F8;
+  $black: #303133;
+  $gray: #90A0B7;
 
-  .logo img {
+  @import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
+
+  .el-aside {
+    width: 256px !important;
+  }
+
+  .el-menu {
+    background-color: $sidebar-bg;
+    box-shadow: inset -2px 0 15px rgba(0, 0, 0, 0.12);
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .logo {
+    display: block;
     margin-left: auto;
     margin-right: auto;
+    width: 88px;
+    margin-top: 96px;
   }
 
-  .logo .full {
-    padding-top: 0.75rem;
-    width: 60%;
+  .user-info {
+    margin-left: 48px;
+    margin-top: 30px;
+  }
+
+  .text-bold {
     display: block;
+    color: $black;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.3125rem;
   }
 
-.logo .small {
-  padding-top: 0.5rem;
-  display: none;
-  width: 90%;
-}
+  .text-gray {
+    display: block;
+    color: $gray;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1rem;
+    letter-spacing: 0.01em;
+  }
 
   /* Default content styling, for small screens (phones) */
   @media screen and (max-width: 800px) {
@@ -69,14 +95,6 @@
     .logo {
       padding-left: 5px !important; /* elem.io has in-line styling for padding-left specifically. */
       padding-right: 5px;
-    }
-
-    .logo .small {
-      display: block;
-    }
-
-    .logo .full {
-      display: none;
     }
   }
 

@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import api from "@/utils/api";
+import api from "@/utils/mockapi";
 import { Component, Vue } from "vue-property-decorator";
 import SearchInput from "@/components/SearchInput.vue";
 import SearchResultsTable from "@/components/SearchResultsTable.vue";
