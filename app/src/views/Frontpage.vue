@@ -49,40 +49,39 @@
 </template>
 
 <script lang="ts">
-  import Footer from "@/components/Footer.vue";
+import Footer from "@/components/Footer.vue";
+import Vue from "vue";
 
- import Vue from "vue"
+export default Vue.extend({
+  components: {
+    Footer
+  },
 
-  export default Vue.extend({
-    components: {
-      Footer
-    },
-
-    data: function () {
-      return {
-        buttons: [
-          {
-            icon: "el-icon-user",
-            text: "View demo",
-            destination: "/search",
-            classes: ""
-          },
-          {
-            icon: "el-icon-info",
-            text: "About us",
-            destination: "/",
-            classes: "disabled"
-          },
-          {
-            icon: "el-icon-s-finance",
-            text: "Pricing",
-            destination: "/",
-            classes: "disabled"
-          }
-        ]
-      };
-    }
-  })
+  data: function() {
+    return {
+      buttons: [
+        {
+          icon: "el-icon-user",
+          text: "Sign in",
+          destination: "/search",
+          classes: ""
+        },
+        {
+          icon: "el-icon-info",
+          text: "About us",
+          destination: "/",
+          classes: "disabled"
+        },
+        {
+          icon: "el-icon-s-finance",
+          text: "Pricing",
+          destination: "/",
+          classes: "disabled"
+        }
+      ]
+    };
+  }
+});
 </script>
 
 <style scoped lang="scss">
