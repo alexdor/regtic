@@ -10,7 +10,7 @@ const api = axios.create({
 });
 
 api.interceptors.response.use(undefined, (error: any) => {
-  const isNetworkError = !error.status;
+  const isNetworkError = !error.response.status;
   const errorTitle = isNetworkError
     ? "Network error"
     : `${error.config.method.toUpperCase()} ${error.config.url}`;
@@ -38,6 +38,9 @@ export default {
     return api
       .get(`v1/validate_company?id=${id}`)
       .then((res: { data: CheckCompanyData }) => res.data);
+  },
+  signup(email: string) {
+    return api.get(`v1/signup?email=${email}`);
   }
 };
 
