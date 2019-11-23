@@ -9,7 +9,7 @@ const api = axios.create({
   }
 });
 
-api.interceptors.response.use(undefined, (error: any) => {
+api.interceptors.response.use(undefined, error => {
   const isNetworkError = !error.response.status;
   const errorTitle = isNetworkError
     ? "Network error"
