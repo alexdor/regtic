@@ -96,7 +96,7 @@ functions:
   # CVR worker
   #####
   cvr-parse:
-    runtime: nodejs10.x
+    runtime: nodejs12.x
     events:
       - http:
           method: post
@@ -141,7 +141,7 @@ functions:
       REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
       ORIGIN: ${self:custom.ORIGIN.${self:custom.ENVIRONMENT}}
   signup:
-    runtime: nodejs10.x
+    runtime: nodejs12.x
     events:
       - http:
           method: get
