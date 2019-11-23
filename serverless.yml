@@ -73,9 +73,9 @@ functions:
       ENVIRONMENT: ${self:custom.ENVIRONMENT}
       REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
 
-####
-# Pepworker upsert
-###
+  ####
+  # Pepworker upsert
+  ###
   pepworkerupsert:
     environment:
       ENVIRONMENT: ${self:custom.ENVIRONMENT}
@@ -90,7 +90,6 @@ functions:
     package:
       include:
         - workers/pythondbtools
-
 
   #####
   # Sanction worker
@@ -115,7 +114,7 @@ functions:
   # CVR worker
   #####
   cvr-parse:
-    runtime: nodejs10.x
+    runtime: nodejs12.x
     events:
       - http:
           method: post
@@ -159,6 +158,19 @@ functions:
       ENVIRONMENT: ${self:custom.ENVIRONMENT}
       REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
       ORIGIN: ${self:custom.ORIGIN.${self:custom.ENVIRONMENT}}
+  signup:
+    runtime: nodejs12.x
+    events:
+      - http:
+          method: get
+          cors: true
+          path: ${self:custom.version}signup
+    handler: api/signup/index.signup
+    module: api/signup
+    environment:
+      ENVIRONMENT: ${self:custom.ENVIRONMENT}
+      NODE_ENV: ${self:custom.ENVIRONMENT}
+      SLACK_WEBHOOK_URL: ${env:SLACK_WEBHOOK_URL}
 #
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:

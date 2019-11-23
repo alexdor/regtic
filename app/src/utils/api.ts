@@ -2,19 +2,21 @@ import axios from "axios";
 import { Notification } from "element-ui";
 
 const api = axios.create({
-  baseURL: process.env.VUE_APP_API_URL || "http://localhost:3030/",
+  baseURL: process.env.VUE_APP_API_URL || "http://localhost:3000/",
   timeout: 200000,
   headers: {
     "Content-Type": "application/json"
   }
 });
 
-api.interceptors.response.use(undefined, (error: any) => {
-  const isNetworkError = !error.status;
+api.interceptors.response.use(undefined, error => {
+  const isNetworkError = !error.response.status;
   const errorTitle = isNetworkError
     ? "Network error"
     : `${error.config.method.toUpperCase()} ${error.config.url}`;
-  const errorMessage = isNetworkError ? "There was an unexpected network error, please verify that you are connected to the internet and refresh the page" : error.message;
+  const errorMessage = isNetworkError
+    ? "There was an unexpected network error, please verify that you are connected to the internet and refresh the page"
+    : error.message;
 
   Notification.error({
     duration: 4000,
@@ -26,18 +28,22 @@ api.interceptors.response.use(undefined, (error: any) => {
   return Promise.reject(error);
 });
 
-export default {
+export default Object.freeze({
+  apiVersion: "v1",
   findCompanies(searchStr: string) {
     return api
-      .get(`v1/find_companies?name=${searchStr}`)
+      .get(`${this.apiVersion}/find_companies?name=${searchStr}`)
       .then((res: { data: FindCompaniesData }) => res.data.companies);
   },
   validateCompany(id: string) {
     return api
-      .get(`v1/validate_company?id=${id}`)
+      .get(`${this.apiVersion}/validate_company?id=${id}`)
       .then((res: { data: CheckCompanyData }) => res.data);
+  },
+  signup(email: string) {
+    return api.get(`${this.apiVersion}/signup?email=${email}`);
   }
-};
+});
 
 export interface Company {
   id: string;

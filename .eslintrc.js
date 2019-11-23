@@ -13,7 +13,10 @@ module.exports = {
     "prettier/@typescript-eslint",
     "plugin:vue/recommended",
     "@vue/prettier",
-    "@vue/typescript"
+    "@vue/typescript",
+    "@vue/typescript/recommended",
+    "prettier/vue",
+    "@vue/prettier/recommended"
   ],
   plugins: ["@typescript-eslint"],
   globals: {
@@ -25,7 +28,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["workers/**/*.js"],
+      files: ["workers/**/*.js", "api/**/*.js"],
       rules: {
         "@typescript-eslint/no-var-requires": "off"
       }
