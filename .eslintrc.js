@@ -28,7 +28,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["workers/**/*.js"],
+      files: ["workers/**/*.js", "api/**/*.js"],
       rules: {
         "@typescript-eslint/no-var-requires": "off"
       }

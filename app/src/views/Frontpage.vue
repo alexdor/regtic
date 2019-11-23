@@ -34,11 +34,16 @@
       <el-container>
         <el-row class="extra-padding">
           <h2><i class="el-icon-message" /> Stay notified</h2>
-          <el-input v-model="newsletter_email" placeholder="Your e-mail">
+          <el-input
+            v-model="email"
+            placeholder="Your e-mail"
+            @keyup.native.enter="signup(email)"
+          >
             <el-button
               slot="append"
               icon="el-icon-message"
               title="Receive e-mails from us"
+              @click="signup(email)"
             ></el-button>
           </el-input>
         </el-row>
@@ -49,40 +54,59 @@
 </template>
 
 <script lang="ts">
-  import Footer from "@/components/Footer.vue";
+import { Notification } from "element-ui";
+import api from "@/utils/api";
+import Footer from "@/components/Footer.vue";
+import Vue from "vue";
 
- import Vue from "vue"
+export default Vue.extend({
+  components: {
+    Footer
+  },
 
-  export default Vue.extend({
-    components: {
-      Footer
-    },
+  data: function() {
+    return {
+      buttons: [
+        {
+          icon: "el-icon-user",
+          text: "View demo",
+          destination: "/search",
+          classes: ""
+        },
+        {
+          icon: "el-icon-info",
+          text: "About us",
+          destination: "/",
+          classes: "disabled"
+        },
+        {
+          icon: "el-icon-s-finance",
+          text: "Pricing",
+          destination: "/",
+          classes: "disabled"
+        }
+      ],
+      email: ""
+    };
+  },
 
-    data: function () {
-      return {
-        buttons: [
-          {
-            icon: "el-icon-user",
-            text: "View demo",
-            destination: "/search",
-            classes: ""
-          },
-          {
-            icon: "el-icon-info",
-            text: "About us",
-            destination: "/",
-            classes: "disabled"
-          },
-          {
-            icon: "el-icon-s-finance",
-            text: "Pricing",
-            destination: "/",
-            classes: "disabled"
-          }
-        ]
-      };
+  methods: {
+    async signup(email: string) {
+      try {
+        await api.signup(email);
+      } catch (error) {
+        return;
+      }
+
+      Notification.success({
+        duration: 4000,
+        title: "Signup successful",
+        message: "",
+        position: "bottom-right"
+      });
     }
-  })
+  }
+});
 </script>
 
 <style scoped lang="scss">
