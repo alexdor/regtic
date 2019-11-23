@@ -10,8 +10,7 @@ const api = axios.create({
 });
 
 api.interceptors.response.use(undefined, error => {
-  console.log(error.config);
-  const isNetworkError = !error.response.status;
+  const isNetworkError = !(error.response || {}).status;
   const errorTitle = isNetworkError ? "Network error" : "There was an error 😅";
   const errorMessage = isNetworkError
     ? "There was an unexpected network error, please verify that you are connected to the internet and refresh the page"
