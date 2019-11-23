@@ -28,7 +28,7 @@ api.interceptors.response.use(undefined, error => {
   return Promise.reject(error);
 });
 
-export default {
+export default Object.freeze({
   apiVersion: "v1",
   findCompanies(searchStr: string) {
     return api
@@ -43,7 +43,7 @@ export default {
   signup(email: string) {
     return api.get(`${this.apiVersion}/signup?email=${email}`);
   }
-};
+});
 
 export interface Company {
   id: string;
