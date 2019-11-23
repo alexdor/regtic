@@ -2,11 +2,11 @@ import os
 import uuid
 import enum
 from datetime import datetime
-from sqlalchemy import Column, String, create_engine, Enum
-from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
+from sqlalchemy import Column, String, create_engine, Enum, cast
+from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP, VARCHAR, ARRAY
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import or_
+
 
 """
 id              (UUID)
@@ -19,7 +19,7 @@ created_at      (Now)
 """
 
 db_uri = os.environ["REGTIC_DATABASE_URL"]
-
+# db_uri = "postgres://admin:admin@localhost:5432/regtic" # todo remove
 base = declarative_base()
 db = create_engine(db_uri)
 Session = sessionmaker(db)
@@ -37,14 +37,17 @@ class BadPerson(base):
     full_name = Column(String)
     type = Column(Enum(BAD_PERSON_TYPE))
     source = Column(String)
-    address = Column(String)
     updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
+    citizenship_country_code = Column(ARRAY(VARCHAR(2)))
 
 
-def push_bad_person(full_name, list_type, source, address):
+def push_bad_person(full_name, list_type, source, country_code):
     session = Session()
     bad_person = BadPerson(
-        full_name=full_name, type=list_type, source=source, address=address
+        full_name=full_name,
+        type=list_type,
+        source=source,
+        citizenship_country_code=country_code,
     )
     try:
         session.add(bad_person)
@@ -67,7 +70,7 @@ def update_df(df, list_type):
                 full_name=bad_person["full_name"],
                 type=list_type,
                 source=bad_person["source"],
-                address=bad_person["address"],
+                citizenship_country_code=bad_person["country_code"],
             )
             session.add(bad_person_obj)
 
@@ -95,7 +98,9 @@ def upsert_df(df, list_type):
             .filter(BadPerson.type == list_type)
             .filter(BadPerson.full_name == person["full_name"])
             .filter(
-                or_(BadPerson.address == person["address"], BadPerson.address.is_(None))
+                BadPerson.citizenship_country_code.contains(
+                    cast(person["country_code"], ARRAY(VARCHAR(2)))
+                )
             )
             .one_or_none()
         )
@@ -105,7 +110,7 @@ def upsert_df(df, list_type):
                 full_name=person["full_name"],
                 type=person["type"],
                 source=person["source"],
-                address=person["address"],
+                citizenship_country_code=person["country_code"],
             )
 
             session.add(bad_person_obj)
