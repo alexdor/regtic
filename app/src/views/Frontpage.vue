@@ -69,7 +69,7 @@ export default Vue.extend({
       buttons: [
         {
           icon: "el-icon-user",
-          text: "Sign in",
+          text: "View demo",
           destination: "/search",
           classes: ""
         },
