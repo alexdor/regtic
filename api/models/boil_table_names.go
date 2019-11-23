@@ -4,17 +4,25 @@
 package models
 
 var TableNames = struct {
-	BadPersons        string
-	BadPersonsAliases string
-	Companies         string
-	CompanyToCompany  string
-	CompanyToPerson   string
-	Persons           string
+	BadCompanies          string
+	BadCompaniesAddresses string
+	BadCompaniesAliases   string
+	BadPersons            string
+	BadPersonsAddresses   string
+	BadPersonsAliases     string
+	Companies             string
+	CompanyToCompany      string
+	CompanyToPerson       string
+	Persons               string
 }{
-	BadPersons:        "bad_persons",
-	BadPersonsAliases: "bad_persons_aliases",
-	Companies:         "companies",
-	CompanyToCompany:  "company_to_company",
-	CompanyToPerson:   "company_to_person",
-	Persons:           "persons",
+	BadCompanies:          "bad_companies",
+	BadCompaniesAddresses: "bad_companies_addresses",
+	BadCompaniesAliases:   "bad_companies_aliases",
+	BadPersons:            "bad_persons",
+	BadPersonsAddresses:   "bad_persons_addresses",
+	BadPersonsAliases:     "bad_persons_aliases",
+	Companies:             "companies",
+	CompanyToCompany:      "company_to_company",
+	CompanyToPerson:       "company_to_person",
+	Persons:               "persons",
 }

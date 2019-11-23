@@ -57,6 +57,12 @@ const (
 	BadPersonTypeSANCTION = "SANCTION"
 )
 
+// Enum values for address_type
+const (
+	AddressTypeBirthplace = "birthplace"
+	AddressTypeAddress    = "address"
+)
+
 // Enum values for company_status
 const (
 	CompanyStatusActive      = "active"

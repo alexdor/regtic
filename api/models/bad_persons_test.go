@@ -353,6 +353,83 @@ func testBadPersonsInsertWhitelist(t *testing.T) {
 	}
 }
 
+func testBadPersonToManyBadPersonsAddresses(t *testing.T) {
+	var err error
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a BadPerson
+	var b, c BadPersonsAddress
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, badPersonDBTypes, true, badPersonColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadPerson struct: %s", err)
+	}
+
+	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	if err = randomize.Struct(seed, &b, badPersonsAddressDBTypes, false, badPersonsAddressColumnsWithDefault...); err != nil {
+		t.Fatal(err)
+	}
+	if err = randomize.Struct(seed, &c, badPersonsAddressDBTypes, false, badPersonsAddressColumnsWithDefault...); err != nil {
+		t.Fatal(err)
+	}
+
+	queries.Assign(&b.BadPersonID, a.ID)
+	queries.Assign(&c.BadPersonID, a.ID)
+	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = c.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	check, err := a.BadPersonsAddresses().All(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	bFound, cFound := false, false
+	for _, v := range check {
+		if queries.Equal(v.BadPersonID, b.BadPersonID) {
+			bFound = true
+		}
+		if queries.Equal(v.BadPersonID, c.BadPersonID) {
+			cFound = true
+		}
+	}
+
+	if !bFound {
+		t.Error("expected to find b")
+	}
+	if !cFound {
+		t.Error("expected to find c")
+	}
+
+	slice := BadPersonSlice{&a}
+	if err = a.L.LoadBadPersonsAddresses(ctx, tx, false, (*[]*BadPerson)(&slice), nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := len(a.R.BadPersonsAddresses); got != 2 {
+		t.Error("number of eager loaded records wrong, got:", got)
+	}
+
+	a.R.BadPersonsAddresses = nil
+	if err = a.L.LoadBadPersonsAddresses(ctx, tx, true, &a, nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := len(a.R.BadPersonsAddresses); got != 2 {
+		t.Error("number of eager loaded records wrong, got:", got)
+	}
+
+	if t.Failed() {
+		t.Logf("%#v", check)
+	}
+}
+
 func testBadPersonToManyBadPersonsAliases(t *testing.T) {
 	var err error
 	ctx := context.Background()
@@ -428,6 +505,257 @@ func testBadPersonToManyBadPersonsAliases(t *testing.T) {
 
 	if t.Failed() {
 		t.Logf("%#v", check)
+	}
+}
+
+func testBadPersonToManyAddOpBadPersonsAddresses(t *testing.T) {
+	var err error
+
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a BadPerson
+	var b, c, d, e BadPersonsAddress
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, badPersonDBTypes, false, strmangle.SetComplement(badPersonPrimaryKeyColumns, badPersonColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	foreigners := []*BadPersonsAddress{&b, &c, &d, &e}
+	for _, x := range foreigners {
+		if err = randomize.Struct(seed, x, badPersonsAddressDBTypes, false, strmangle.SetComplement(badPersonsAddressPrimaryKeyColumns, badPersonsAddressColumnsWithoutDefault)...); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = c.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	foreignersSplitByInsertion := [][]*BadPersonsAddress{
+		{&b, &c},
+		{&d, &e},
+	}
+
+	for i, x := range foreignersSplitByInsertion {
+		err = a.AddBadPersonsAddresses(ctx, tx, i != 0, x...)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		first := x[0]
+		second := x[1]
+
+		if !queries.Equal(a.ID, first.BadPersonID) {
+			t.Error("foreign key was wrong value", a.ID, first.BadPersonID)
+		}
+		if !queries.Equal(a.ID, second.BadPersonID) {
+			t.Error("foreign key was wrong value", a.ID, second.BadPersonID)
+		}
+
+		if first.R.BadPerson != &a {
+			t.Error("relationship was not added properly to the foreign slice")
+		}
+		if second.R.BadPerson != &a {
+			t.Error("relationship was not added properly to the foreign slice")
+		}
+
+		if a.R.BadPersonsAddresses[i*2] != first {
+			t.Error("relationship struct slice not set to correct value")
+		}
+		if a.R.BadPersonsAddresses[i*2+1] != second {
+			t.Error("relationship struct slice not set to correct value")
+		}
+
+		count, err := a.BadPersonsAddresses().Count(ctx, tx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if want := int64((i + 1) * 2); count != want {
+			t.Error("want", want, "got", count)
+		}
+	}
+}
+
+func testBadPersonToManySetOpBadPersonsAddresses(t *testing.T) {
+	var err error
+
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a BadPerson
+	var b, c, d, e BadPersonsAddress
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, badPersonDBTypes, false, strmangle.SetComplement(badPersonPrimaryKeyColumns, badPersonColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	foreigners := []*BadPersonsAddress{&b, &c, &d, &e}
+	for _, x := range foreigners {
+		if err = randomize.Struct(seed, x, badPersonsAddressDBTypes, false, strmangle.SetComplement(badPersonsAddressPrimaryKeyColumns, badPersonsAddressColumnsWithoutDefault)...); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err = a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = c.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	err = a.SetBadPersonsAddresses(ctx, tx, false, &b, &c)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err := a.BadPersonsAddresses().Count(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 2 {
+		t.Error("count was wrong:", count)
+	}
+
+	err = a.SetBadPersonsAddresses(ctx, tx, true, &d, &e)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err = a.BadPersonsAddresses().Count(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 2 {
+		t.Error("count was wrong:", count)
+	}
+
+	if !queries.IsValuerNil(b.BadPersonID) {
+		t.Error("want b's foreign key value to be nil")
+	}
+	if !queries.IsValuerNil(c.BadPersonID) {
+		t.Error("want c's foreign key value to be nil")
+	}
+	if !queries.Equal(a.ID, d.BadPersonID) {
+		t.Error("foreign key was wrong value", a.ID, d.BadPersonID)
+	}
+	if !queries.Equal(a.ID, e.BadPersonID) {
+		t.Error("foreign key was wrong value", a.ID, e.BadPersonID)
+	}
+
+	if b.R.BadPerson != nil {
+		t.Error("relationship was not removed properly from the foreign struct")
+	}
+	if c.R.BadPerson != nil {
+		t.Error("relationship was not removed properly from the foreign struct")
+	}
+	if d.R.BadPerson != &a {
+		t.Error("relationship was not added properly to the foreign struct")
+	}
+	if e.R.BadPerson != &a {
+		t.Error("relationship was not added properly to the foreign struct")
+	}
+
+	if a.R.BadPersonsAddresses[0] != &d {
+		t.Error("relationship struct slice not set to correct value")
+	}
+	if a.R.BadPersonsAddresses[1] != &e {
+		t.Error("relationship struct slice not set to correct value")
+	}
+}
+
+func testBadPersonToManyRemoveOpBadPersonsAddresses(t *testing.T) {
+	var err error
+
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a BadPerson
+	var b, c, d, e BadPersonsAddress
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, badPersonDBTypes, false, strmangle.SetComplement(badPersonPrimaryKeyColumns, badPersonColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	foreigners := []*BadPersonsAddress{&b, &c, &d, &e}
+	for _, x := range foreigners {
+		if err = randomize.Struct(seed, x, badPersonsAddressDBTypes, false, strmangle.SetComplement(badPersonsAddressPrimaryKeyColumns, badPersonsAddressColumnsWithoutDefault)...); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	err = a.AddBadPersonsAddresses(ctx, tx, true, foreigners...)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err := a.BadPersonsAddresses().Count(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 4 {
+		t.Error("count was wrong:", count)
+	}
+
+	err = a.RemoveBadPersonsAddresses(ctx, tx, foreigners[:2]...)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err = a.BadPersonsAddresses().Count(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 2 {
+		t.Error("count was wrong:", count)
+	}
+
+	if !queries.IsValuerNil(b.BadPersonID) {
+		t.Error("want b's foreign key value to be nil")
+	}
+	if !queries.IsValuerNil(c.BadPersonID) {
+		t.Error("want c's foreign key value to be nil")
+	}
+
+	if b.R.BadPerson != nil {
+		t.Error("relationship was not removed properly from the foreign struct")
+	}
+	if c.R.BadPerson != nil {
+		t.Error("relationship was not removed properly from the foreign struct")
+	}
+	if d.R.BadPerson != &a {
+		t.Error("relationship to a should have been preserved")
+	}
+	if e.R.BadPerson != &a {
+		t.Error("relationship to a should have been preserved")
+	}
+
+	if len(a.R.BadPersonsAddresses) != 2 {
+		t.Error("should have preserved two relationships")
+	}
+
+	// Removal doesn't do a stable deletion for performance so we have to flip the order
+	if a.R.BadPersonsAddresses[1] != &d {
+		t.Error("relationship to d should have been preserved")
+	}
+	if a.R.BadPersonsAddresses[0] != &e {
+		t.Error("relationship to e should have been preserved")
 	}
 }
 
@@ -581,7 +909,7 @@ func testBadPersonsSelect(t *testing.T) {
 }
 
 var (
-	badPersonDBTypes = map[string]string{`ID`: `uuid`, `FullName`: `text`, `Type`: `enum.bad_person_type('PEP','SANCTION')`, `Source`: `text`, `Address`: `text`, `UpdatedAt`: `timestamp without time zone`, `CreatedAt`: `timestamp without time zone`, `NameVector`: `tsvector`}
+	badPersonDBTypes = map[string]string{`ID`: `uuid`, `FullName`: `text`, `Type`: `enum.bad_person_type('PEP','SANCTION')`, `Source`: `text`, `UpdatedAt`: `timestamp without time zone`, `CreatedAt`: `timestamp without time zone`, `NameVector`: `tsvector`, `CitizenshipCountryCode`: `ARRAYcharacter varying`}
 	_                = bytes.MinRead
 )
 

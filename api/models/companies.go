@@ -28,13 +28,14 @@ type Company struct {
 	Address      null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
 	Vat          string      `boil:"vat" json:"vat" toml:"vat" yaml:"vat"`
 	StartingDate null.String `boil:"starting_date" json:"starting_date,omitempty" toml:"starting_date" yaml:"starting_date,omitempty"`
-	CountryCode  null.String `boil:"country_code" json:"country_code,omitempty" toml:"country_code" yaml:"country_code,omitempty"`
+	CountryCode  string      `boil:"country_code" json:"country_code" toml:"country_code" yaml:"country_code"`
 	UpdatedAt    time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	CreatedAt    time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	Name         null.String `boil:"name" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
 	Status       null.String `boil:"status" json:"status,omitempty" toml:"status" yaml:"status,omitempty"`
 	StatusNotes  null.String `boil:"status_notes" json:"status_notes,omitempty" toml:"status_notes" yaml:"status_notes,omitempty"`
 	NameVector   null.String `boil:"name_vector" json:"name_vector,omitempty" toml:"name_vector" yaml:"name_vector,omitempty"`
+	Type         null.String `boil:"type" json:"type,omitempty" toml:"type" yaml:"type,omitempty"`
 
 	R *companyR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L companyL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -52,6 +53,7 @@ var CompanyColumns = struct {
 	Status       string
 	StatusNotes  string
 	NameVector   string
+	Type         string
 }{
 	ID:           "id",
 	Address:      "address",
@@ -64,6 +66,7 @@ var CompanyColumns = struct {
 	Status:       "status",
 	StatusNotes:  "status_notes",
 	NameVector:   "name_vector",
+	Type:         "type",
 }
 
 // Generated where
@@ -73,25 +76,27 @@ var CompanyWhere = struct {
 	Address      whereHelpernull_String
 	Vat          whereHelperstring
 	StartingDate whereHelpernull_String
-	CountryCode  whereHelpernull_String
+	CountryCode  whereHelperstring
 	UpdatedAt    whereHelpertime_Time
 	CreatedAt    whereHelpertime_Time
 	Name         whereHelpernull_String
 	Status       whereHelpernull_String
 	StatusNotes  whereHelpernull_String
 	NameVector   whereHelpernull_String
+	Type         whereHelpernull_String
 }{
 	ID:           whereHelperstring{field: "\"companies\".\"id\""},
 	Address:      whereHelpernull_String{field: "\"companies\".\"address\""},
 	Vat:          whereHelperstring{field: "\"companies\".\"vat\""},
 	StartingDate: whereHelpernull_String{field: "\"companies\".\"starting_date\""},
-	CountryCode:  whereHelpernull_String{field: "\"companies\".\"country_code\""},
+	CountryCode:  whereHelperstring{field: "\"companies\".\"country_code\""},
 	UpdatedAt:    whereHelpertime_Time{field: "\"companies\".\"updated_at\""},
 	CreatedAt:    whereHelpertime_Time{field: "\"companies\".\"created_at\""},
 	Name:         whereHelpernull_String{field: "\"companies\".\"name\""},
 	Status:       whereHelpernull_String{field: "\"companies\".\"status\""},
 	StatusNotes:  whereHelpernull_String{field: "\"companies\".\"status_notes\""},
 	NameVector:   whereHelpernull_String{field: "\"companies\".\"name_vector\""},
+	Type:         whereHelpernull_String{field: "\"companies\".\"type\""},
 }
 
 // CompanyRels is where relationship names are stored.
@@ -121,9 +126,9 @@ func (*companyR) NewStruct() *companyR {
 type companyL struct{}
 
 var (
-	companyAllColumns            = []string{"id", "address", "vat", "starting_date", "country_code", "updated_at", "created_at", "name", "status", "status_notes", "name_vector"}
-	companyColumnsWithoutDefault = []string{"address", "vat", "starting_date", "country_code", "name", "status", "status_notes", "name_vector"}
-	companyColumnsWithDefault    = []string{"id", "updated_at", "created_at"}
+	companyAllColumns            = []string{"id", "address", "vat", "starting_date", "country_code", "updated_at", "created_at", "name", "status", "status_notes", "name_vector", "type"}
+	companyColumnsWithoutDefault = []string{"address", "vat", "starting_date", "name", "status", "status_notes", "name_vector", "type"}
+	companyColumnsWithDefault    = []string{"id", "country_code", "updated_at", "created_at"}
 	companyPrimaryKeyColumns     = []string{"id"}
 )
 
@@ -345,7 +350,7 @@ func (companyL) LoadMotherCompanyCompanies(ctx context.Context, e boil.ContextEx
 		one := new(Company)
 		var localJoinCol string
 
-		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &localJoinCol)
+		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &one.Type, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for companies")
 		}
@@ -453,7 +458,7 @@ func (companyL) LoadDaughterCompanyCompanies(ctx context.Context, e boil.Context
 		one := new(Company)
 		var localJoinCol string
 
-		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &localJoinCol)
+		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &one.Type, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for companies")
 		}

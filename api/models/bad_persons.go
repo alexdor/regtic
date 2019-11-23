@@ -20,135 +20,79 @@ import (
 	"github.com/volatiletech/sqlboiler/queries/qm"
 	"github.com/volatiletech/sqlboiler/queries/qmhelper"
 	"github.com/volatiletech/sqlboiler/strmangle"
+	"github.com/volatiletech/sqlboiler/types"
 )
 
 // BadPerson is an object representing the database table.
 type BadPerson struct {
-	ID         string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	FullName   null.String `boil:"full_name" json:"full_name,omitempty" toml:"full_name" yaml:"full_name,omitempty"`
-	Type       string      `boil:"type" json:"type" toml:"type" yaml:"type"`
-	Source     null.String `boil:"source" json:"source,omitempty" toml:"source" yaml:"source,omitempty"`
-	Address    null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
-	UpdatedAt  time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	CreatedAt  time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	NameVector null.String `boil:"name_vector" json:"name_vector,omitempty" toml:"name_vector" yaml:"name_vector,omitempty"`
+	ID                     string            `boil:"id" json:"id" toml:"id" yaml:"id"`
+	FullName               null.String       `boil:"full_name" json:"full_name,omitempty" toml:"full_name" yaml:"full_name,omitempty"`
+	Type                   string            `boil:"type" json:"type" toml:"type" yaml:"type"`
+	Source                 null.String       `boil:"source" json:"source,omitempty" toml:"source" yaml:"source,omitempty"`
+	UpdatedAt              time.Time         `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	CreatedAt              time.Time         `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	NameVector             null.String       `boil:"name_vector" json:"name_vector,omitempty" toml:"name_vector" yaml:"name_vector,omitempty"`
+	CitizenshipCountryCode types.StringArray `boil:"citizenship_country_code" json:"citizenship_country_code" toml:"citizenship_country_code" yaml:"citizenship_country_code"`
 
 	R *badPersonR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L badPersonL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var BadPersonColumns = struct {
-	ID         string
-	FullName   string
-	Type       string
-	Source     string
-	Address    string
-	UpdatedAt  string
-	CreatedAt  string
-	NameVector string
+	ID                     string
+	FullName               string
+	Type                   string
+	Source                 string
+	UpdatedAt              string
+	CreatedAt              string
+	NameVector             string
+	CitizenshipCountryCode string
 }{
-	ID:         "id",
-	FullName:   "full_name",
-	Type:       "type",
-	Source:     "source",
-	Address:    "address",
-	UpdatedAt:  "updated_at",
-	CreatedAt:  "created_at",
-	NameVector: "name_vector",
+	ID:                     "id",
+	FullName:               "full_name",
+	Type:                   "type",
+	Source:                 "source",
+	UpdatedAt:              "updated_at",
+	CreatedAt:              "created_at",
+	NameVector:             "name_vector",
+	CitizenshipCountryCode: "citizenship_country_code",
 }
 
 // Generated where
 
-type whereHelperstring struct{ field string }
-
-func (w whereHelperstring) EQ(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperstring) NEQ(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
-func (w whereHelperstring) LT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperstring) LTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
-func (w whereHelperstring) GT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperstring) GTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
-func (w whereHelperstring) IN(slice []string) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-
-type whereHelpernull_String struct{ field string }
-
-func (w whereHelpernull_String) EQ(x null.String) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_String) NEQ(x null.String) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-func (w whereHelpernull_String) LT(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_String) LTE(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_String) GT(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
-type whereHelpertime_Time struct{ field string }
-
-func (w whereHelpertime_Time) EQ(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.EQ, x)
-}
-func (w whereHelpertime_Time) NEQ(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.NEQ, x)
-}
-func (w whereHelpertime_Time) LT(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpertime_Time) LTE(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpertime_Time) GT(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
 var BadPersonWhere = struct {
-	ID         whereHelperstring
-	FullName   whereHelpernull_String
-	Type       whereHelperstring
-	Source     whereHelpernull_String
-	Address    whereHelpernull_String
-	UpdatedAt  whereHelpertime_Time
-	CreatedAt  whereHelpertime_Time
-	NameVector whereHelpernull_String
+	ID                     whereHelperstring
+	FullName               whereHelpernull_String
+	Type                   whereHelperstring
+	Source                 whereHelpernull_String
+	UpdatedAt              whereHelpertime_Time
+	CreatedAt              whereHelpertime_Time
+	NameVector             whereHelpernull_String
+	CitizenshipCountryCode whereHelpertypes_StringArray
 }{
-	ID:         whereHelperstring{field: "\"bad_persons\".\"id\""},
-	FullName:   whereHelpernull_String{field: "\"bad_persons\".\"full_name\""},
-	Type:       whereHelperstring{field: "\"bad_persons\".\"type\""},
-	Source:     whereHelpernull_String{field: "\"bad_persons\".\"source\""},
-	Address:    whereHelpernull_String{field: "\"bad_persons\".\"address\""},
-	UpdatedAt:  whereHelpertime_Time{field: "\"bad_persons\".\"updated_at\""},
-	CreatedAt:  whereHelpertime_Time{field: "\"bad_persons\".\"created_at\""},
-	NameVector: whereHelpernull_String{field: "\"bad_persons\".\"name_vector\""},
+	ID:                     whereHelperstring{field: "\"bad_persons\".\"id\""},
+	FullName:               whereHelpernull_String{field: "\"bad_persons\".\"full_name\""},
+	Type:                   whereHelperstring{field: "\"bad_persons\".\"type\""},
+	Source:                 whereHelpernull_String{field: "\"bad_persons\".\"source\""},
+	UpdatedAt:              whereHelpertime_Time{field: "\"bad_persons\".\"updated_at\""},
+	CreatedAt:              whereHelpertime_Time{field: "\"bad_persons\".\"created_at\""},
+	NameVector:             whereHelpernull_String{field: "\"bad_persons\".\"name_vector\""},
+	CitizenshipCountryCode: whereHelpertypes_StringArray{field: "\"bad_persons\".\"citizenship_country_code\""},
 }
 
 // BadPersonRels is where relationship names are stored.
 var BadPersonRels = struct {
-	BadPersonsAliases string
+	BadPersonsAddresses string
+	BadPersonsAliases   string
 }{
-	BadPersonsAliases: "BadPersonsAliases",
+	BadPersonsAddresses: "BadPersonsAddresses",
+	BadPersonsAliases:   "BadPersonsAliases",
 }
 
 // badPersonR is where relationships are stored.
 type badPersonR struct {
-	BadPersonsAliases BadPersonsAliasSlice
+	BadPersonsAddresses BadPersonsAddressSlice
+	BadPersonsAliases   BadPersonsAliasSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -160,9 +104,9 @@ func (*badPersonR) NewStruct() *badPersonR {
 type badPersonL struct{}
 
 var (
-	badPersonAllColumns            = []string{"id", "full_name", "type", "source", "address", "updated_at", "created_at", "name_vector"}
-	badPersonColumnsWithoutDefault = []string{"full_name", "type", "source", "address", "name_vector"}
-	badPersonColumnsWithDefault    = []string{"id", "updated_at", "created_at"}
+	badPersonAllColumns            = []string{"id", "full_name", "type", "source", "updated_at", "created_at", "name_vector", "citizenship_country_code"}
+	badPersonColumnsWithoutDefault = []string{"full_name", "type", "source", "name_vector"}
+	badPersonColumnsWithDefault    = []string{"id", "updated_at", "created_at", "citizenship_country_code"}
 	badPersonPrimaryKeyColumns     = []string{"id"}
 )
 
@@ -257,6 +201,27 @@ func (q badPersonQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (
 	return count > 0, nil
 }
 
+// BadPersonsAddresses retrieves all the bad_persons_address's BadPersonsAddresses with an executor.
+func (o *BadPerson) BadPersonsAddresses(mods ...qm.QueryMod) badPersonsAddressQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"bad_persons_addresses\".\"bad_person_id\"=?", o.ID),
+	)
+
+	query := BadPersonsAddresses(queryMods...)
+	queries.SetFrom(query.Query, "\"bad_persons_addresses\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"bad_persons_addresses\".*"})
+	}
+
+	return query
+}
+
 // BadPersonsAliases retrieves all the bad_persons_alias's BadPersonsAliases with an executor.
 func (o *BadPerson) BadPersonsAliases(mods ...qm.QueryMod) badPersonsAliasQuery {
 	var queryMods []qm.QueryMod
@@ -276,6 +241,94 @@ func (o *BadPerson) BadPersonsAliases(mods ...qm.QueryMod) badPersonsAliasQuery 
 	}
 
 	return query
+}
+
+// LoadBadPersonsAddresses allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (badPersonL) LoadBadPersonsAddresses(ctx context.Context, e boil.ContextExecutor, singular bool, maybeBadPerson interface{}, mods queries.Applicator) error {
+	var slice []*BadPerson
+	var object *BadPerson
+
+	if singular {
+		object = maybeBadPerson.(*BadPerson)
+	} else {
+		slice = *maybeBadPerson.(*[]*BadPerson)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &badPersonR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &badPersonR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.ID) {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`bad_persons_addresses`), qm.WhereIn(`bad_persons_addresses.bad_person_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load bad_persons_addresses")
+	}
+
+	var resultSlice []*BadPersonsAddress
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice bad_persons_addresses")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on bad_persons_addresses")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for bad_persons_addresses")
+	}
+
+	if singular {
+		object.R.BadPersonsAddresses = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &badPersonsAddressR{}
+			}
+			foreign.R.BadPerson = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if queries.Equal(local.ID, foreign.BadPersonID) {
+				local.R.BadPersonsAddresses = append(local.R.BadPersonsAddresses, foreign)
+				if foreign.R == nil {
+					foreign.R = &badPersonsAddressR{}
+				}
+				foreign.R.BadPerson = local
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // LoadBadPersonsAliases allows an eager lookup of values, cached into the
@@ -360,6 +413,129 @@ func (badPersonL) LoadBadPersonsAliases(ctx context.Context, e boil.ContextExecu
 				foreign.R.BadPerson = local
 				break
 			}
+		}
+	}
+
+	return nil
+}
+
+// AddBadPersonsAddresses adds the given related objects to the existing relationships
+// of the bad_person, optionally inserting them as new records.
+// Appends related to o.R.BadPersonsAddresses.
+// Sets related.R.BadPerson appropriately.
+func (o *BadPerson) AddBadPersonsAddresses(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*BadPersonsAddress) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			queries.Assign(&rel.BadPersonID, o.ID)
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"bad_persons_addresses\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"bad_person_id"}),
+				strmangle.WhereClause("\"", "\"", 2, badPersonsAddressPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			queries.Assign(&rel.BadPersonID, o.ID)
+		}
+	}
+
+	if o.R == nil {
+		o.R = &badPersonR{
+			BadPersonsAddresses: related,
+		}
+	} else {
+		o.R.BadPersonsAddresses = append(o.R.BadPersonsAddresses, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &badPersonsAddressR{
+				BadPerson: o,
+			}
+		} else {
+			rel.R.BadPerson = o
+		}
+	}
+	return nil
+}
+
+// SetBadPersonsAddresses removes all previously related items of the
+// bad_person replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.BadPerson's BadPersonsAddresses accordingly.
+// Replaces o.R.BadPersonsAddresses with related.
+// Sets related.R.BadPerson's BadPersonsAddresses accordingly.
+func (o *BadPerson) SetBadPersonsAddresses(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*BadPersonsAddress) error {
+	query := "update \"bad_persons_addresses\" set \"bad_person_id\" = null where \"bad_person_id\" = $1"
+	values := []interface{}{o.ID}
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, query)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.BadPersonsAddresses {
+			queries.SetScanner(&rel.BadPersonID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.BadPerson = nil
+		}
+
+		o.R.BadPersonsAddresses = nil
+	}
+	return o.AddBadPersonsAddresses(ctx, exec, insert, related...)
+}
+
+// RemoveBadPersonsAddresses relationships from objects passed in.
+// Removes related items from R.BadPersonsAddresses (uses pointer comparison, removal does not keep order)
+// Sets related.R.BadPerson.
+func (o *BadPerson) RemoveBadPersonsAddresses(ctx context.Context, exec boil.ContextExecutor, related ...*BadPersonsAddress) error {
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.BadPersonID, nil)
+		if rel.R != nil {
+			rel.R.BadPerson = nil
+		}
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("bad_person_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.BadPersonsAddresses {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.BadPersonsAddresses)
+			if ln > 1 && i < ln-1 {
+				o.R.BadPersonsAddresses[i] = o.R.BadPersonsAddresses[ln-1]
+			}
+			o.R.BadPersonsAddresses = o.R.BadPersonsAddresses[:ln-1]
+			break
 		}
 	}
 
