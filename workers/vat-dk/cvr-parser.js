@@ -61,6 +61,18 @@ function parseCompany(company) {
   };
 }
 
+function parseMetaData(relations) {
+  const activeTitles = relations
+    .filter(relation => {
+      return relation.organisationsNavn[0].periode.gyldigTil === null;
+    })
+    .map(relation => {
+      return relation.organisationsNavn[0].navn;
+    });
+
+  return { activeTitles };
+}
+
 function parse(hit) {
   const entry = hit._source.Vrvirksomhed;
   const persons = [];
@@ -72,22 +84,33 @@ function parse(hit) {
   if (!isEntryValid) return;
 
   entry.deltagerRelation.forEach(entity => {
-    const isTypeOfOwner = !!entity.organisationer.hovedtype === "REGISTER";
-    if (!isTypeOfOwner) return;
-
     const hasDeltager = !!entity.deltager;
     const hasType = hasDeltager && entity.deltager.enhedstype;
     if (!hasType) return;
 
+    const metaData = parseMetaData(entity.organisationer);
+
     const isPerson = entity.deltager.enhedstype === "PERSON";
-    if (isPerson) persons.push(parsePerson(entity.deltager));
+    if (isPerson) {
+      persons.push({
+        ...parsePerson(entity.deltager),
+        ...metaData
+      });
+    }
 
     const isCompany = entity.deltager.enhedstype === "VIRKSOMHED";
-    if (isCompany) motherCompanies.push(parseMotherCompany(entity.deltager));
+    if (isCompany) {
+      motherCompanies.push({
+        ...parseMotherCompany(entity.deltager),
+        ...metaData
+      });
+    }
   });
 
   company.persons = persons;
   company.motherCompanies = motherCompanies;
+
+  console.log(company);
 
   return company;
 }
