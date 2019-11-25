@@ -62,13 +62,23 @@ function parseCompany(company) {
 }
 
 function parseMetaData(relations) {
+  function translateTitle(title) {
+    if (title === "Direktion") return "direction";
+    if (title === "Bestyrelse") return "board of directors";
+    if (title === "EJERREGISTER") return "legal owner";
+    if (title === "Reelle ejere") return "ultimate beneficial owner";
+    if (title === "Revision") return "accountant";
+    return undefined;
+  }
+
   const activeTitles = relations
     .filter(relation => {
       return relation.organisationsNavn[0].periode.gyldigTil === null;
     })
     .map(relation => {
-      return relation.organisationsNavn[0].navn;
-    });
+      return translateTitle(relation.organisationsNavn[0].navn);
+    })
+    .filter(title => title);
 
   return { activeTitles };
 }
