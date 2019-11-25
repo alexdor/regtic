@@ -1,6 +1,4 @@
 // imports
-const fs = require("fs");
-const path = require("path");
 const { Pool } = require("pg");
 
 const insertCompanyQuery = require("./sql/insert-company");
@@ -71,9 +69,9 @@ async function insertDataTransactionally(company) {
         return insertCompany(client, motherCompany);
       }
     );
-    const motherCompanyIds = (await Promise.all(
-      motherCompanyInsertPromises
-    )).map(result => result.rows[0].id);
+    const motherCompanyIds = (
+      await Promise.all(motherCompanyInsertPromises)
+    ).map(result => result.rows[0].id);
 
     // insert company to company relations
     const companyToCompanyInsertPromises = motherCompanyIds.map(
