@@ -40,6 +40,10 @@ body {
   text-overflow: ellipsis;
 }
 
+.searchInput .el-input__inner {
+  border-width: 2px;
+}
+
 #app,
 #app .el-container,
 #app .el-container .el-aside,

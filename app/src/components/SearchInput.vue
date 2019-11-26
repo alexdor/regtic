@@ -3,7 +3,7 @@
     <el-input
       v-model="searchStr"
       class="inline-input full-with"
-      placeholder="Enter company name"
+      placeholder="Enter company name or VAT"
       prefix-icon="el-icon-search"
       clearable
       @keyup.native.enter="search()"
@@ -14,7 +14,7 @@
         class="full-width"
         :disabled="!isSearchStrValid"
         @click.native="search()"
-        >Search</el-button
+        >Search Company</el-button
       >
     </div>
   </div>
@@ -88,5 +88,10 @@ a {
 
 .vertical-spacing {
   margin: 20px 0;
+}
+
+.el-button {
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
 }
 </style>

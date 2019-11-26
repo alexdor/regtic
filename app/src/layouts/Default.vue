@@ -83,7 +83,6 @@ $footer-height: 60px; /* Height of the footer element */
 }
 
 .full-height {
-  background-color: #fafafa;
   display: inline-table;
   min-height: calc(100% - #{$footer-height});
   /* FIXME: this is a dirty fix and should be fixed properly in the feature */
