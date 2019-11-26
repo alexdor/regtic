@@ -13,15 +13,18 @@
         <span class="user-email text-gray">example@example.com</span>
       </div>
       <div class="menu-items">
-        <el-menu-item index="/search" title="Search">
+        <router-link to="/search" title="Search" class="menu-item">
           <i class="el-icon-search" aria-hidden="true" /><span>Search</span>
-        </el-menu-item>
-        <el-menu-item index="/watchlist" disabled title="Watchlist - coming soon...">
-          <i class="el-icon-tickets" aria-hidden="true"></i><span>Watchlist</span>
-        </el-menu-item>
-        <el-menu-item index="not-added-yet" disabled title="Subscription - coming soon...">
-          <i class="el-icon-s-finance" aria-hidden="true"></i><span>Subscription</span>
-        </el-menu-item>
+        </router-link>
+        <router-link to="/watchlist" disabled title="Watchlist - coming soon..." class="menu-item">
+          <i class="el-icon-document-copy" aria-hidden="true"></i><span>Watchlist</span>
+        </router-link>
+        <router-link to="not-added-yet" disabled title="Subscription - coming soon..." class="menu-item">
+          <i class="el-icon-chat-square" aria-hidden="true"></i><span>Subscription</span>
+        </router-link>
+        <router-link to="not-added-yet" disabled title="Settings - coming soon..." class="menu-item">
+          <i class="el-icon-setting" aria-hidden="true"></i><span>Settings</span>
+        </router-link>
       </div>
     </el-menu>
   </el-aside>
@@ -32,10 +35,13 @@
   $black: #303133;
   $gray: #90A0B7;
 
+  $link-normal: #C2CFE0;
+  $link-hover: #109CF1;
+
   @import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
 
   .el-aside {
-    width: 256px !important;
+    width: 16rem !important; /* elem.io using inline styling! */
   }
 
   .el-menu {
@@ -48,13 +54,14 @@
     display: block;
     margin-left: auto;
     margin-right: auto;
-    width: 88px;
-    margin-top: 96px;
+    width: 5.5rem;
+    margin-top: 8rem;
   }
 
   .user-info {
-    margin-left: 48px;
-    margin-top: 30px;
+    margin-left: 4rem;
+    margin-top: 1.875rem;
+    margin-bottom: 1.875rem;
   }
 
   .text-bold {
@@ -74,50 +81,61 @@
     letter-spacing: 0.01em;
   }
 
+  .menu-item {
+    color: $link-normal;
+    font-size: 0.8125rem;
+    line-height: 1.1875rem;
+    padding: 0.5rem 0;
+    margin: 0.5rem 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-decoration: none;
+    font-weight: 500;
+    padding-left: 4rem;
+    &[disabled] {
+      cursor: not-allowed;
+      opacity: 0.75;
+      color: $link-normal !important;
+    }
+    &:hover,
+    &:focus {
+      color: $link-hover;
+    }
+    i {
+      font-size: 1.25rem;
+    }
+    span {
+      margin-left: 0.875rem;
+    }
+  }
+
   /* Default content styling, for small screens (phones) */
   @media screen and (max-width: 800px) {
     .el-aside {
       width: 80px !important; /* Override other CSS width of 250px, as well as elem.io's in-line styling width. */
     }
 
-    .el-aside .el-menu-item {
-      text-align: center;
+    .logo {
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      width: 60%;
     }
 
-      .el-aside .el-menu-item i:before {
-        font-size: 1.5rem;
-      }
-
-    .el-aside .el-menu-item span {
+    .user-info {
       display: none;
     }
 
-    .logo {
-      padding-left: 5px !important; /* elem.io has in-line styling for padding-left specifically. */
-      padding-right: 5px;
+    .menu-item {
+      padding: 1rem;
+      margin: 1rem auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .menu-item span {
+      display: none;
     }
   }
-
-.el-menu {
-  border-right: 0;
-  &-item {
-    &:hover,
-    &:focus {
-      color: #fff !important;
-      background-color: #345bcc !important;
-    }
-    i {
-      color: inherit;
-    }
-  }
-}
-
-.menu-divider {
-  display: block;
-  height: 1.5px;
-  width: 85%;
-  margin: 1.25rem auto;
-  background-color: rgba(255, 255, 255, 0.3);
-  position: relative;
-}
 </style>
