@@ -12,7 +12,7 @@ export default {
   name: "App",
   computed: {
     showGoBack: function() {
-      return this.$route.name === "company";
+      return ["company", "search-name"].indexOf(this.$route.name) > -1;
     },
     layout() {
       return (this.$route.meta.layout || defaultLayout) + "-layout";
@@ -42,6 +42,22 @@ body {
 
 .searchInput .el-input__inner {
   border-width: 2px;
+}
+
+/*Override elem.io color on buttons*/
+.el-button--primary {
+  background-color: #1989FA !important;
+  border-color: #1989FA !important;
+}
+
+.el-button--primary:hover, .el-button--primary:focus {
+  background-color: #167BE0 !important;
+  border-color: #167BE0 !important;
+}
+
+.el-button--primary[disabled] {
+  background-color: #4FA4F9 !important;
+  border-color: #4FA4F9 !important;
 }
 
 #app,

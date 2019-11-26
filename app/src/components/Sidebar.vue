@@ -16,7 +16,7 @@
         <router-link to="/search" title="Search" class="menu-item">
           <i class="el-icon-search" aria-hidden="true" /><span>Search</span>
         </router-link>
-        <router-link to="/watchlist" disabled title="Watchlist - coming soon..." class="menu-item">
+        <router-link to="/watchlist" title="Watchlist" class="menu-item">
           <i class="el-icon-document-copy" aria-hidden="true"></i><span>Watchlist</span>
         </router-link>
         <router-link to="not-added-yet" disabled title="Subscription - coming soon..." class="menu-item">
@@ -108,6 +108,10 @@
     span {
       margin-left: 0.875rem;
     }
+  }
+
+  .menu-item.router-link-active {
+    color: $link-hover;
   }
 
   /* Default content styling, for small screens (phones) */
