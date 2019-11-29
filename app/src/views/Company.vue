@@ -1,8 +1,13 @@
 <template>
   <div class="full-height">
     <div class="canvas">
-      <EntityCard :data="testCompany" x="10" y="60"></EntityCard>
-      <EntityCard :data="testPerson" x="20" y="300"></EntityCard>
+      <div class="view-mode">
+        <el-radio v-model="expanded" label="collapsed">Collapsed</el-radio>
+        <el-radio v-model="expanded" label="expanded">Expanded</el-radio>
+      </div>
+      <LineCurve :x1="720" :y1="191" :x2="920" :y2="231"></LineCurve>
+      <EntityCard :data="testCompany" :x="400" :y="160" :open="testCompany.open"></EntityCard>
+      <EntityCard :data="testPerson" :x="920" :y="200" :open="testCompany.open"></EntityCard>
     </div>
   </div>
 </template>
@@ -10,13 +15,16 @@
 <script>
   import api from "../utils/mockapi";
   import EntityCard from "../components/EntityCard.vue";
+  import LineCurve from "../components/LineCurve.vue";
 
   export default {
     components: {
-      EntityCard
+      EntityCard,
+      LineCurve
     },
     data() {
       return {
+        expanded: "",
         result: {},
         testCompany: {},
         testPerson: {},
@@ -32,13 +40,26 @@
     methods: {
       parseCompany(company) {
         company.entityType = "company";
+        company.open = false;
         return company;
       },
       parsePerson(person, status) {
         person.entityType = "person";
+        person.open = false;
         person.status = status;
         person.relation = person.relation || "Ultimate Beneficial Owner";
         return person;
+      },
+      setAllExpanded(expanded) {
+        this.testCompany.open = expanded;
+        this.testPerson.open = expanded;
+      }
+    },
+    watch: {
+      expanded: {
+        handler(val) {
+          if (val.length > 0) this.setAllExpanded(val == "expanded");
+        }
       }
     }
   }
@@ -51,6 +72,17 @@
     width: 100%;
     height: -webkit-fill-available;
     overflow: auto;
+  }
+
+  .view-mode {
+    margin-left: 3rem;
+  }
+
+  .view-mode .el-radio {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
   }
 
 .title-col {

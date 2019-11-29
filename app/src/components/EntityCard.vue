@@ -1,21 +1,21 @@
 <template>
-  <div :class="'entity-card' + (active ? ' active' : '')" :style="'left: ' + x + 'px; top: ' + y + 'px'" v-on:click="active = !active">
+  <div :class="'entity-card ' + data.entityType + (active ? ' active' : '')" :style="'left: ' + x + 'px; top: ' + y + 'px'" v-on:click="active = !active">
     <div class="flex-row flex-row-space">
       <div class="flex-row-inline">
-        <div :class="'entity-type ' + data.entityType" :aria-label="data.entityType" :title="data.entityType"></div>
+        <div class="entity-type" :aria-label="data.entityType" :title="data.entityType"></div>
         <span class="title">{{data.full_name || data.name}}</span>
       </div>
       <div :class="'status-icon ' + data.status" :aria-label="data.status" :title="data.status"></div>
     </div>
-    <table class="info" v-if="open">
+    <table class="info" v-show="openState">
       <tr v-for="info in info[data.entityType]" v-bind:key="info.key">
         <td class="key">{{info.name}}</td>
         <td class="value" v-if="info.type == 'literal'">{{data[info.key]}}</td>
         <td class="value" v-if="info.type == 'percent'">{{data[info.key] * 100}}%</td>
       </tr>
     </table>
-    <a class="expand-collapse expand" v-if="!open" aria-hidden="true" title="Expand" v-on:click.stop="open = !open"><i class="el-icon-arrow-down"></i></a>
-    <a class="expand-collapse collapse" v-if="open" aria-hidden="true" title="Collapse" v-on:click.stop="open = !open"><i class="el-icon-arrow-up"></i></a>
+    <a class="expand-collapse expand" v-show="!openState" aria-hidden="true" title="Expand" v-on:click.stop="openState = !openState"><i class="el-icon-arrow-down"></i></a>
+    <a class="expand-collapse collapse" v-show="openState" aria-hidden="true" title="Collapse" v-on:click.stop="openState = !openState"><i class="el-icon-arrow-up"></i></a>
   </div>
 </template>
 
@@ -26,12 +26,13 @@
         type: Object
       },
       x: Number,
-      y: Number
+      y: Number,
+      open: Boolean,
     },
     data() {
       return {
-        open: false,
         active: false,
+        openState: this.$props.open,
         info: {
           company: [
             { name: "VAT", key: "vat", type: "literal" },
@@ -47,6 +48,11 @@
           ]
         }
       };
+    },
+    watch: {
+      open(val) {
+        this.openState = val;
+      }
     }
   }
 </script>
@@ -62,7 +68,8 @@
 
   $card-bg: white;
 
-  $card-width: 320px;
+  $card-width-company: 320px;
+  $card-width-person: 390px;
   $card-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.15);
 
   .entity-card {
@@ -71,11 +78,15 @@
     border-radius: 1.125rem;
     font-family: 'Poppins', sans-serif;
     box-shadow: $card-shadow;
-    width: $card-width;
+    width: $card-width-company;
     background-color: $card-bg;
     border: 1px solid $border;
     margin: 1px;
     margin-bottom: 3px;
+  }
+
+  .entity-card.person {
+    width: $card-width-person;
   }
 
   .entity-card.active {
@@ -114,10 +125,14 @@
     background-color: $card-bg;
     border: 1px solid $border;
     border-radius: 50%;
-    margin-left: calc(#{$card-width} / 2);
+    margin-left: calc(#{$card-width-company} / 2);
     transform: translate(-50%, 25%);
     text-align: center;
     cursor: pointer;
+  }
+
+  .entity-card.person .expand-collapse {
+    margin-left: calc(#{$card-width-person} / 2);
   }
 
   .entity-card.active .expand-collapse {
@@ -151,6 +166,7 @@
 
   .key {
     padding-right: 0.75rem;
+    white-space: nowrap;
   }
 
   .value {
@@ -165,11 +181,11 @@
     margin-right: 1rem;
   }
 
-    .entity-type.company {
+   .entity-card.company .entity-type {
       background-image: url('../assets/icon-company.svg');
     }
 
-    .entity-type.person {
+   .entity-card.person .entity-type {
       background-image: url('../assets/icon-person.svg');
     }
 
