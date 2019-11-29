@@ -60,5 +60,6 @@
     width: 2rem;
     height: 2rem;
     font-size: 1rem;
+    padding: 0;
   }
 </style>
