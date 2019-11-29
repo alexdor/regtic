@@ -2,7 +2,7 @@
   <div class="container-center container-width-small">
     <SearchInput :initial-search-str="initialSearchStr" @search="search" class="bottom-spacing" />
     <div v-if="loading" class="align-center">
-      <VclTable class="loading-screen" :rows="15" :columns="10" />
+      <VclTable class="loading-screen" :rows="5" :columns="1" />
     </div>
     <div v-else>
       <CompanyListItem v-for="item in results" v-bind:key="item.id" :data="item" />
@@ -44,6 +44,8 @@ export default class SelectCompany extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+  $light-gray: #DCDFE5;
+
   .bottom-spacing {
     margin-bottom: 3rem;
   }
@@ -111,4 +113,8 @@ a {
 .loading-screen {
   margin: 40px 0;
 }
+
+  .company-list-item:not(:last-child) {
+    border-bottom: 1px solid $light-gray;
+  }
 </style>

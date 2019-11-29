@@ -1,182 +1,58 @@
 <template>
   <div class="full-height">
-    <el-row>
-      <el-col :span="14" class="title-col">
-        <div class="title vertical-center">
-          <div v-if="loading" class="title-loading">
-            <VclCode height="40" />
-          </div>
-          <div v-else>{{ name }}</div>
-        </div>
-      </el-col>
-      <el-col :span="10" align="right">
-        <el-button
-          disabled
-          title="Coming soon..."
-          type="info"
-          icon="el-icon-collection-tag"
-          >Add to watchlist</el-button
-        >
-        <el-button
-          disabled
-          title="Coming soon..."
-          type="primary"
-          icon="el-icon-download"
-          >Generate report</el-button
-        >
-      </el-col>
-    </el-row>
-    <el-row>
-      <el-col :span="12">
-        <el-card class="people-card">
-          <div slot="header" class="clearfix">People</div>
-          <div v-if="loading">
-            <VclList v-for="index in 2" :key="index" />
-          </div>
-          <div v-else>
-            <el-table class="full-width" :data="people">
-              <el-table-column prop="name" label="Name" sortable />
-              <el-table-column
-                prop="type"
-                label="Status"
-                sortable
-                width="100"
-                align="center"
-              >
-                <template slot-scope="scope">
-                  <el-tooltip
-                    v-if="scope.row.type === 'warning'"
-                    class="item"
-                    :content="scope.row.source"
-                    placement="top"
-                    effect="dark"
-                  >
-                    <el-button
-                      circle
-                      size="mini"
-                      icon="el-icon-view"
-                      type="warning"
-                    ></el-button>
-                  </el-tooltip>
-                  <el-tooltip
-                    v-else-if="scope.row.type === 'bad'"
-                    class="item"
-                    :content="scope.row.source"
-                    placement="top"
-                    effect="dark"
-                  >
-                    <el-button
-                      circle
-                      size="mini"
-                      icon="el-icon-close"
-                      type="danger"
-                    ></el-button>
-                  </el-tooltip>
-                  <el-button
-                    v-else
-                    circle
-                    size="mini"
-                    icon="el-icon-check"
-                    type="success"
-                  ></el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="12">
-        <el-card class="companies-card">
-          <div slot="header" class="clearfix">Companies</div>
-          <div v-if="loading">
-            <VclList v-for="index in 2" :key="index" />
-          </div>
-          <div v-else>
-            <el-table class="full-width" :data="companies">
-              <el-table-column prop="name" label="Name" sortable />
-              <el-table-column prop="vat" label="VAT" sortable width="120" />
-              <el-table-column prop="address" label="Address" sortable />
-            </el-table>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+    <div class="canvas">
+      <EntityCard :data="testCompany" x="10" y="60"></EntityCard>
+      <EntityCard :data="testPerson" x="20" y="300"></EntityCard>
+    </div>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { VclCode, VclList } from "vue-content-loading";
-import api, {
-  People,
-  Company as CompanyType,
-  CommonPersonFields
-} from "../utils/mockapi";
+<script>
+  import api from "../utils/mockapi";
+  import EntityCard from "../components/EntityCard.vue";
 
-type PersonType = "good" | "warning" | "bad";
-interface ViewPerson extends CommonPersonFields {
-  type: PersonType;
-  source?: string;
-  name: string;
-  first_name?: string;
-  last_name?: string;
-  country_code?: string;
-}
-@Component({
-  components: {
-    VclCode,
-    VclList
+  export default {
+    components: {
+      EntityCard
+    },
+    data() {
+      return {
+        result: {},
+        testCompany: {},
+        testPerson: {},
+        loading: false
+      };
+    },
+    async created() {
+      const companyId = this.$route.params.id;
+      this.result = await api.validateCompany(companyId);
+      this.testCompany = this.parseCompany(this.result.companies[0]);
+      this.testPerson = this.parsePerson(this.result.people.bad[0], "bad");
+    },
+    methods: {
+      parseCompany(company) {
+        company.entityType = "company";
+        return company;
+      },
+      parsePerson(person, status) {
+        person.entityType = "person";
+        person.status = status;
+        person.relation = person.relation || "Ultimate Beneficial Owner";
+        return person;
+      }
+    }
   }
-})
-export default class Company extends Vue {
-  name = "";
-  vat = "";
-  address = "";
-  companies: CompanyType[] = [];
-  people: ViewPerson[] = [];
-  loading = true;
-
-  async created() {
-    const companyId = this.$route.params.id;
-    const {
-      info: { name, vat, address },
-      companies,
-      people
-    } = await api.validateCompany(companyId);
-    this.name = name;
-    this.vat = vat;
-    this.address = address;
-    this.companies = companies;
-    this.people = this.parsePeopleArray(people);
-    this.loading = false;
-  }
-
-  parsePeopleArray(people: People): ViewPerson[] {
-    // TODO: Make this less verbose
-    const goodPeople = (people.good || []).map(person => ({
-      name: person.full_name,
-      ...person,
-      type: "good" as PersonType
-    }));
-
-    const warningPeople = (people.warning || []).map(person => ({
-      name: person.full_name,
-      ...person,
-      type: "warning" as PersonType
-    }));
-
-    const badPeople = (people.bad || []).map(person => ({
-      name: person.full_name,
-      ...person,
-      type: "bad" as PersonType
-    }));
-
-    return [...badPeople, ...warningPeople, ...goodPeople];
-  }
-}
 </script>
 
 <style scoped lang="scss">
+  .canvas {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: -webkit-fill-available;
+    overflow: auto;
+  }
+
 .title-col {
   height: 40px;
   display: flex;

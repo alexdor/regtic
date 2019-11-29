@@ -11,7 +11,7 @@
         <td class="key">Type</td><td class="type">{{data.type}}</td>
       </tr>
     </table>
-    <router-link class="check-button" :to="'/company/' + data.id"><el-button class="check-button" type="primary" icon="el-icon-search"></el-button></router-link>
+    <router-link class="check-button" :to="'/company/' + data.id"><el-button class="check-button" type="primary" icon="el-icon-search" aria-label="Check" title="Check"></el-button></router-link>
   </div>
 </template>
 
@@ -61,5 +61,8 @@
     height: 2rem;
     font-size: 1rem;
     padding: 0;
+    position: absolute;
+    right: 0;
+    margin-top: -2rem;
   }
 </style>

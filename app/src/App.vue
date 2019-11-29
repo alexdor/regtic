@@ -21,7 +21,9 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+  $footer-height: 76px;
+
   @import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
 
   #app,
@@ -73,7 +75,7 @@ export default {
   position: relative;
   left: 50%;
   transform: translate(-50%, 0);
-  height: 100%;
+  min-height: calc(100% - #{$footer-height});
 }
 
 .container-width-small {
