@@ -1,10 +1,20 @@
 <template>
   <div class="searchInput">
     <el-input
+      v-if="includeButton"
       v-model="searchStr"
       class="inline-input full-with"
       placeholder="Enter company name or VAT"
       prefix-icon="el-icon-search"
+      clearable
+      @keyup.native.enter="search()"
+    />
+    <el-input
+      v-if="!includeButton"
+      v-model="searchStr"
+      class="inline-input full-with"
+      placeholder="Enter company name or VAT"
+      suffix-icon="el-icon-search"
       clearable
       @keyup.native.enter="search()"
     />

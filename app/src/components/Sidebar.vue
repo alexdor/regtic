@@ -38,8 +38,6 @@
   $link-normal: #C2CFE0;
   $link-hover: #109CF1;
 
-  @import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
-
   .el-aside {
     width: 16rem !important; /* elem.io using inline styling! */
   }

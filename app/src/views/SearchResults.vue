@@ -1,12 +1,12 @@
 <template>
-  <div class="full-height">
-    <el-card>
-      <SearchInput :initial-search-str="initialSearchStr" @search="search" />
-      <div v-if="loading" class="align-center">
-        <VclTable class="loading-screen" :rows="15" :columns="10" />
-      </div>
-      <SearchResultsTable v-else class="vertical-spacing" :data="results" />
-    </el-card>
+  <div class="container-center container-width-small">
+    <SearchInput :initial-search-str="initialSearchStr" @search="search" class="bottom-spacing" />
+    <div v-if="loading" class="align-center">
+      <VclTable class="loading-screen" :rows="15" :columns="10" />
+    </div>
+    <div v-else>
+      <CompanyListItem v-for="item in results" v-bind:key="item.id" :data="item" />
+    </div>
   </div>
 </template>
 
@@ -14,13 +14,13 @@
 import api from "@/utils/mockapi";
 import { Component, Vue } from "vue-property-decorator";
 import SearchInput from "@/components/SearchInput.vue";
-import SearchResultsTable from "@/components/SearchResultsTable.vue";
+import CompanyListItem from "@/components/CompanyListItem.vue";
 import { VclTable } from "vue-content-loading";
 
 @Component({
   components: {
     SearchInput,
-    SearchResultsTable,
+    CompanyListItem,
     VclTable
   }
 })
@@ -44,6 +44,10 @@ export default class SelectCompany extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+  .bottom-spacing {
+    margin-bottom: 3rem;
+  }
+
 .text-large {
   display: inline-block;
   font-size: 18px;

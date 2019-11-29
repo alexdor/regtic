@@ -22,14 +22,16 @@ export default {
 </script>
 
 <style>
-#app,
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-}
+  @import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
+
+  #app,
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: "Avenir", Helvetica, Arial, sans-serif;
+  }
 
 .el-notification__group {
   width: 230px;
@@ -65,5 +67,16 @@ body {
 #app .el-container .el-aside,
 #app .el-container .el-aside .el-menu {
   height: 100%;
+}
+
+.container-center {
+  position: relative;
+  left: 50%;
+  transform: translate(-50%, 0);
+  height: 100%;
+}
+
+.container-width-small {
+  width: 524px;
 }
 </style>
