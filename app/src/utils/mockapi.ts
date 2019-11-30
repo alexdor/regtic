@@ -67,7 +67,7 @@ export default {
     ];
   },
   async validateCompany(id: string) {
-    await sleep(3000);
+    await sleep(300);
 
     return {
       info: {
@@ -82,7 +82,9 @@ export default {
         status: "warning",
         status_notes: "",
         rank: 2,
-        name_vector: "Demo Company ApS"
+        name_vector: "Demo Company ApS",
+        companies: ["2345-56789-01234-5678", "3456-56789-01234-5678"],
+        people: []
       },
       companies: [
         {
@@ -99,7 +101,9 @@ export default {
           status: "warning",
           status_notes: "",
           rank: 2,
-          name_vector: "Demo Company ApS"
+          name_vector: "Demo Company ApS",
+          companies: [],
+          people: ["1234-67890-12345-6789"]
         },
         {
           id: "3456-56789-01234-5678",
@@ -115,7 +119,9 @@ export default {
           status: "warning",
           status_notes: "",
           rank: 2,
-          name_vector: "Demo Company ApS"
+          name_vector: "Demo Company ApS",
+          companies: ["4567-56789-01234-5678"],
+          people: ["1234-67890-12345-6789", "2345-67890-12345-6789"]
         },
         {
           id: "4567-56789-01234-5678",
@@ -131,7 +137,9 @@ export default {
           status: "good",
           status_notes: "",
           rank: 2,
-          name_vector: "Demo Company ApS"
+          name_vector: "Demo Company ApS",
+          companies: [],
+          people: ["4567-67890-12345-6789"]
         }
       ],
       people: {
@@ -173,8 +181,8 @@ export default {
             full_name: "Gary Goodguy",
             relation: "Ultimate Beneficial Owner",
             country: "Denmark / DK",
-            ownership: 20,
-            voting_rights: 70,
+            ownership: 0.2,
+            voting_rights: 0.7,
             updated_at: new Date(),
             created_at: new Date(),
             name_vector: "Gary Goodguy",

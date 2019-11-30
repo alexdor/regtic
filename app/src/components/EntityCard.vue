@@ -1,5 +1,5 @@
 <template>
-  <div :class="'entity-card ' + data.entityType + (active ? ' active' : '')" :style="'left: ' + x + 'px; top: ' + y + 'px'" v-on:click="active = !active">
+  <div :class="'entity-card ' + data.entityType + (active ? ' active' : '')" :style="'left: ' + x + 'px; top: ' + y + 'px'" v-on:click="setActive()">
     <div class="flex-row flex-row-space">
       <div class="flex-row-inline">
         <div class="entity-type" :aria-label="data.entityType" :title="data.entityType"></div>
@@ -49,6 +49,11 @@
         }
       };
     },
+    methods: {
+      setActive() {
+        this.$parent.entityCardSelected(this);
+      }
+    },
     watch: {
       open(val) {
         this.openState = val;
@@ -82,7 +87,7 @@
     background-color: $card-bg;
     border: 1px solid $border;
     margin: 1px;
-    margin-bottom: 3px;
+    margin-bottom: 34px;
   }
 
   .entity-card.person {
@@ -93,6 +98,7 @@
     border-color: $border-active;
     border-width: 2px;
     margin: 0;
+    margin-bottom: 33px;
   }
 
   .title {

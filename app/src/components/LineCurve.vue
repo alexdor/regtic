@@ -9,6 +9,8 @@
       y1: Number,
       x2: Number,
       y2: Number,
+      xWeight1: Number,
+      xWeight2: Number
     },
 
     mounted() {
@@ -21,7 +23,7 @@
         canvas.width = this.x2 - this.x1 + padding * 2;
         canvas.height = Math.abs(this.y2 - this.y1) + padding * 2;
         canvas.style.left = (this.x1 - 5) + "px";
-        canvas.style.top = (this.y1 - 5) + "px";
+        canvas.style.top = (Math.min(this.y1, this.y2) - 5) + "px";
 
         // Setup the canvas context & drawing style - just going for a predefined style here, as we only need it for 1 view.
         const ctx = canvas.getContext("2d");
@@ -31,11 +33,11 @@
         // Only for the y coordinate we might have y2 be less than y1. Expecting all curves to go left to right.
         const minY = Math.min(this.y1, this.y2);
 
-        // Draws the curve with 2 control points adjusted to the middle between x1 and x2.
+        // Draws the curve with 2 control points adjusted between x1 and x2 by xWeight1 and xWeight2 (0 = at x1, 1 = at x2).
         ctx.moveTo(padding - widen, padding + this.y1 - minY);
         ctx.bezierCurveTo(
-          padding + (this.x2 - this.x1) * 0.5, padding + this.y1 - minY,
-          padding + (this.x2 - this.x1) * 0.5, padding + this.y2 - minY,
+          padding + (this.x2 - this.x1) * this.xWeight1, padding + this.y1 - minY,
+          padding + (this.x2 - this.x1) * this.xWeight2, padding + this.y2 - minY,
           padding + this.x2 - this.x1 + widen, padding + this.y2 - minY
         );
         ctx.stroke();
