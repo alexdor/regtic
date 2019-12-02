@@ -8,8 +8,36 @@
         </div>
       </div>
     </div>
-    <div class="company-info">
-      Test!
+    <div class="company-info" v-if="selectedCompany != null">
+      <div class="flex-row row-spacing-bottom-large row-spacing-top-small">
+        <div class="company-icon"></div>
+        <div class="header">{{selectedCompany.data.name}}</div>
+        <el-button type="primary" round class="button-small"><i class="el-icon-plus"></i> Watchlist</el-button>
+      </div>
+      <div class="flex-row responsive-flex flex-start">
+        <div class="col-width-30">
+          <div class="header-small">Info</div>
+          <table class="padding-all-small">
+            <tbody>
+              <tr>
+                <td class="key">VAT</td><td class="value">{{selectedCompany.data.vat}}</td>
+              </tr>
+              <tr>
+                <td class="key">Country</td><td class="value">{{selectedCompany.data.country}}</td>
+              </tr>
+              <tr>
+                <td class="key">Address</td><td class="value">{{selectedCompany.data.address}}</td>
+              </tr>
+              <tr>
+                <td class="key">Type</td><td class="value">{{selectedCompany.data.type}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-width-70">
+          <div class="header-small">Beneficiaries</div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -32,7 +60,7 @@
       };
     },
     async mounted() {
-      console.log(this);
+      console.log(this, this.$el);
       const canvas = this.$el.querySelector(".canvas");
 
       const companyId = this.$route.params.id;
@@ -255,6 +283,8 @@
 </script>
 
 <style scoped lang="scss">
+  $black: #303133;
+
   .flex-vertical {
     display: flex;
     flex-direction: column;
@@ -281,6 +311,106 @@
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
     margin-bottom: 0.75rem;
+  }
+
+  .flex-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .flex-start {
+    align-items: flex-start;
+  }
+
+  .row-spacing-bottom-large {
+    margin-bottom: 3rem;
+  }
+
+  .row-spacing-top-small {
+    margin-top: 1rem;
+  }
+
+  .company-icon {
+    background-image: url('../assets/icon-company.svg');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .header {
+    font-size: 1.5rem;
+    line-height: 2.5rem;
+    font-weight: bold;
+    color: $black;
+    margin-left: 1.5rem;
+  }
+
+  .header-small {
+    font-size: 1.375rem;
+    margin-bottom: 0.75rem;
+    color: $black;
+  }
+
+  .button-small {
+    padding: 0 0.75rem;
+    height: 2rem;
+    font-size: 0.875rem;
+    font-family: 'Poppins', sans-serif;
+    margin-left: 0.75rem;
+  }
+
+  .col-width-30 {
+    width: 30%;
+    margin-right: 2rem;
+  }
+
+  .col-width-70 {
+    width: 70%;
+  }
+
+  .padding-all-small {
+    padding: 0.5rem;
+  }
+
+  tr td {
+    padding-top: 0.5rem;
+  }
+
+  .key {
+    padding-right: 2rem;
+    white-space: nowrap;
+  }
+
+  .value {
+    color: $black;
+  }
+
+  /* Default content styling, for semi-small screens (tablets) */
+  @media screen and (max-width: 1400px) {
+    .col-width-30 {
+      width: 50%;
+    }
+
+    .col-width-70 {
+      width: 50%;
+    }
+  }
+
+  /* Default content styling, for small screens (phones) */
+  @media screen and (max-width: 1000px) {
+    .col-width-30, .col-width-70 {
+      width: 100%;
+      margin-right: 0;
+      display: block;
+    }
+
+    .responsive-flex {
+      display: inline;
+    }
   }
 
 .title-col {
