@@ -79,12 +79,17 @@ export default {
         updated_at: new Date(),
         created_at: new Date(),
         name: "Demo Company ApS",
-        status: "warning",
-        status_notes: "",
+        status: {
+          type: "warning",
+          lists: [],
+          notes: "Inherited from beneficiaries"
+        },
         rank: 2,
         name_vector: "Demo Company ApS",
-        companies: ["2345-56789-01234-5678", "3456-56789-01234-5678"],
-        people: []
+        sub_entities: [
+          { id: "2345-56789-01234-5678", relation: "Legal Owner" },
+          { id: "3456-56789-01234-5678", relation: "Ultimate Beneficial Owner" }
+        ]
       },
       companies: [
         {
@@ -93,53 +98,75 @@ export default {
           vat: "DK-23456789",
           country: "Danmark / DK",
           type: "IVS",
+          ownership: 0.3,
+          voting_rights: 0.2,
           starting_date: "11-11-2019Z05:12:34T",
           country_code: "DK",
           updated_at: new Date(),
           created_at: new Date(),
           name: "Demo Company 2 ApS",
-          status: "warning",
-          status_notes: "",
+          status: {
+            type: "warning",
+            lists: [],
+            notes: "Inherited from beneficiaries"
+          },
           rank: 2,
           name_vector: "Demo Company ApS",
-          companies: [],
-          people: ["1234-67890-12345-6789"]
+          sub_entities: [
+            { id: "1234-67890-12345-6789", relation: "Ultimate Beneficial Owner" }
+          ]
         },
         {
           id: "3456-56789-01234-5678",
           address: "Anker Engelundsvej 1, 2800 Kgs. Lyngby",
           country: "Danmark / DK",
           type: "IVS",
+          ownership: 0.1,
+          voting_rights: 0.15,
           vat: "DK-34567890",
           starting_date: "11-11-2019Z05:12:34T",
           country_code: "DK",
           updated_at: new Date(),
           created_at: new Date(),
           name: "Demo Company 3 ApS",
-          status: "warning",
-          status_notes: "",
+          status: {
+            type: "warning",
+            lists: [
+              { type: "pep", name: "EU PEP List 2019", url: "https://www.example.org/link/pep-2019-list.pdf" }
+            ],
+            notes: "Inherited from beneficiaries"
+          },
           rank: 2,
           name_vector: "Demo Company ApS",
-          companies: ["4567-56789-01234-5678"],
-          people: ["1234-67890-12345-6789", "2345-67890-12345-6789"]
+          sub_entities: [
+            { id: "4567-56789-01234-5678", relation: "Legal Owner" },
+            { id: "1234-67890-12345-6789", relation: "Accountant" },
+            { id: "2345-67890-12345-6789", relation: "Ultimate Beneficial Owner" }
+          ]
         },
         {
           id: "4567-56789-01234-5678",
           address: "Anker Engelundsvej 1, 2800 Kgs. Lyngby",
           country: "Danmark / DK",
           type: "IVS",
+          ownership: 0.4,
+          voting_rights: 0.45,
           vat: "DK-45678901",
           starting_date: "11-11-2019Z05:12:34T",
           country_code: "DK",
           updated_at: new Date(),
           created_at: new Date(),
           name: "Demo Company 4 ApS",
-          status: "good",
-          status_notes: "",
+          status: {
+            type: "good",
+            lists: [],
+            notes: ""
+          },
           rank: 2,
           name_vector: "Demo Company ApS",
-          companies: [],
-          people: ["4567-67890-12345-6789"]
+          sub_entities: [
+            { id: "4567-67890-12345-6789", relation: "Ultimate Beneficial Owner" }
+          ]
         }
       ],
       people: {
@@ -154,9 +181,13 @@ export default {
             updated_at: new Date(),
             created_at: new Date(),
             name_vector: "Mallory Malicious",
-            type: "sanctions",
-            source: "EU Sanctions List 2019",
-            address: "https://www.example.org/link/sanctions-list.pdf"
+            status: {
+              type: "bad",
+              lists: [
+                { type: "sanctions", name: "EU Sanctions List 2019", url: "https://www.example.org/link/sanctions-list.pdf" }
+              ],
+              notes: ""
+            }
           }
         ],
         warning: [
@@ -170,9 +201,13 @@ export default {
             updated_at: new Date(),
             created_at: new Date(),
             name_vector: "Phil Pepper",
-            type: "pep",
-            source: "UN PEP List 2019, Q4",
-            address: "https://www.example.org/link/pep-list.pdf"
+            status: {
+              type: "warning",
+              lists: [
+                { type: "pep", name: "UN PEP List 2019, Q4", url: "https://www.example.org/link/pep-list.pdf" }
+              ],
+              notes: ""
+            }
           }
         ],
         good: [

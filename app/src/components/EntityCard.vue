@@ -5,7 +5,7 @@
         <div class="entity-type" :aria-label="data.entityType" :title="data.entityType"></div>
         <span class="title">{{data.full_name || data.name}}</span>
       </div>
-      <div :class="'status-icon ' + data.status" :aria-label="data.status" :title="data.status"></div>
+      <StatusIcon :data="data.status"></StatusIcon>
     </div>
     <table class="info" v-show="openState">
       <tr v-for="info in info[data.entityType]" v-bind:key="info.key">
@@ -20,7 +20,12 @@
 </template>
 
 <script>
+  import StatusIcon from "../components/StatusIcon.vue";
+
   export default {
+    components: {
+      StatusIcon
+    },
     props: {
       data: {
         type: Object

@@ -36,6 +36,11 @@
         </div>
         <div class="col-width-70">
           <div class="header-small">Beneficiaries</div>
+          <table class="padding-all-small full-width">
+            <tbody>
+              <BeneficiaryListItem :data="entityById(item.id)" v-for="item in selectedCompany.data.sub_entities" v-bind:key="item.id"></BeneficiaryListItem>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -47,14 +52,19 @@
   import api from "../utils/mockapi";
   import EntityCard from "../components/EntityCard.vue";
   import LineCurve from "../components/LineCurve.vue";
+  import BeneficiaryListItem from "../components/BeneficiaryListItem.vue";
 
   export default {
+    components: {
+      BeneficiaryListItem
+    },
     data() {
       return {
-        expanded: "",
+        expanded: "collapsed",
         result: {},
         companyCards: [],
         cards: [],
+        entities: [],
         selectedCompany: null,
         loading: false
       };
@@ -77,6 +87,15 @@
 
       const companyCardWidth = 352;
       const companyCardClosedHeightCenter = 31;
+
+      this.parseCompany(this.result.info);
+      this.result.companies.forEach(this.parseCompany);
+
+      const people = this.mapPeople(this.result.people);
+      this.entities.push(this.result.info);
+      this.entities.push(...this.result.companies);
+      this.entities.push(...people);
+      console.log(this.entities, people);
       
       this.mapCompaniesToGrid(this.result.companies, companyGrid, visitedCompanies, this.result.info, 0);
       let maxHeight = 0;
@@ -87,8 +106,7 @@
         for (let i = 0; i < companyGrid[depth].length; i++)
           companyGrid[depth][i].y = maxHeight * 0.5 * companyCardHeightBase + (i - (companyGrid[depth].length - 1) * 0.5) * companyCardHeightBase;
       }
-
-      const people = this.mapPeople(this.result.people);
+      
       for (let i = 0; i < people.length; i++) {
         people[i].x = 220 + companyGrid.length * 450;
         people[i].y = 10 + i * personCardHeightBase;
@@ -100,9 +118,9 @@
       for (let depth = 0; depth < companyGrid.length; depth++) {
         for (let i = 0; i < companyGrid[depth].length; i++) {
           const company = companyGrid[depth][i];
-          for (let ci = 0; ci < company.companies.length; ci++) {
-            const otherCompany = this.companyById(company.companies[ci]);
-            if (otherCompany != undefined) {
+          for (let ei = 0; ei < company.sub_entities.length; ei++) {
+            const otherCompany = this.entityById(company.sub_entities[ei].id);
+            if (otherCompany != undefined && otherCompany.entityType == "company") {
               const line = new LineCurveClass({
                 propsData: {
                   x1: company.x + companyCardWidth - 10,
@@ -116,10 +134,8 @@
               line.$mount();
               canvas.append(line.$el);
             }
-          }
-          for (let pi = 0; pi < company.people.length; pi++) {
-            const person = this.personById(people, company.people[pi]);
-            if (person != undefined) {
+            const person = this.entityById(company.sub_entities[ei].id);
+            if (person != undefined && person.entityType == "person") {
               const line = new LineCurveClass({
                 propsData: {
                   x1: company.x + companyCardWidth - 10,
@@ -196,20 +212,13 @@
         canvasWidth = Math.max(canvasWidth, this.cards[i].x + (this.cards[i].entityType == "person" ? personCardWidthBase : companyCardWidthBase) + 32);
         canvasHeight = Math.max(canvasHeight, this.cards[i].y + (this.cards[i].entityType == "person" ? personCardHeightBase : companyCardHeightBase) + 32);
       }
-
-      console.log(canvasWidth, canvasHeight);
+      
       canvas.style.width = canvasWidth + "px";
       //canvas.style.height = canvasHeight + "px";
     },
     methods: {
-      // Finds company info by id, if we have any that matches.
-      companyById(id) {
-        if (this.result.info.id == id)
-          return this.result.info;
-        return this.result.companies.find(company => company.id == id);
-      },
-      personById(people, id) {
-        return people.find(person => person.id == id);
+      entityById(id) {
+        return this.entities.find(entity => entity.id == id);
       },
       // Recursively scans and maps companies into a 2D array, and avoids recursive loops.
       mapCompaniesToGrid(companies, grid, visited, company, depth) {
@@ -219,29 +228,27 @@
         visited[company.id] = { depth: depth, index: grid[depth].length - 1 };
         this.parseCompany(company);
         company.x = 20 + depth * 450;
-        for (let i = 0; i < company.companies.length; i++) {
-          const otherCompany = this.companyById(company.companies[i]);
-          if (otherCompany != undefined)
+        for (let i = 0; i < company.sub_entities.length; i++) {
+          const otherCompany = this.entityById(company.sub_entities[i].id);
+          if (otherCompany != undefined && otherCompany.entityType == "company")
             this.mapCompaniesToGrid(companies, grid, visited, otherCompany, depth + 1);
-        };
+        }
       },
       mapPeople(people) {
         const goodPeople = (people.good || []).map(person => ({
           name: person.full_name,
           ...person,
-          status: "good"
+          status: { type: "good", lists: [], notes: "" }
         }));
 
         const warningPeople = (people.warning || []).map(person => ({
           name: person.full_name,
-          ...person,
-          status: "warning"
+          ...person
         }));
 
         const badPeople = (people.bad || []).map(person => ({
           name: person.full_name,
-          ...person,
-          status: "bad"
+          ...person
         }));
 
         return [...badPeople, ...warningPeople, ...goodPeople].map(this.parsePerson);
