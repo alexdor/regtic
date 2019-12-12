@@ -59,7 +59,7 @@ async function insertDataTransactionally(company) {
     // insert company
     const companyId = (await insertCompany(client, company)).rows[0].id;
 
-    // insert persons
+    // make persons promises
     const personsInsertPromises = company.persons.map(person => {
       return insertPerson(client, person).then(result => {
         return {
@@ -68,20 +68,8 @@ async function insertDataTransactionally(company) {
         };
       });
     });
-    const persons = await Promise.all(personsInsertPromises);
 
-    // insert company to persons relations
-    const companyToPersonInsertPromises = persons.map(person => {
-      return insertCompanyToPerson(
-        client,
-        companyId,
-        person.id,
-        person.relations
-      );
-    });
-    await Promise.all(companyToPersonInsertPromises);
-
-    // insert mother companies
+    // make mother companies promises
     const motherCompanyInsertPromises = company.motherCompanies.map(
       motherCompany => {
         return insertCompany(client, motherCompany).then(result => {
@@ -92,7 +80,22 @@ async function insertDataTransactionally(company) {
         });
       }
     );
-    const motherCompanies = await Promise.all(motherCompanyInsertPromises);
+
+    // insert companies and persons
+    const [persons, motherCompanies] = await Promise.all([
+      Promise.all(personsInsertPromises),
+      Promise.all(motherCompanyInsertPromises)
+    ]);
+
+    // insert company to persons relations
+    const companyToPersonInsertPromises = persons.map(person => {
+      return insertCompanyToPerson(
+        client,
+        companyId,
+        person.id,
+        person.relations
+      );
+    });
 
     // insert company to company relations
     const companyToCompanyInsertPromises = motherCompanies.map(
@@ -105,7 +108,11 @@ async function insertDataTransactionally(company) {
         );
       }
     );
-    await Promise.all(companyToCompanyInsertPromises);
+
+    await Promise.all([
+      ...companyToPersonInsertPromises,
+      ...companyToCompanyInsertPromises
+    ]);
 
     await client.query("COMMIT");
   } catch (error) {
