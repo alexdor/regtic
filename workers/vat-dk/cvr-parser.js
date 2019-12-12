@@ -61,17 +61,21 @@ function parseCompany(company) {
   };
 }
 
-function parseMetaData(relations) {
+function parseMetaData(titles) {
   function translateTitle(title) {
-    if (title === "Direktion") return "direction";
-    if (title === "Bestyrelse") return "board of directors";
-    if (title === "EJERREGISTER") return "legal owner";
-    if (title === "Reelle ejere") return "ultimate beneficial owner";
-    if (title === "Revision") return "accountant";
+    title = title.toLowerCase();
+
+    if (title === "direktion") return "direction";
+    if (title === "bestyrelse") return "board of directors";
+    if (title === "ejerregister") return "legal owner";
+    if (title === "reelle ejere") return "ultimate beneficial owner";
+    if (title === "revision") return "accountant";
+    if (title === "stiftere") return "founder";
+
     return undefined;
   }
 
-  const activeTitles = relations
+  const relations = titles
     .filter(relation => {
       return relation.organisationsNavn[0].periode.gyldigTil === null;
     })
@@ -80,7 +84,7 @@ function parseMetaData(relations) {
     })
     .filter(title => title);
 
-  return { activeTitles };
+  return { relations };
 }
 
 function parse(hit) {
@@ -119,8 +123,6 @@ function parse(hit) {
 
   company.persons = persons;
   company.motherCompanies = motherCompanies;
-
-  console.log(company);
 
   return company;
 }
