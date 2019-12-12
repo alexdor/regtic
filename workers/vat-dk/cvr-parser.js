@@ -78,16 +78,18 @@ function parseMetaData(titles) {
   const relations = titles.reduce((result, relation) => {
     const isActiveRelation =
       relation.organisationsNavn[0].periode.gyldigTil === null;
-    if (!isActiveRelation) return;
+    if (!isActiveRelation) return result;
 
     const translatedRelation = translateTitle(
       relation.organisationsNavn[0].navn
     );
 
     const isTranslatedRelationValid = !!translatedRelation;
-    if (!isTranslatedRelationValid) return;
+    if (!isTranslatedRelationValid) return result;
 
     result.push(translatedRelation);
+
+    return result;
   }, []);
 
   return { relations };
