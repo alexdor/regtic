@@ -5,7 +5,8 @@ exports.up = function(knex) {
       'legal owner',
       'accountant',
       'direction',
-      'board of directors'
+      'board of directors',
+      'founder'
     );
     ALTER TABLE company_to_company ADD relations ENTITY_RELATION[];
     ALTER TABLE company_to_person ADD relations ENTITY_RELATION[];
