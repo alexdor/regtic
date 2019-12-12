@@ -75,14 +75,20 @@ function parseMetaData(titles) {
     return undefined;
   }
 
-  const relations = titles
-    .filter(relation => {
-      return relation.organisationsNavn[0].periode.gyldigTil === null;
-    })
-    .map(relation => {
-      return translateTitle(relation.organisationsNavn[0].navn);
-    })
-    .filter(title => title);
+  const relations = titles.reduce((result, relation) => {
+    const isActiveRelation =
+      relation.organisationsNavn[0].periode.gyldigTil === null;
+    if (!isActiveRelation) return;
+
+    const translatedRelation = translateTitle(
+      relation.organisationsNavn[0].navn
+    );
+
+    const isTranslatedRelationValid = !!translatedRelation;
+    if (!isTranslatedRelationValid) return;
+
+    result.push(translatedRelation);
+  }, []);
 
   return { relations };
 }
