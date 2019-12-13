@@ -89,7 +89,7 @@ def upsert_run(event, context):
         file_link = get_link_to_file()
         parsed_df = parse_pep_xlsx(file_link)
         result_string = upsert_new_pep_to_db(parsed_df)
-        body_dict = {"data": "pepworker finished", "message": result_string}
+        body_dict = {"data": "pepworker finished", "message": result_string.split("\n")}
         return {
             "statusCode": 200,
             "body": json.dumps(body_dict),

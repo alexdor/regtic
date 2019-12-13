@@ -52,6 +52,7 @@ class BadCompany(base):
     source = Column(String)
     citizenship_region = Column(String)
     citizenship_country_code = Column(ARRAY(VARCHAR(2)))
+    updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
     type = Column(Enum(BAD_PERSON_TYPE))
 
 
@@ -117,132 +118,132 @@ def update_df(df, list_type):
 
     try:
         delete_all_bad_persons_in_session(session, list_type)
-
-        if list_type == BAD_PERSON_TYPE.SANCTION:
-
-            for index, bad_person in df.iterrows():
-
-                if bad_person["entity"] == "E":
-                    bad_company_obj = BadCompany(
-                        name=bad_person["full_name"],
-                        source=bad_person["source"],
-                        citizenship_region=bad_person["citizenship_region"],
-                        citizenship_country_code=bad_person["citizenship_code"],
-                        type=bad_person["type"],
-                    )
-                    session.add(bad_company_obj)
-                    session.commit()
-                    for alias in bad_person["alias"]:
-                        if (
-                            session.query(BadCompanyAlias).filter_by(name=alias).first()
-                            is None
-                        ):
-                            alias_obj = BadCompanyAlias(
-                                name=alias,
-                                type=bad_company_obj.type,
-                                bad_company_id=bad_company_obj.id,
-                            )
-                            session.add(alias_obj)
-                    session.commit()
-                    for i in range(len(bad_person["street"])):
-                        if (
-                            session.query(BadCompanyAddresses)
-                            .filter_by(
-                                street=bad_person["street"][i],
-                                city=bad_person["city"][i],
-                                zip_code=bad_person["zipCode"][i],
-                                region=bad_person["region"][i],
-                                place=bad_person["place"][i],
-                                po_box=bad_person["poBox"][i],
-                                country_code=bad_person["country"][i],
-                                bad_company_id=bad_company_obj.id,
-                            )
-                            .first()
-                            is None
-                        ):
-                            bad_company_address_obj = BadCompanyAddresses(
-                                street=bad_person["street"][i],
-                                city=bad_person["city"][i],
-                                zip_code=bad_person["zipCode"][i],
-                                region=bad_person["region"][i],
-                                place=bad_person["place"][i],
-                                po_box=bad_person["poBox"][i],
-                                country_code=bad_person["country"][i],
-                                bad_company_id=bad_company_obj.id,
-                            )
-                            session.add(bad_company_address_obj)
-                    session.commit()
-
-                if bad_person["entity"] == "P":
-                    bad_person_obj = BadPerson(
-                        full_name=bad_person["full_name"],
-                        type=bad_person["type"],
-                        source=bad_person["source"],
-                        citizenship_country_code=bad_person["citizenship_code"],
-                    )
-                    session.add(bad_person_obj)
-                    session.commit()
-
-                    for alias in bad_person["alias"]:
-                        if (
-                            session.query(BadPersonAlias)
-                            .filter_by(full_name=alias)
-                            .first()
-                            is None
-                        ):
-                            alias_obj = BadPersonAlias(
-                                full_name=alias, bad_person_id=bad_person_obj.id
-                            )
-                            session.add(alias_obj)
-                    session.commit()
-
-                    for i in range(len(bad_person["street"])):
-                        if (
-                            session.query(BadPersonAddresses)
-                            .filter_by(
-                                street=bad_person["street"][i],
-                                city=bad_person["city"][i],
-                                zip_code=bad_person["zipCode"][i],
-                                region=bad_person["region"][i],
-                                place=bad_person["place"][i],
-                                po_box=bad_person["poBox"][i],
-                                country_code=bad_person["country"][i],
-                                bad_person_id=bad_person_obj.id,
-                            )
-                            .first()
-                            is None
-                        ):
-                            bad_person_address_obj = BadPersonAddresses(
-                                street=bad_person["street"][i],
-                                city=bad_person["city"][i],
-                                zip_code=bad_person["zipCode"][i],
-                                region=bad_person["region"][i],
-                                place=bad_person["place"][i],
-                                po_box=bad_person["poBox"][i],
-                                country_code=bad_person["country"][i],
-                                type=bad_person["address_type"][i].value,
-                                bad_person_id=bad_person_obj.id,
-                            )
-                            session.add(bad_person_address_obj)
-
-                    session.commit()
-
-        elif list_type == BAD_PERSON_TYPE.PEP:
-            for index, bad_person in df.iterrows():
-                bad_person_obj = BadPerson(
-                    full_name=bad_person["full_name"],
-                    type=bad_person["type"],
-                    source=bad_person["source"],
-                    citizenship_country_code=bad_person["country_code"],
-                )
-                session.add(bad_person_obj)
-            session.commit()
-
+        for index, bad_person in df.iterrows():
+            push_person_in_session(
+                session=session, bad_person=bad_person, list_type=list_type
+            )
+        session.commit()
     except Exception as err:
         session.rollback()
         raise err
     finally:
         session.close()
+
+
+def push_person_in_session(session, bad_person, list_type):
+    returned_id = None
+    returned_id_type = "P"
+
+    if list_type == BAD_PERSON_TYPE.PEP:
+        bad_person_obj = BadPerson(
+            full_name=bad_person["full_name"],
+            type=bad_person["type"],
+            source=bad_person["source"],
+            citizenship_country_code=bad_person["country_code"],
+        )
+        session.add(bad_person_obj)
+        returned_id = bad_person_obj.id
+
+    elif list_type == BAD_PERSON_TYPE.SANCTION:
+        if bad_person["entity"] == "E":
+            bad_company_obj = BadCompany(
+                name=bad_person["full_name"],
+                source=bad_person["source"],
+                citizenship_region=bad_person["citizenship_region"],
+                citizenship_country_code=bad_person["citizenship_code"],
+                type=bad_person["type"],
+            )
+            session.add(bad_company_obj)
+            returned_id = bad_company_obj.id
+            returned_id_type = "E"
+
+            for alias in bad_person["alias"]:
+                if session.query(BadCompanyAlias).filter_by(name=alias).first() is None:
+                    alias_obj = BadCompanyAlias(
+                        name=alias,
+                        type=bad_company_obj.type,
+                        bad_company_id=bad_company_obj.id,
+                    )
+                    session.add(alias_obj)
+
+            for i in range(len(bad_person["street"])):
+                if (
+                    session.query(BadCompanyAddresses)
+                    .filter_by(
+                        street=bad_person["street"][i],
+                        city=bad_person["city"][i],
+                        zip_code=bad_person["zipCode"][i],
+                        region=bad_person["region"][i],
+                        place=bad_person["place"][i],
+                        po_box=bad_person["poBox"][i],
+                        country_code=bad_person["country"][i],
+                        bad_company_id=bad_company_obj.id,
+                    )
+                    .first()
+                    is None
+                ):
+                    bad_company_address_obj = BadCompanyAddresses(
+                        street=bad_person["street"][i],
+                        city=bad_person["city"][i],
+                        zip_code=bad_person["zipCode"][i],
+                        region=bad_person["region"][i],
+                        place=bad_person["place"][i],
+                        po_box=bad_person["poBox"][i],
+                        country_code=bad_person["country"][i],
+                        bad_company_id=bad_company_obj.id,
+                    )
+                    session.add(bad_company_address_obj)
+
+        if bad_person["entity"] == "P":
+            bad_person_obj = BadPerson(
+                full_name=bad_person["full_name"],
+                type=bad_person["type"],
+                source=bad_person["source"],
+                citizenship_country_code=bad_person["citizenship_code"],
+            )
+            session.add(bad_person_obj)
+            returned_id = bad_person_obj.id
+
+            for alias in bad_person["alias"]:
+                if (
+                    session.query(BadPersonAlias).filter_by(full_name=alias).first()
+                    is None
+                ):
+                    alias_obj = BadPersonAlias(
+                        full_name=alias, bad_person_id=bad_person_obj.id
+                    )
+                    session.add(alias_obj)
+
+            for i in range(len(bad_person["street"])):
+                if (
+                    session.query(BadPersonAddresses)
+                    .filter_by(
+                        street=bad_person["street"][i],
+                        city=bad_person["city"][i],
+                        zip_code=bad_person["zipCode"][i],
+                        region=bad_person["region"][i],
+                        place=bad_person["place"][i],
+                        po_box=bad_person["poBox"][i],
+                        country_code=bad_person["country"][i],
+                        bad_person_id=bad_person_obj.id,
+                    )
+                    .first()
+                    is None
+                ):
+                    bad_person_address_obj = BadPersonAddresses(
+                        street=bad_person["street"][i],
+                        city=bad_person["city"][i],
+                        zip_code=bad_person["zipCode"][i],
+                        region=bad_person["region"][i],
+                        place=bad_person["place"][i],
+                        po_box=bad_person["poBox"][i],
+                        country_code=bad_person["country"][i],
+                        type=bad_person["address_type"][i].value,
+                        bad_person_id=bad_person_obj.id,
+                    )
+                    session.add(bad_person_address_obj)
+
+    return returned_id, returned_id_type
 
 
 def upsert_df(df, list_type):
@@ -251,36 +252,43 @@ def upsert_df(df, list_type):
     # Get persons from database
     session = Session()
 
-    inserted_ids = []
-    updated_ids = []
-    deleted_ids = []
+    inserted_ids = {"P": [], "E": []}
+    updated_ids = {"P": [], "E": []}
+    deleted_ids = {"P": [], "E": []}
 
-    for _, person in df.iterrows():
-        query_person = (
-            session.query(BadPerson)
-            .filter(BadPerson.type == list_type)
-            .filter(BadPerson.full_name == person["full_name"])
-            .filter(
-                BadPerson.citizenship_country_code.contains(
-                    cast(person["country_code"], ARRAY(VARCHAR(2)))
+    for _, row in df.iterrows():
+        row_type_switch = "P"
+        query_row = None
+        if list_type == BAD_PERSON_TYPE.SANCTION:
+            if row["entity"] == "E":
+                query_row = (
+                    session.query(BadCompany)
+                    .filter(BadCompany.type == list_type)
+                    .filter(BadCompany.name == row["full_name"])
+                    .one_or_none()
                 )
-            )
-            .one_or_none()
-        )
-
-        if query_person is None:
-            bad_person_obj = BadPerson(
-                full_name=person["full_name"],
-                type=person["type"],
-                source=person["source"],
-                citizenship_country_code=person["country_code"],
-            )
-
-            session.add(bad_person_obj)
-            inserted_ids.append(bad_person_obj.id)
+                row_type_switch = "E"
         else:
-            updated_ids.append(query_person.id)
-            query_person.updated_at = time_now
+            query_row = (
+                session.query(BadPerson)
+                .filter(BadPerson.type == list_type)
+                .filter(BadPerson.full_name == row["full_name"])
+                .filter(
+                    BadPerson.citizenship_country_code.contains(
+                        cast(row["country_code"], ARRAY(VARCHAR(2)))
+                    )
+                )
+                .one_or_none()
+            )
+
+        if query_row is None:
+            person_id = push_person_in_session(
+                session=session, bad_person=row, list_type=list_type
+            )
+            inserted_ids[row_type_switch].append(person_id)
+        else:
+            updated_ids[row_type_switch].append(query_row.id)
+            query_row.updated_at = time_now
 
     session.commit()
 
@@ -291,14 +299,27 @@ def upsert_df(df, list_type):
         .all()
     )
 
+    removed_companies = (
+        session.query(BadCompany)
+        .filter(BadCompany.type == list_type)
+        .filter(BadCompany.updated_at < time_now)
+        .all()
+    )
+
     for person in removed_persons:
-        deleted_ids.append(person.id)
+        deleted_ids["P"].append(person.id)
+
+    for company in removed_companies:
+        deleted_ids["E"].append(company.id)
 
     updates_trigger(updated_ids)
     inserts_trigger(inserted_ids)
     deletes_trigger(deleted_ids)
 
-    return f"inserted: {len(inserted_ids)} updated: {len(updated_ids)} deleted: {len(deleted_ids)}"
+    return (
+        f"PERSONS: inserted: {len(inserted_ids['P'])} updated: {len(updated_ids['P'])} deleted: {len(deleted_ids['P'])}\n"
+        f"COMPANIES: inserted: {len(inserted_ids['E'])} updated: {len(updated_ids['E'])} deleted: {len(deleted_ids['E'])}"
+    )
 
 
 def updates_trigger(UUIDS):

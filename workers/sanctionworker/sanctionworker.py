@@ -5,6 +5,7 @@ import traceback
 from workers.pythondbtools import dbtools
 from workers.pythondbtools.dbtools import BAD_PERSON_TYPE, ADDRESS_TYPE
 import os
+import json
 
 
 def parse_file():
@@ -39,6 +40,9 @@ def select_fields(tree):
     sanctions_export = "{http://eu.europa.ec/fpi/fsd/export}"
 
     for sanctionEntity in tree.findall(sanctions_export + "sanctionEntity"):
+        name_set
+
+        is_duplicate = []
 
         person_alias = []
 
@@ -148,25 +152,32 @@ def remove_sanction_from_db():
 
 
 def add_new_sanction_to_db(df):
-    dbtools.update_df(df, list_type=BAD_PERSON_TYPE.SANCTION)
+    result_string = dbtools.upsert_df(df, list_type=BAD_PERSON_TYPE.SANCTION)
+    return result_string
 
 
 def run(event, context):
     try:
         tree = parse_file()
         data = select_fields(tree)
-        add_new_sanction_to_db(data)
+        result_string = add_new_sanction_to_db(data)
+        body_dict = {
+            "data": "sanctionworker finished",
+            "message": result_string.split("\n"),
+        }
         return {
             "statusCode": 200,
-            "body": '{"data": "sanctionworker finished"}',
+            "body": json.dumps(body_dict),
             "headers": {"Content-Type": "application/json"},
         }
     except Exception as err:
+        body_dict = {
+            "error": "sanctionworker failed",
+            "error message": traceback.format_exc().split("\n"),
+        }
         return {
             "statusCode": 500,
-            "body": '{"error": "sanctionworker failed, error: '
-            + traceback.format_exc()
-            + '"}',
+            "body": json.dumps(body_dict),
             "headers": {"Content-Type": "application/json"},
         }
 
