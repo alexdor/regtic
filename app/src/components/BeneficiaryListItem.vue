@@ -1,9 +1,9 @@
 <template>
-  <tr :class="'beneficiary-list-item ' + data.entityType">
-    <td class="value"><div class="entity-type" :title="data.entityType" :aria-label="data.entityType"></div> {{data.name}}</td>
-    <td><span class="key">Ownership:</span> <span class="value">{{data.ownership * 100}}%</span></td>
-    <td><span class="key">Voting rights:</span> <span class="value">{{data.voting_rights * 100}}%</span></td>
-    <td><StatusIcon :data="data.status"></StatusIcon></td>
+  <tr :class="'beneficiary-list-item ' + entity.entityType">
+    <td class="value"><div class="entity-type" :title="entity.entityType" :aria-label="entity.entityType"></div> {{entity.name}}</td>
+    <td><span class="key">Ownership:</span> <span class="value">{{percent(relation.ownership)}}</span></td>
+    <td><span class="key">Voting rights:</span> <span class="value">{{percent(relation.votingRight)}}</span></td>
+    <td><StatusIcon :status="entity.status" :statusType="entity.statusType" :source="entity.source" :statusNotes="entity.statusNotes"></StatusIcon></td>
   </tr>
 </template>
 
@@ -15,8 +15,16 @@
       StatusIcon
     },
     props: {
-      data: {
+      entity: {
         type: Object
+      },
+      relation: {
+        type: Object
+      }
+    },
+    methods: {
+      percent(value) {
+        return Math.round(value * 100) + "%";
       }
     }
   }

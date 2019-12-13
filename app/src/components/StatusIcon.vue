@@ -1,14 +1,16 @@
 <template>
   <div>
-    <el-tooltip v-if="data.type == 'good'" class="item" effect="dark" content="Good" placement="top">
-      <div :class="'status-icon ' + data.type" :aria-label="data.type"></div>
+    <el-tooltip v-if="status == 'ok'" class="item" effect="dark" content="Not detected on any list" placement="top">
+      <div :class="'status-icon ' + status" :aria-label="status"></div>
     </el-tooltip>
-    <el-tooltip v-if="data.type != 'good'" class="item" effect="dark" placement="top">
-      <div slot="content"><li v-for="list in data.lists" v-bind:key="list.url">{{list.name}} | <a :href="list.url">{{list.url}}</a></li>
-      <br v-if="data.lists.length > 0 && data.notes.length > 0" />
-      <br v-if="data.lists.length > 0 && data.notes.length > 0" />
-      {{data.notes}}</div>
-      <div :class="'status-icon ' + data.type"></div>
+    <el-tooltip v-if="status != 'ok'" class="item" effect="dark" placement="top">
+      <div slot="content">
+        <a :href="source">{{source}}</a>
+        <br v-if="source != undefined && statusNotes != undefined" />
+        <br v-if="source != undefined && statusNotes != undefined" />
+        {{statusNotes}}
+      </div>
+      <div :class="'status-icon ' + status"></div>
     </el-tooltip>
   </div>
 </template>
@@ -16,9 +18,10 @@
 <script>
   export default {
     props: {
-      data: {
-        type: Object
-      }
+      status: String,
+      statusType: String,
+      source: String,
+      statusNotes: String
     }
   }
 </script>
@@ -38,7 +41,7 @@
     background-position: center;
   }
 
-    .status-icon.good {
+    .status-icon.ok {
       background-color: $green;
       background-image: url('../assets/icon-good.svg');
     }
@@ -48,16 +51,12 @@
       background-image: url('../assets/icon-warning.svg');
     }
 
-    .status-icon.bad {
+    .status-icon.issue {
       background-color: $red;
       background-image: url('../assets/icon-bad.svg');
     }
 
-    li {
-      list-style: none;
-    }
-
-    li a {
+    a {
       color: $link-color;
     }
 </style>

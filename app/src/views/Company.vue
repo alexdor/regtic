@@ -23,7 +23,7 @@
                 <td class="key">VAT</td><td class="value">{{selectedCompany.data.vat}}</td>
               </tr>
               <tr>
-                <td class="key">Country</td><td class="value">{{selectedCompany.data.country}}</td>
+                <td class="key">Country</td><td class="value">{{getCountry(selectedCompany.data.countryCode)}}</td>
               </tr>
               <tr>
                 <td class="key">Address</td><td class="value">{{selectedCompany.data.address}}</td>
@@ -38,7 +38,7 @@
           <div class="header-small">Beneficiaries</div>
           <table class="padding-all-small full-width">
             <tbody>
-              <BeneficiaryListItem :data="entityById(item.id)" v-for="item in selectedCompany.data.sub_entities" v-bind:key="item.id"></BeneficiaryListItem>
+              <BeneficiaryListItem :entity="entityById(item.id)" :relation="item" v-for="item in selectedCompany.data.owns" v-bind:key="item.id"></BeneficiaryListItem>
             </tbody>
           </table>
         </div>
@@ -53,6 +53,7 @@
   import EntityCard from "../components/EntityCard.vue";
   import LineCurve from "../components/LineCurve.vue";
   import BeneficiaryListItem from "../components/BeneficiaryListItem.vue";
+  import store from "../store";
 
   export default {
     components: {
@@ -80,18 +81,15 @@
       const visitedCompanies = {};
 
       const companyCardHeightBase = 260;
-      const personCardHeightBase = 240;
+      const personCardHeightBase = 180;
 
       const companyCardWidthBase = 354;
       const personCardWidthBase = 424;
 
       const companyCardWidth = 352;
       const companyCardClosedHeightCenter = 31;
-
-      this.parseCompany(this.result.info);
-      this.result.companies.forEach(this.parseCompany);
-
-      const people = this.mapPeople(this.result.people);
+      
+      const people = this.result.people;
       this.entities.push(this.result.info);
       this.entities.push(...this.result.companies);
       this.entities.push(...people);
@@ -118,8 +116,8 @@
       for (let depth = 0; depth < companyGrid.length; depth++) {
         for (let i = 0; i < companyGrid[depth].length; i++) {
           const company = companyGrid[depth][i];
-          for (let ei = 0; ei < company.sub_entities.length; ei++) {
-            const otherCompany = this.entityById(company.sub_entities[ei].id);
+          for (let ei = 0; ei < company.owns.length; ei++) {
+            const otherCompany = this.entityById(company.owns[ei].id);
             if (otherCompany != undefined && otherCompany.entityType == "company") {
               const line = new LineCurveClass({
                 propsData: {
@@ -134,7 +132,7 @@
               line.$mount();
               canvas.append(line.$el);
             }
-            const person = this.entityById(company.sub_entities[ei].id);
+            const person = this.entityById(company.owns[ei].id);
             if (person != undefined && person.entityType == "person") {
               const line = new LineCurveClass({
                 propsData: {
@@ -226,43 +224,17 @@
         grid[depth] = grid[depth] || [];
         grid[depth].push(company);
         visited[company.id] = { depth: depth, index: grid[depth].length - 1 };
-        this.parseCompany(company);
         company.x = 20 + depth * 450;
-        for (let i = 0; i < company.sub_entities.length; i++) {
-          const otherCompany = this.entityById(company.sub_entities[i].id);
+        for (let i = 0; i < company.owns.length; i++) {
+          const otherCompany = this.entityById(company.owns[i].id);
           if (otherCompany != undefined && otherCompany.entityType == "company")
             this.mapCompaniesToGrid(companies, grid, visited, otherCompany, depth + 1);
         }
       },
-      mapPeople(people) {
-        const goodPeople = (people.good || []).map(person => ({
-          name: person.full_name,
-          ...person,
-          status: { type: "good", lists: [], notes: "" }
-        }));
-
-        const warningPeople = (people.warning || []).map(person => ({
-          name: person.full_name,
-          ...person
-        }));
-
-        const badPeople = (people.bad || []).map(person => ({
-          name: person.full_name,
-          ...person
-        }));
-
-        return [...badPeople, ...warningPeople, ...goodPeople].map(this.parsePerson);
-      },
-      parseCompany(company) {
-        company.entityType = "company";
-        company.open = false;
-        return company;
-      },
-      parsePerson(person) {
-        person.entityType = "person";
-        person.open = false;
-        person.relation = person.relation || "Ultimate Beneficial Owner";
-        return person;
+      getCountry(code) {
+        const found = store.state.countries.filter(entry => entry.alpha2Code == code);
+        if (found.length > 0) return found[0].name + " / " + code;
+        else return "Unknown / ZZ";
       },
       // Callback for when 'expanded' is either expanded/collapsed, to toggle all cards.
       setAllExpanded(expanded) {

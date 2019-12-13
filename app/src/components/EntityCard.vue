@@ -5,12 +5,13 @@
         <div class="entity-type" :aria-label="data.entityType" :title="data.entityType"></div>
         <span class="title">{{data.full_name || data.name}}</span>
       </div>
-      <StatusIcon :data="data.status"></StatusIcon>
+      <StatusIcon :status="data.status" :statusType="data.statusType" :source="data.source" :statusNotes="data.statusNotes"></StatusIcon>
     </div>
     <table class="info" v-show="openState">
       <tr v-for="info in info[data.entityType]" v-bind:key="info.key">
         <td class="key">{{info.name}}</td>
         <td class="value" v-if="info.type == 'literal'">{{data[info.key]}}</td>
+        <td class="value" v-if="info.type == 'country'">{{getCountry(data[info.key])}}</td>
         <td class="value" v-if="info.type == 'percent'">{{data[info.key] * 100}}%</td>
       </tr>
     </table>
@@ -21,6 +22,7 @@
 
 <script>
   import StatusIcon from "../components/StatusIcon.vue";
+  import store from "../store";
 
   export default {
     components: {
@@ -41,15 +43,13 @@
         info: {
           company: [
             { name: "VAT", key: "vat", type: "literal" },
-            { name: "Country", key: "country", type: "literal" },
+            { name: "Country", key: "countryCode", type: "country" },
             { name: "Address", key: "address", type: "literal" },
             { name: "Type", key: "type", type: "literal" }
           ],
           person: [
-            { name: "Relation", key: "relation", type: "literal" },
-            { name: "Country", key: "country", type: "literal" },
-            { name: "Ownership", key: "ownership", type: "percent" },
-            { name: "Voting rights", key: "voting_rights", type: "percent" }
+            { name: "Address", key: "address", type: "literal" },
+            { name: "Country", key: "countryCode", type: "country" }
           ]
         }
       };
@@ -57,6 +57,11 @@
     methods: {
       setActive() {
         this.$parent.entityCardSelected(this);
+      },
+      getCountry(code) {
+        const found = store.state.countries.filter(entry => entry.alpha2Code == code);
+        if (found.length > 0) return found[0].name + " / " + code;
+        else return "Unknown / ZZ";
       }
     },
     watch: {
