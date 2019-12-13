@@ -63,16 +63,18 @@ function parseCompany(company) {
 
 function parseMetaData(titles) {
   function translateTitle(title) {
+    const titleMapping = {
+      bestyrelse: "board of directors",
+      direktion: "direction",
+      ejerregister: "legal owner",
+      "reelle ejere": "ultimate beneficial owner",
+      revision: "accountant",
+      stiftere: "founder"
+    };
+
     title = title.toLowerCase();
 
-    if (title === "direktion") return "direction";
-    if (title === "bestyrelse") return "board of directors";
-    if (title === "ejerregister") return "legal owner";
-    if (title === "reelle ejere") return "ultimate beneficial owner";
-    if (title === "revision") return "accountant";
-    if (title === "stiftere") return "founder";
-
-    return undefined;
+    return titleMapping[title];
   }
 
   const relations = titles.reduce((result, relation) => {
