@@ -7,7 +7,6 @@ from sqlalchemy import select
 
 from psycopg2.extensions import AsIs
 
-# from django.contrib.postgres.search import SearchRank
 
 # db_uri = os.environ["REGTIC_DATABASE_URL"]
 db_uri = (
@@ -22,14 +21,16 @@ base.metadata.create_all(db)
 
 # todo remove this test stuff
 created_bad_people = ["a1d8b9df-b0fd-432b-af98-e90767953499"]
+updated_bad_people = ["647dc6da-0ce9-4346-bc16-278a1664ceea"]
+
 
 # created_bad_people = ["a78b77bf-c91c-47f4-b85a-314f7d778038", "4aea249c-c967-46ff-ab41-239e0a786eee", "454ba45f-a350-45c4-80ee-5f92138ff970", "23e3b13d-d26b-40f0-9f04-fc44290542dd", "c031b078-8336-4e83-8a11-202da3e03adc"]
-updated_bad_people = [
-    "4aea249c-c967-46ff-ab41-239e0a786eee",
-    "454ba45f-a350-45c4-80ee-5f92138ff970",
-    "23e3b13d-d26b-40f0-9f04-fc44290542dd",
-    "c031b078-8336-4e83-8a11-202da3e03adc",
-]
+# updated_bad_people = [
+#    "4aea249c-c967-46ff-ab41-239e0a786eee",
+#    "454ba45f-a350-45c4-80ee-5f92138ff970",
+#    "23e3b13d-d26b-40f0-9f04-fc44290542dd",
+#    "c031b078-8336-4e83-8a11-202da3e03adc",
+# ]
 deleted_bad_people = [
     "4aea249c-c967-46ff-ab41-239e0a786eee",
     "454ba45f-a350-45c4-80ee-5f92138ff970",
@@ -52,14 +53,27 @@ def add_to_bad_person_to_person_dict(bp_to_p_dict, bad_person_id, session):
         .all()
     )
     for alias_query in bad_person_alias_query:
-        reformated_alias = alias_query[0].replace(" ", " & ")
         ts_query = (
-            session.query(Persons)
-            .filter(Persons.name_vector.match(reformated_alias))
-            .first()
-        )
+            session.query(
+                Persons,
+                func.ts_rank(
+                    Persons.name_vector, func.plainto_tsquery("simple", alias_query[0])
+                ).label("rank"),
+            )
+            .filter(
+                Persons.name_vector.op("@@")(
+                    func.plainto_tsquery("simple", alias_query[0])
+                )
+            )
+            .order_by(text("rank desc"))
+        ).one_or_none()
+
         if ts_query is not None:
-            bp_to_p_dict[bad_person_id] = ts_query.id
+            top_result = ts_query[0]
+            print(f"Alias: {alias_query[0]}")
+            print(f"Person: {top_result.full_name}")
+            print(f"rank: {ts_query[1]}")
+            bp_to_p_dict[bad_person_id] = top_result.id
 
 
 def worker(
@@ -69,14 +83,18 @@ def worker(
     try:
         session = Session()
 
-        persons_obj = Persons(first_name="Abu", last_name="Ali", country_code="IQ")
+        # persons_obj = Persons(first_name="Abu", last_name="Ali", country_code="IQ")
+        # session.add(persons_obj)
+        # persons_obj2 = Persons(first_name="Lars", last_name="Løkke Rasmussen", country_code="DK")
+        # session.add(persons_obj2)
 
-        session.add(persons_obj)
-        session.commit()
+        # session.commit()
 
         created_bp_to_p_dict = {}
         for person_id in created_bad_people:
             add_to_bad_person_to_person_dict(created_bp_to_p_dict, person_id, session)
+
+        print(created_bp_to_p_dict)
 
         updated_bp_to_p_dict = {}
         for person_id in updated_bad_people:
