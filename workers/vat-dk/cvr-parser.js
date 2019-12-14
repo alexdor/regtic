@@ -61,7 +61,47 @@ function parseCompany(company) {
   };
 }
 
-function parseMetaData(titles) {
+function parseMetaData(organizations) {
+  function getRights(organizations) {
+    const ownershipAmountMatch = "EJERANDEL_PROCENT";
+    const votingRightsAmountMatch = "EJERANDEL_STEMMERET_PROCENT";
+
+    function getActiveValueFromAttribute(attribute) {
+      // find the attribute value which is active
+      const activeAttribute =
+        attribute.vaerdier.find(vaerdi => vaerdi.periode.gyldigTil === null) ||
+        {};
+      return activeAttribute.vaerdi;
+    }
+
+    // quickly filter out the non-essential organizations/relations
+    const registrantOrganization = organizations.find(
+      organization => organization.hovedtype === "REGISTER"
+    );
+    if (!registrantOrganization)
+      return { ownershipPercentage: 0, votingsRightsPercentage: 0 };
+
+    // find the attribute that maches the type we are searching for
+    const ownershipAttribute = registrantOrganization.medlemsData[0].attributter.find(
+      attribute => attribute.type === ownershipAmountMatch
+    );
+
+    const votingRightsAttribute = registrantOrganization.medlemsData[0].attributter.find(
+      attribute => attribute.type === votingRightsAmountMatch
+    );
+
+    const areAttributesValids = ownershipAttribute && votingRightsAttribute;
+
+    if (!areAttributesValids)
+      return { ownershipPercentage: 0, votingsRightsPercentage: 0 };
+
+    return {
+      ownershipPercentage: getActiveValueFromAttribute(ownershipAttribute) || 0,
+      votingsRightsPercentage:
+        getActiveValueFromAttribute(votingRightsAttribute) || 0
+    };
+  }
+
   function translateTitle(title) {
     const titleMapping = {
       bestyrelse: "board of directors",
@@ -77,7 +117,7 @@ function parseMetaData(titles) {
     return titleMapping[title];
   }
 
-  const relations = titles.reduce((result, relation) => {
+  const relations = organizations.reduce((result, relation) => {
     const isActiveRelation =
       relation.organisationsNavn[0].periode.gyldigTil === null;
     if (!isActiveRelation) return result;
@@ -94,7 +134,11 @@ function parseMetaData(titles) {
     return result;
   }, []);
 
-  return { relations };
+  const { ownershipPercentage, votingsRightsPercentage } = getRights(
+    organizations
+  );
+
+  return { relations, ownershipPercentage, votingsRightsPercentage };
 }
 
 function parse(hit) {
