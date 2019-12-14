@@ -35,8 +35,8 @@ class BadPerson(base):
     citizenship_country_code = Column(ARRAY(VARCHAR(2)))
 
 
-class BadPersonAlias(base):
-    __tablename__ = "bad_persons_aliases"
+class BadPersonAllNames(base):
+    __tablename__ = "bad_persons_all_names"
     id = Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid.uuid4)
     full_name = Column(String)
     bad_person_id = Column(
@@ -142,14 +142,15 @@ def push_person_in_session(session, bad_person, list_type):
             citizenship_country_code=bad_person["country_code"],
         )
         session.add(bad_person_obj)
-
+        print("test")
         if (
-            session.query(BadPersonAlias)
+            session.query(BadPersonAllNames)
             .filter_by(full_name=bad_person["full_name"])
             .first()
             is None
         ):
-            alias_obj = BadPersonAlias(
+            print("We tried")
+            alias_obj = BadPersonAllNames(
                 full_name=bad_person["full_name"], bad_person_id=bad_person_obj.id
             )
             session.add(alias_obj)
@@ -218,10 +219,10 @@ def push_person_in_session(session, bad_person, list_type):
 
             for alias in bad_person["alias"]:
                 if (
-                    session.query(BadPersonAlias).filter_by(full_name=alias).first()
+                    session.query(BadPersonAllNames).filter_by(full_name=alias).first()
                     is None
                 ):
-                    alias_obj = BadPersonAlias(
+                    alias_obj = BadPersonAllNames(
                         full_name=alias, bad_person_id=bad_person_obj.id
                     )
                     session.add(alias_obj)
@@ -264,74 +265,80 @@ def upsert_df(df, list_type):
     # Get persons from database
     session = Session()
 
-    inserted_ids = {"P": [], "E": []}
-    updated_ids = {"P": [], "E": []}
-    deleted_ids = {"P": [], "E": []}
+    try:
+        inserted_ids = {"P": [], "E": []}
+        updated_ids = {"P": [], "E": []}
+        deleted_ids = {"P": [], "E": []}
 
-    for _, row in df.iterrows():
-        row_type_switch = "P"
-        query_row = None
-        if list_type == BAD_PERSON_TYPE.SANCTION:
-            if row["entity"] == "E":
+        for _, row in df.iterrows():
+            row_type_switch = "P"
+            query_row = None
+            if list_type == BAD_PERSON_TYPE.SANCTION:
+                if row["entity"] == "E":
+                    query_row = (
+                        session.query(BadCompany)
+                        .filter(BadCompany.type == list_type)
+                        .filter(BadCompany.name == row["full_name"])
+                        .one_or_none()
+                    )
+                    row_type_switch = "E"
+            else:
                 query_row = (
-                    session.query(BadCompany)
-                    .filter(BadCompany.type == list_type)
-                    .filter(BadCompany.name == row["full_name"])
+                    session.query(BadPerson)
+                    .filter(BadPerson.type == list_type)
+                    .filter(BadPerson.full_name == row["full_name"])
+                    .filter(
+                        BadPerson.citizenship_country_code.contains(
+                            cast(row["country_code"], ARRAY(VARCHAR(2)))
+                        )
+                    )
                     .one_or_none()
                 )
-                row_type_switch = "E"
-        else:
-            query_row = (
-                session.query(BadPerson)
-                .filter(BadPerson.type == list_type)
-                .filter(BadPerson.full_name == row["full_name"])
-                .filter(
-                    BadPerson.citizenship_country_code.contains(
-                        cast(row["country_code"], ARRAY(VARCHAR(2)))
-                    )
+
+            if query_row is None:
+                person_id = push_person_in_session(
+                    session=session, bad_person=row, list_type=list_type
                 )
-                .one_or_none()
-            )
+                inserted_ids[row_type_switch].append(person_id)
+            else:
+                updated_ids[row_type_switch].append(query_row.id)
+                query_row.updated_at = time_now
 
-        if query_row is None:
-            person_id = push_person_in_session(
-                session=session, bad_person=row, list_type=list_type
-            )
-            inserted_ids[row_type_switch].append(person_id)
-        else:
-            updated_ids[row_type_switch].append(query_row.id)
-            query_row.updated_at = time_now
+        session.commit()
 
-    session.commit()
+        removed_persons = (
+            session.query(BadPerson)
+            .filter(BadPerson.type == list_type)
+            .filter(BadPerson.updated_at < time_now)
+            .all()
+        )
 
-    removed_persons = (
-        session.query(BadPerson)
-        .filter(BadPerson.type == list_type)
-        .filter(BadPerson.updated_at < time_now)
-        .all()
-    )
+        removed_companies = (
+            session.query(BadCompany)
+            .filter(BadCompany.type == list_type)
+            .filter(BadCompany.updated_at < time_now)
+            .all()
+        )
 
-    removed_companies = (
-        session.query(BadCompany)
-        .filter(BadCompany.type == list_type)
-        .filter(BadCompany.updated_at < time_now)
-        .all()
-    )
+        for person in removed_persons:
+            deleted_ids["P"].append(person.id)
 
-    for person in removed_persons:
-        deleted_ids["P"].append(person.id)
+        for company in removed_companies:
+            deleted_ids["E"].append(company.id)
 
-    for company in removed_companies:
-        deleted_ids["E"].append(company.id)
+        updates_trigger(updated_ids)
+        inserts_trigger(inserted_ids)
+        deletes_trigger(deleted_ids)
 
-    updates_trigger(updated_ids)
-    inserts_trigger(inserted_ids)
-    deletes_trigger(deleted_ids)
-
-    return (
-        f"PERSONS: inserted: {len(inserted_ids['P'])} updated: {len(updated_ids['P'])} deleted: {len(deleted_ids['P'])}\n"
-        f"COMPANIES: inserted: {len(inserted_ids['E'])} updated: {len(updated_ids['E'])} deleted: {len(deleted_ids['E'])}"
-    )
+        return (
+            f"PERSONS: inserted: {len(inserted_ids['P'])} updated: {len(updated_ids['P'])} deleted: {len(deleted_ids['P'])}\n"
+            f"COMPANIES: inserted: {len(inserted_ids['E'])} updated: {len(updated_ids['E'])} deleted: {len(deleted_ids['E'])}"
+        )
+    except Exception as err:
+        session.rollback()
+        raise err
+    finally:
+        session.close()
 
 
 def updates_trigger(uuids):
@@ -368,7 +375,7 @@ def delete_all_bad_persons_in_session(session=None, list_type=None):
             bad_companies_alias = session.query(BadCompanyAlias)
             bad_persons_addresses = session.query(BadPersonAddresses)
             bad_company_addresses = session.query(BadCompanyAddresses)
-            bad_persons_aliases = session.query(BadPersonAlias)
+            bad_persons_aliases = session.query(BadPersonAllNames)
 
             for bad_company_alias in bad_companies_alias:
                 session.delete(bad_company_alias)
@@ -401,10 +408,10 @@ def delete_all_bad_persons(list_type=None):
         if list_type is not None:
             bad_persons = session.query(BadPerson).filter(BadPerson.type == list_type)
             if list_type == BAD_PERSON_TYPE.SANCTION:
-                bad_persons_alias = session.query(BadPersonAlias)
+                bad_persons_alias = session.query(BadPersonAllNames)
         else:
             bad_persons = session.query(BadPerson)
-            bad_persons_alias = session.query(BadPersonAlias)
+            bad_persons_alias = session.query(BadPersonAllNames)
 
         if list_type == BAD_PERSON_TYPE.SANCTION:
 
