@@ -8,8 +8,8 @@ exports.up = function(knex) {
       'board of directors',
       'founder'
     );
-    ALTER TABLE company_to_company ADD relations ENTITY_RELATION[];
-    ALTER TABLE company_to_person ADD relations ENTITY_RELATION[];
+    ALTER TABLE company_to_company ADD relations ENTITY_RELATION[] NOT NULL;
+    ALTER TABLE company_to_person ADD relations ENTITY_RELATION[] NOT NULL;
   `);
 };
 
