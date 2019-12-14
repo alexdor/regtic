@@ -334,17 +334,17 @@ def upsert_df(df, list_type):
     )
 
 
-def updates_trigger(UUIDS):
+def updates_trigger(uuids):
     # Do cool stuff
     return 1
 
 
-def inserts_trigger(UUIDS):
+def inserts_trigger(uuids):
     # Do cool stuff
     return 1
 
 
-def deletes_trigger(UUIDS):
+def deletes_trigger(uuids):
     # Do cool stuff
     return 1
 
