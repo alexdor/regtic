@@ -40,7 +40,6 @@ def select_fields(tree):
     sanctions_export = "{http://eu.europa.ec/fpi/fsd/export}"
 
     for sanctionEntity in tree.findall(sanctions_export + "sanctionEntity"):
-        name_set
 
         is_duplicate = []
 

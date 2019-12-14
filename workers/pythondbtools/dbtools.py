@@ -142,6 +142,18 @@ def push_person_in_session(session, bad_person, list_type):
             citizenship_country_code=bad_person["country_code"],
         )
         session.add(bad_person_obj)
+
+        if (
+            session.query(BadPersonAlias)
+            .filter_by(full_name=bad_person["full_name"])
+            .first()
+            is None
+        ):
+            alias_obj = BadPersonAlias(
+                full_name=bad_person["full_name"], bad_person_id=bad_person_obj.id
+            )
+            session.add(alias_obj)
+
         returned_id = bad_person_obj.id
 
     elif list_type == BAD_PERSON_TYPE.SANCTION:
