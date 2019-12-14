@@ -30,11 +30,20 @@ function insertPerson(client, person) {
   ]);
 }
 
-function insertCompanyToPerson(client, companyId, personId, relations) {
+function insertCompanyToPerson(
+  client,
+  companyId,
+  personId,
+  relations,
+  ownership,
+  votingRights
+) {
   return client.query(insertCompanyToPersonQuery, [
     companyId,
     personId,
-    `{${relations.join(",")}}`
+    `{${relations.join(",")}}`,
+    ownership,
+    votingRights
   ]);
 }
 
@@ -42,12 +51,16 @@ function insertCompanyToCompany(
   client,
   motherCompanyId,
   daugtherCompanyId,
-  relations
+  relations,
+  ownership,
+  votingRights
 ) {
   return client.query(insertCompanyToCompanyQuery, [
     motherCompanyId,
     daugtherCompanyId,
-    `{${relations.join(",")}}`
+    `{${relations.join(",")}}`,
+    ownership,
+    votingRights
   ]);
 }
 
@@ -64,7 +77,9 @@ async function insertDataTransactionally(company) {
       return insertPerson(client, person).then(result => {
         return {
           id: result.rows[0].id,
-          relations: person.relations
+          relations: person.relations,
+          ownership: person.ownershipPercentage,
+          votingRights: person.votingsRightsPercentage
         };
       });
     });
@@ -75,7 +90,9 @@ async function insertDataTransactionally(company) {
         return insertCompany(client, motherCompany).then(result => {
           return {
             id: result.rows[0].id,
-            relations: motherCompany.relations
+            relations: motherCompany.relations,
+            ownership: motherCompany.ownershipPercentage,
+            votingRights: motherCompany.votingsRightsPercentage
           };
         });
       }
@@ -93,7 +110,9 @@ async function insertDataTransactionally(company) {
         client,
         companyId,
         person.id,
-        person.relations
+        person.relations,
+        person.ownership,
+        person.votingRights
       );
     });
 
@@ -104,7 +123,9 @@ async function insertDataTransactionally(company) {
           client,
           motherCompany.id,
           companyId,
-          motherCompany.relations
+          motherCompany.relations,
+          motherCompany.ownership,
+          motherCompany.votingRights
         );
       }
     );
