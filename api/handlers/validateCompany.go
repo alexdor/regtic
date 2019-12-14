@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/alexdor/regtic/api/db"
 	"github.com/alexdor/regtic/api/interfaces"
@@ -16,8 +15,6 @@ import (
 
 const unprocessableValidateError = "{\"error\": \"Please provide a company id \"}"
 const companyIDNotFound = "{\"error\": \"Company id provided doesn't exist in the database \"}"
-
-var origin = os.Getenv("ORIGIN")
 
 func ValidateCompanyHandler(ctx context.Context, request events.APIGatewayProxyRequest, headers map[string]string) (interfaces.Response, error) {
 	headers["X-Regtic-Func-Reply"] = "validate_company_handler"

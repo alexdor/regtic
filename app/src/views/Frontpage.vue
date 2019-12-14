@@ -92,6 +92,7 @@ export default Vue.extend({
 
   methods: {
     async signup(email: string) {
+      if (!email) return;
       try {
         await api.signup(email);
       } catch (error) {

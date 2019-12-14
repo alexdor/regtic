@@ -7,29 +7,32 @@ service: regtic-main-service
 
 provider:
   name: aws
-  runtime: python3.7
-  region: eu-north-1
+  runtime: nodejs12.x
+  region: eu-west-1
+  memorySize: 256
+  endpointType: regional
+  minimumCompressionSize: 1024
 
 package:
   individually: true
   exclude:
-    - ./app/**
-    - ./webapp/**
-    - docker-compose
-    - .eslint*
-    - README.md
-    - .editorconfig
-    # - ./api/**
-    # - database
-    # include:
-    #   - ./api/bin/**
+    - "*/**"
+    - "*.*"
+    - ".*"
 
 plugins:
   - serverless-offline
-  - serverless-python-requirements
+  # - serverless-python-requirements
   - serverless-iam-roles-per-function
 custom:
   version: /v1/
+
+  vpc:
+    securityGroupIds:
+      - sg-0f3a386d9cb8b3e70
+    subnetIds:
+      - subnet-4237130a
+      - subnet-2de87e77
   REGTIC_DATABASE_URL: ${env:REGTIC_DATABASE_URL,  "postgres://admin:admin@localhost:5432/regtic"}
   ENVIRONMENT: ${env:ENVIRONMENT, "development"}
   ORIGIN:
@@ -37,7 +40,6 @@ custom:
     production: "https://demo.regtic.com"
   pythonRequirements:
     dockerizePip: true
-    zip: true
     slim: true
     # In some cases, stripping binaries leads to problems like "ELF load command address/offset not properly aligned", even when done in the Docker environment. You can still slim down the package without *.so files with if we face this case we have to comment out the following:
     # strip: false
@@ -66,9 +68,11 @@ functions:
           path: ${self:custom.version}pepworker
     handler: workers/pepworker/pepworker.run
     module: workers/pepworker
+    vpc: ${self:custom.vpc}
     package:
-      include:
-        - workers/pythondbtools
+      exclude:
+        - "!workers/pythondbtools/**"
+        - "!workers/pepworker/**"
     environment:
       ENVIRONMENT: ${self:custom.ENVIRONMENT}
       REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
@@ -103,8 +107,10 @@ functions:
     handler: workers/sanctionworker/sanctionworker.run
     module: workers/sanctionworker
     package:
-      include:
-        - workers/pythondbtools
+      exclude:
+        - "!workers/pythondbtools/**"
+        - "!workers/pepworker/**"
+    vpc: ${self:custom.vpc}
     environment:
       ENVIRONMENT: ${self:custom.ENVIRONMENT}
       REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
@@ -120,7 +126,10 @@ functions:
           method: post
           path: ${self:custom.version}cvr-parse
     handler: workers/vat-dk/index.scrollAndParse
-    module: workers/vat-dk
+    package:
+      exclude:
+        - "!workers/vat-dk/**"
+    vpc: ${self:custom.vpc}
     environment:
       ENVIRONMENT: ${self:custom.ENVIRONMENT}
       NODE_ENV: ${self:custom.ENVIRONMENT}
@@ -131,33 +140,27 @@ functions:
   #####
   # API
   #####
-  find_companies:
-    handler: api/bin/find_companies
+  api:
+    handler: api/bin/main
     runtime: go1.x
     events:
       - http:
           path: ${self:custom.version}find_companies
           cors: true
           method: get
-    module: api/find_companies
-    environment:
-      ENVIRONMENT: ${self:custom.ENVIRONMENT}
-      REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
-      ORIGIN: ${self:custom.ORIGIN.${self:custom.ENVIRONMENT}}
-
-  validate_company:
-    handler: api/bin/validate_company
-    runtime: go1.x
-    events:
       - http:
           path: ${self:custom.version}validate_company
           cors: true
           method: get
-    module: api/validate_company
+    vpc: ${self:custom.vpc}
+    package:
+      exclude:
+        - "!api/bin/main"
     environment:
-      ENVIRONMENT: ${self:custom.ENVIRONMENT}
+      ENVIONMENT: ${self:custom.ENVIRONMENT}
       REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
       ORIGIN: ${self:custom.ORIGIN.${self:custom.ENVIRONMENT}}
+
   signup:
     runtime: nodejs12.x
     events:
@@ -166,83 +169,11 @@ functions:
           cors: true
           path: ${self:custom.version}signup
     handler: api/signup/index.signup
-    module: api/signup
+    package:
+      exclude:
+        - "!api/signup/**"
     environment:
-      ENVIRONMENT: ${self:custom.ENVIRONMENT}
+      ENVIONMENT: ${self:custom.ENVIRONMENT}
       NODE_ENV: ${self:custom.ENVIRONMENT}
       SLACK_WEBHOOK_URL: ${env:SLACK_WEBHOOK_URL}
-#
-# you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
-
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
-
-# you can add packaging information here
-#package:
-#  include:
-#    - include-me.js
-#    - include-me-dir/**
-#  exclude:
-#    - exclude-me.js
-#    - exclude-me-dir/**
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
-#    events:
-#      - http:
-#          path: users/create
-#          method: get
-#      - websocket: $connect
-#      - s3: ${env:BUCKET}
-#      - schedule: rate(10 minutes)
-#      - sns: greeter-topic
-#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
-#      - alexaSkill: amzn1.ask.skill.xx-xx-xx-xx
-#      - alexaSmartHome: amzn1.ask.skill.xx-xx-xx-xx
-#      - iot:
-#          sql: "SELECT * FROM 'some_topic'"
-#      - cloudwatchEvent:
-#          event:
-#            source:
-#              - "aws.ec2"
-#            detail-type:
-#              - "EC2 Instance State-change Notification"
-#            detail:
-#              state:
-#                - pending
-#      - cloudwatchLog: '/aws/lambda/hello'
-#      - cognitoUserPool:
-#          pool: MyUserPool
-#          trigger: PreSignUp
-#      - alb:
-#          listenerArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXX:listener/app/my-load-balancer/50dc6c495c0c9188/
-#          priority: 1
-#          conditions:
-#            host: example.com
-#            path: /hello
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+      ORIGIN: ${self:custom.ORIGIN.${self:custom.ENVIRONMENT}}

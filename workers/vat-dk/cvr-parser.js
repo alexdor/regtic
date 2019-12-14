@@ -61,6 +61,42 @@ function parseCompany(company) {
   };
 }
 
+function parseMetaData(titles) {
+  function translateTitle(title) {
+    const titleMapping = {
+      bestyrelse: "board of directors",
+      direktion: "direction",
+      ejerregister: "legal owner",
+      "reelle ejere": "ultimate beneficial owner",
+      revision: "accountant",
+      stiftere: "founder"
+    };
+
+    title = title.toLowerCase();
+
+    return titleMapping[title];
+  }
+
+  const relations = titles.reduce((result, relation) => {
+    const isActiveRelation =
+      relation.organisationsNavn[0].periode.gyldigTil === null;
+    if (!isActiveRelation) return result;
+
+    const translatedRelation = translateTitle(
+      relation.organisationsNavn[0].navn
+    );
+
+    const isTranslatedRelationValid = !!translatedRelation;
+    if (!isTranslatedRelationValid) return result;
+
+    result.push(translatedRelation);
+
+    return result;
+  }, []);
+
+  return { relations };
+}
+
 function parse(hit) {
   const entry = hit._source.Vrvirksomhed;
   const persons = [];
@@ -72,18 +108,27 @@ function parse(hit) {
   if (!isEntryValid) return;
 
   entry.deltagerRelation.forEach(entity => {
-    const isTypeOfOwner = !!entity.organisationer.hovedtype === "REGISTER";
-    if (!isTypeOfOwner) return;
-
     const hasDeltager = !!entity.deltager;
     const hasType = hasDeltager && entity.deltager.enhedstype;
     if (!hasType) return;
 
+    const metaData = parseMetaData(entity.organisationer);
+
     const isPerson = entity.deltager.enhedstype === "PERSON";
-    if (isPerson) persons.push(parsePerson(entity.deltager));
+    if (isPerson) {
+      persons.push({
+        ...parsePerson(entity.deltager),
+        ...metaData
+      });
+    }
 
     const isCompany = entity.deltager.enhedstype === "VIRKSOMHED";
-    if (isCompany) motherCompanies.push(parseMotherCompany(entity.deltager));
+    if (isCompany) {
+      motherCompanies.push({
+        ...parseMotherCompany(entity.deltager),
+        ...metaData
+      });
+    }
   });
 
   company.persons = persons;

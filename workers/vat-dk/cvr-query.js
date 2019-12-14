@@ -6,8 +6,7 @@ module.exports = {
     "Vrvirksomhed.cvrNummer",
     "Vrvirksomhed.navne",
     "Vrvirksomhed.virksomhedMetadata",
-    "Vrvirksomhed.deltagerRelation.deltager",
-    "Vrvirksomhed.deltagerRelation.organisationer"
+    "Vrvirksomhed.deltagerRelation"
   ],
   query: {
     bool: {
