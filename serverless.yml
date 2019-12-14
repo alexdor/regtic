@@ -66,7 +66,7 @@ functions:
       - http:
           method: get
           path: ${self:custom.version}pepworker
-    handler: workers/pepworker/pepworker.run
+    handler: workers/pepworker/pepworker.upsert_run
     module: workers/pepworker
     vpc: ${self:custom.vpc}
     package:
@@ -76,24 +76,6 @@ functions:
     environment:
       ENVIRONMENT: ${self:custom.ENVIRONMENT}
       REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
-
-  ####
-  # Pepworker upsert
-  ###
-  pepworkerupsert:
-    environment:
-      ENVIRONMENT: ${self:custom.ENVIRONMENT}
-      REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
-    runtime: python3.7
-    events:
-      - http:
-          method: get
-          path: ${self:custom.version}pepworkerupsert
-    handler: workers/pepworker/pepworker.upsert_run
-    module: workers/pepworker
-    package:
-      include:
-        - workers/pythondbtools
 
   #####
   # Sanction worker

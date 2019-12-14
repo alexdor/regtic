@@ -56,8 +56,8 @@ class BadCompany(base):
     type = Column(Enum(BAD_PERSON_TYPE))
 
 
-class BadCompanyAlias(base):
-    __tablename__ = "bad_companies_aliases"
+class BadCompanyAllNames(base):
+    __tablename__ = "bad_companies_all_names"
     id = Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid.uuid4)
     name = Column(String)
     type = Column(Enum(BAD_PERSON_TYPE))
@@ -142,14 +142,12 @@ def push_person_in_session(session, bad_person, list_type):
             citizenship_country_code=bad_person["country_code"],
         )
         session.add(bad_person_obj)
-        print("test")
         if (
             session.query(BadPersonAllNames)
             .filter_by(full_name=bad_person["full_name"])
             .first()
             is None
         ):
-            print("We tried")
             alias_obj = BadPersonAllNames(
                 full_name=bad_person["full_name"], bad_person_id=bad_person_obj.id
             )
@@ -171,8 +169,11 @@ def push_person_in_session(session, bad_person, list_type):
             returned_id_type = "E"
 
             for alias in bad_person["alias"]:
-                if session.query(BadCompanyAlias).filter_by(name=alias).first() is None:
-                    alias_obj = BadCompanyAlias(
+                if (
+                    session.query(BadCompanyAllNames).filter_by(name=alias).first()
+                    is None
+                ):
+                    alias_obj = BadCompanyAllNames(
                         name=alias,
                         type=bad_company_obj.type,
                         bad_company_id=bad_company_obj.id,
@@ -372,7 +373,7 @@ def delete_all_bad_persons_in_session(session=None, list_type=None):
     if list_type is not None:
         if list_type == BAD_PERSON_TYPE.SANCTION:
             bad_companies = session.query(BadCompany)
-            bad_companies_alias = session.query(BadCompanyAlias)
+            bad_companies_alias = session.query(BadCompanyAllNames)
             bad_persons_addresses = session.query(BadPersonAddresses)
             bad_company_addresses = session.query(BadCompanyAddresses)
             bad_persons_aliases = session.query(BadPersonAllNames)
