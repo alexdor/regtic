@@ -430,14 +430,14 @@ func testBadCompanyToManyBadCompaniesAddresses(t *testing.T) {
 	}
 }
 
-func testBadCompanyToManyBadCompaniesAliases(t *testing.T) {
+func testBadCompanyToManyBadCompaniesAllNames(t *testing.T) {
 	var err error
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
 	var a BadCompany
-	var b, c BadCompaniesAlias
+	var b, c BadCompaniesAllName
 
 	seed := randomize.NewSeed()
 	if err = randomize.Struct(seed, &a, badCompanyDBTypes, true, badCompanyColumnsWithDefault...); err != nil {
@@ -448,10 +448,10 @@ func testBadCompanyToManyBadCompaniesAliases(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err = randomize.Struct(seed, &b, badCompaniesAliasDBTypes, false, badCompaniesAliasColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &b, badCompaniesAllNameDBTypes, false, badCompaniesAllNameColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
-	if err = randomize.Struct(seed, &c, badCompaniesAliasDBTypes, false, badCompaniesAliasColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &c, badCompaniesAllNameDBTypes, false, badCompaniesAllNameColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
 
@@ -464,7 +464,7 @@ func testBadCompanyToManyBadCompaniesAliases(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	check, err := a.BadCompaniesAliases().All(ctx, tx)
+	check, err := a.BadCompaniesAllNames().All(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -487,18 +487,102 @@ func testBadCompanyToManyBadCompaniesAliases(t *testing.T) {
 	}
 
 	slice := BadCompanySlice{&a}
-	if err = a.L.LoadBadCompaniesAliases(ctx, tx, false, (*[]*BadCompany)(&slice), nil); err != nil {
+	if err = a.L.LoadBadCompaniesAllNames(ctx, tx, false, (*[]*BadCompany)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.BadCompaniesAliases); got != 2 {
+	if got := len(a.R.BadCompaniesAllNames); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
-	a.R.BadCompaniesAliases = nil
-	if err = a.L.LoadBadCompaniesAliases(ctx, tx, true, &a, nil); err != nil {
+	a.R.BadCompaniesAllNames = nil
+	if err = a.L.LoadBadCompaniesAllNames(ctx, tx, true, &a, nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.BadCompaniesAliases); got != 2 {
+	if got := len(a.R.BadCompaniesAllNames); got != 2 {
+		t.Error("number of eager loaded records wrong, got:", got)
+	}
+
+	if t.Failed() {
+		t.Logf("%#v", check)
+	}
+}
+
+func testBadCompanyToManyCompanies(t *testing.T) {
+	var err error
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a BadCompany
+	var b, c Company
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, badCompanyDBTypes, true, badCompanyColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompany struct: %s", err)
+	}
+
+	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	if err = randomize.Struct(seed, &b, companyDBTypes, false, companyColumnsWithDefault...); err != nil {
+		t.Fatal(err)
+	}
+	if err = randomize.Struct(seed, &c, companyDBTypes, false, companyColumnsWithDefault...); err != nil {
+		t.Fatal(err)
+	}
+
+	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = c.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = tx.Exec("insert into \"bad_company_to_company\" (\"bad_company_id\", \"company_id\") values ($1, $2)", a.ID, b.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = tx.Exec("insert into \"bad_company_to_company\" (\"bad_company_id\", \"company_id\") values ($1, $2)", a.ID, c.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	check, err := a.Companies().All(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	bFound, cFound := false, false
+	for _, v := range check {
+		if v.ID == b.ID {
+			bFound = true
+		}
+		if v.ID == c.ID {
+			cFound = true
+		}
+	}
+
+	if !bFound {
+		t.Error("expected to find b")
+	}
+	if !cFound {
+		t.Error("expected to find c")
+	}
+
+	slice := BadCompanySlice{&a}
+	if err = a.L.LoadCompanies(ctx, tx, false, (*[]*BadCompany)(&slice), nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := len(a.R.Companies); got != 2 {
+		t.Error("number of eager loaded records wrong, got:", got)
+	}
+
+	a.R.Companies = nil
+	if err = a.L.LoadCompanies(ctx, tx, true, &a, nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := len(a.R.Companies); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
@@ -758,7 +842,7 @@ func testBadCompanyToManyRemoveOpBadCompaniesAddresses(t *testing.T) {
 	}
 }
 
-func testBadCompanyToManyAddOpBadCompaniesAliases(t *testing.T) {
+func testBadCompanyToManyAddOpBadCompaniesAllNames(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
@@ -766,15 +850,15 @@ func testBadCompanyToManyAddOpBadCompaniesAliases(t *testing.T) {
 	defer func() { _ = tx.Rollback() }()
 
 	var a BadCompany
-	var b, c, d, e BadCompaniesAlias
+	var b, c, d, e BadCompaniesAllName
 
 	seed := randomize.NewSeed()
 	if err = randomize.Struct(seed, &a, badCompanyDBTypes, false, strmangle.SetComplement(badCompanyPrimaryKeyColumns, badCompanyColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	foreigners := []*BadCompaniesAlias{&b, &c, &d, &e}
+	foreigners := []*BadCompaniesAllName{&b, &c, &d, &e}
 	for _, x := range foreigners {
-		if err = randomize.Struct(seed, x, badCompaniesAliasDBTypes, false, strmangle.SetComplement(badCompaniesAliasPrimaryKeyColumns, badCompaniesAliasColumnsWithoutDefault)...); err != nil {
+		if err = randomize.Struct(seed, x, badCompaniesAllNameDBTypes, false, strmangle.SetComplement(badCompaniesAllNamePrimaryKeyColumns, badCompaniesAllNameColumnsWithoutDefault)...); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -789,13 +873,13 @@ func testBadCompanyToManyAddOpBadCompaniesAliases(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	foreignersSplitByInsertion := [][]*BadCompaniesAlias{
+	foreignersSplitByInsertion := [][]*BadCompaniesAllName{
 		{&b, &c},
 		{&d, &e},
 	}
 
 	for i, x := range foreignersSplitByInsertion {
-		err = a.AddBadCompaniesAliases(ctx, tx, i != 0, x...)
+		err = a.AddBadCompaniesAllNames(ctx, tx, i != 0, x...)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -817,14 +901,14 @@ func testBadCompanyToManyAddOpBadCompaniesAliases(t *testing.T) {
 			t.Error("relationship was not added properly to the foreign slice")
 		}
 
-		if a.R.BadCompaniesAliases[i*2] != first {
+		if a.R.BadCompaniesAllNames[i*2] != first {
 			t.Error("relationship struct slice not set to correct value")
 		}
-		if a.R.BadCompaniesAliases[i*2+1] != second {
+		if a.R.BadCompaniesAllNames[i*2+1] != second {
 			t.Error("relationship struct slice not set to correct value")
 		}
 
-		count, err := a.BadCompaniesAliases().Count(ctx, tx)
+		count, err := a.BadCompaniesAllNames().Count(ctx, tx)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -834,7 +918,7 @@ func testBadCompanyToManyAddOpBadCompaniesAliases(t *testing.T) {
 	}
 }
 
-func testBadCompanyToManySetOpBadCompaniesAliases(t *testing.T) {
+func testBadCompanyToManySetOpBadCompaniesAllNames(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
@@ -842,15 +926,15 @@ func testBadCompanyToManySetOpBadCompaniesAliases(t *testing.T) {
 	defer func() { _ = tx.Rollback() }()
 
 	var a BadCompany
-	var b, c, d, e BadCompaniesAlias
+	var b, c, d, e BadCompaniesAllName
 
 	seed := randomize.NewSeed()
 	if err = randomize.Struct(seed, &a, badCompanyDBTypes, false, strmangle.SetComplement(badCompanyPrimaryKeyColumns, badCompanyColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	foreigners := []*BadCompaniesAlias{&b, &c, &d, &e}
+	foreigners := []*BadCompaniesAllName{&b, &c, &d, &e}
 	for _, x := range foreigners {
-		if err = randomize.Struct(seed, x, badCompaniesAliasDBTypes, false, strmangle.SetComplement(badCompaniesAliasPrimaryKeyColumns, badCompaniesAliasColumnsWithoutDefault)...); err != nil {
+		if err = randomize.Struct(seed, x, badCompaniesAllNameDBTypes, false, strmangle.SetComplement(badCompaniesAllNamePrimaryKeyColumns, badCompaniesAllNameColumnsWithoutDefault)...); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -865,12 +949,12 @@ func testBadCompanyToManySetOpBadCompaniesAliases(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = a.SetBadCompaniesAliases(ctx, tx, false, &b, &c)
+	err = a.SetBadCompaniesAllNames(ctx, tx, false, &b, &c)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	count, err := a.BadCompaniesAliases().Count(ctx, tx)
+	count, err := a.BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -878,12 +962,12 @@ func testBadCompanyToManySetOpBadCompaniesAliases(t *testing.T) {
 		t.Error("count was wrong:", count)
 	}
 
-	err = a.SetBadCompaniesAliases(ctx, tx, true, &d, &e)
+	err = a.SetBadCompaniesAllNames(ctx, tx, true, &d, &e)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	count, err = a.BadCompaniesAliases().Count(ctx, tx)
+	count, err = a.BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -917,15 +1001,15 @@ func testBadCompanyToManySetOpBadCompaniesAliases(t *testing.T) {
 		t.Error("relationship was not added properly to the foreign struct")
 	}
 
-	if a.R.BadCompaniesAliases[0] != &d {
+	if a.R.BadCompaniesAllNames[0] != &d {
 		t.Error("relationship struct slice not set to correct value")
 	}
-	if a.R.BadCompaniesAliases[1] != &e {
+	if a.R.BadCompaniesAllNames[1] != &e {
 		t.Error("relationship struct slice not set to correct value")
 	}
 }
 
-func testBadCompanyToManyRemoveOpBadCompaniesAliases(t *testing.T) {
+func testBadCompanyToManyRemoveOpBadCompaniesAllNames(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
@@ -933,15 +1017,15 @@ func testBadCompanyToManyRemoveOpBadCompaniesAliases(t *testing.T) {
 	defer func() { _ = tx.Rollback() }()
 
 	var a BadCompany
-	var b, c, d, e BadCompaniesAlias
+	var b, c, d, e BadCompaniesAllName
 
 	seed := randomize.NewSeed()
 	if err = randomize.Struct(seed, &a, badCompanyDBTypes, false, strmangle.SetComplement(badCompanyPrimaryKeyColumns, badCompanyColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	foreigners := []*BadCompaniesAlias{&b, &c, &d, &e}
+	foreigners := []*BadCompaniesAllName{&b, &c, &d, &e}
 	for _, x := range foreigners {
-		if err = randomize.Struct(seed, x, badCompaniesAliasDBTypes, false, strmangle.SetComplement(badCompaniesAliasPrimaryKeyColumns, badCompaniesAliasColumnsWithoutDefault)...); err != nil {
+		if err = randomize.Struct(seed, x, badCompaniesAllNameDBTypes, false, strmangle.SetComplement(badCompaniesAllNamePrimaryKeyColumns, badCompaniesAllNameColumnsWithoutDefault)...); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -950,12 +1034,12 @@ func testBadCompanyToManyRemoveOpBadCompaniesAliases(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = a.AddBadCompaniesAliases(ctx, tx, true, foreigners...)
+	err = a.AddBadCompaniesAllNames(ctx, tx, true, foreigners...)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	count, err := a.BadCompaniesAliases().Count(ctx, tx)
+	count, err := a.BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -963,12 +1047,12 @@ func testBadCompanyToManyRemoveOpBadCompaniesAliases(t *testing.T) {
 		t.Error("count was wrong:", count)
 	}
 
-	err = a.RemoveBadCompaniesAliases(ctx, tx, foreigners[:2]...)
+	err = a.RemoveBadCompaniesAllNames(ctx, tx, foreigners[:2]...)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	count, err = a.BadCompaniesAliases().Count(ctx, tx)
+	count, err = a.BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -996,15 +1080,243 @@ func testBadCompanyToManyRemoveOpBadCompaniesAliases(t *testing.T) {
 		t.Error("relationship to a should have been preserved")
 	}
 
-	if len(a.R.BadCompaniesAliases) != 2 {
+	if len(a.R.BadCompaniesAllNames) != 2 {
 		t.Error("should have preserved two relationships")
 	}
 
 	// Removal doesn't do a stable deletion for performance so we have to flip the order
-	if a.R.BadCompaniesAliases[1] != &d {
+	if a.R.BadCompaniesAllNames[1] != &d {
 		t.Error("relationship to d should have been preserved")
 	}
-	if a.R.BadCompaniesAliases[0] != &e {
+	if a.R.BadCompaniesAllNames[0] != &e {
+		t.Error("relationship to e should have been preserved")
+	}
+}
+
+func testBadCompanyToManyAddOpCompanies(t *testing.T) {
+	var err error
+
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a BadCompany
+	var b, c, d, e Company
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, badCompanyDBTypes, false, strmangle.SetComplement(badCompanyPrimaryKeyColumns, badCompanyColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	foreigners := []*Company{&b, &c, &d, &e}
+	for _, x := range foreigners {
+		if err = randomize.Struct(seed, x, companyDBTypes, false, strmangle.SetComplement(companyPrimaryKeyColumns, companyColumnsWithoutDefault)...); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = c.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	foreignersSplitByInsertion := [][]*Company{
+		{&b, &c},
+		{&d, &e},
+	}
+
+	for i, x := range foreignersSplitByInsertion {
+		err = a.AddCompanies(ctx, tx, i != 0, x...)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		first := x[0]
+		second := x[1]
+
+		if first.R.BadCompanies[0] != &a {
+			t.Error("relationship was not added properly to the slice")
+		}
+		if second.R.BadCompanies[0] != &a {
+			t.Error("relationship was not added properly to the slice")
+		}
+
+		if a.R.Companies[i*2] != first {
+			t.Error("relationship struct slice not set to correct value")
+		}
+		if a.R.Companies[i*2+1] != second {
+			t.Error("relationship struct slice not set to correct value")
+		}
+
+		count, err := a.Companies().Count(ctx, tx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if want := int64((i + 1) * 2); count != want {
+			t.Error("want", want, "got", count)
+		}
+	}
+}
+
+func testBadCompanyToManySetOpCompanies(t *testing.T) {
+	var err error
+
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a BadCompany
+	var b, c, d, e Company
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, badCompanyDBTypes, false, strmangle.SetComplement(badCompanyPrimaryKeyColumns, badCompanyColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	foreigners := []*Company{&b, &c, &d, &e}
+	for _, x := range foreigners {
+		if err = randomize.Struct(seed, x, companyDBTypes, false, strmangle.SetComplement(companyPrimaryKeyColumns, companyColumnsWithoutDefault)...); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err = a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = c.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	err = a.SetCompanies(ctx, tx, false, &b, &c)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err := a.Companies().Count(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 2 {
+		t.Error("count was wrong:", count)
+	}
+
+	err = a.SetCompanies(ctx, tx, true, &d, &e)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err = a.Companies().Count(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 2 {
+		t.Error("count was wrong:", count)
+	}
+
+	// The following checks cannot be implemented since we have no handle
+	// to these when we call Set(). Leaving them here as wishful thinking
+	// and to let people know there's dragons.
+	//
+	// if len(b.R.BadCompanies) != 0 {
+	// 	t.Error("relationship was not removed properly from the slice")
+	// }
+	// if len(c.R.BadCompanies) != 0 {
+	// 	t.Error("relationship was not removed properly from the slice")
+	// }
+	if d.R.BadCompanies[0] != &a {
+		t.Error("relationship was not added properly to the slice")
+	}
+	if e.R.BadCompanies[0] != &a {
+		t.Error("relationship was not added properly to the slice")
+	}
+
+	if a.R.Companies[0] != &d {
+		t.Error("relationship struct slice not set to correct value")
+	}
+	if a.R.Companies[1] != &e {
+		t.Error("relationship struct slice not set to correct value")
+	}
+}
+
+func testBadCompanyToManyRemoveOpCompanies(t *testing.T) {
+	var err error
+
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a BadCompany
+	var b, c, d, e Company
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, badCompanyDBTypes, false, strmangle.SetComplement(badCompanyPrimaryKeyColumns, badCompanyColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	foreigners := []*Company{&b, &c, &d, &e}
+	for _, x := range foreigners {
+		if err = randomize.Struct(seed, x, companyDBTypes, false, strmangle.SetComplement(companyPrimaryKeyColumns, companyColumnsWithoutDefault)...); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	err = a.AddCompanies(ctx, tx, true, foreigners...)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err := a.Companies().Count(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 4 {
+		t.Error("count was wrong:", count)
+	}
+
+	err = a.RemoveCompanies(ctx, tx, foreigners[:2]...)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err = a.Companies().Count(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 2 {
+		t.Error("count was wrong:", count)
+	}
+
+	if len(b.R.BadCompanies) != 0 {
+		t.Error("relationship was not removed properly from the slice")
+	}
+	if len(c.R.BadCompanies) != 0 {
+		t.Error("relationship was not removed properly from the slice")
+	}
+	if d.R.BadCompanies[0] != &a {
+		t.Error("relationship was not added properly to the foreign struct")
+	}
+	if e.R.BadCompanies[0] != &a {
+		t.Error("relationship was not added properly to the foreign struct")
+	}
+
+	if len(a.R.Companies) != 2 {
+		t.Error("should have preserved two relationships")
+	}
+
+	// Removal doesn't do a stable deletion for performance so we have to flip the order
+	if a.R.Companies[1] != &d {
+		t.Error("relationship to d should have been preserved")
+	}
+	if a.R.Companies[0] != &e {
 		t.Error("relationship to e should have been preserved")
 	}
 }

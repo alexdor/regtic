@@ -27,14 +27,14 @@ type Company struct {
 	ID           string      `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Address      null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
 	Vat          string      `boil:"vat" json:"vat" toml:"vat" yaml:"vat"`
-	StartingDate null.String `boil:"starting_date" json:"starting_date,omitempty" toml:"starting_date" yaml:"starting_date,omitempty"`
-	CountryCode  string      `boil:"country_code" json:"country_code" toml:"country_code" yaml:"country_code"`
-	UpdatedAt    time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	CreatedAt    time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	StartingDate null.String `boil:"starting_date" json:"startingDate,omitempty" toml:"startingDate" yaml:"startingDate,omitempty"`
+	CountryCode  string      `boil:"country_code" json:"countryCode" toml:"countryCode" yaml:"countryCode"`
+	UpdatedAt    time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	CreatedAt    time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	Name         null.String `boil:"name" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
 	Status       null.String `boil:"status" json:"status,omitempty" toml:"status" yaml:"status,omitempty"`
-	StatusNotes  null.String `boil:"status_notes" json:"status_notes,omitempty" toml:"status_notes" yaml:"status_notes,omitempty"`
-	NameVector   null.String `boil:"name_vector" json:"name_vector,omitempty" toml:"name_vector" yaml:"name_vector,omitempty"`
+	StatusNotes  null.String `boil:"status_notes" json:"statusNotes,omitempty" toml:"statusNotes" yaml:"statusNotes,omitempty"`
+	NameVector   null.String `boil:"name_vector" json:"nameVector,omitempty" toml:"nameVector" yaml:"nameVector,omitempty"`
 	Type         null.String `boil:"type" json:"type,omitempty" toml:"type" yaml:"type,omitempty"`
 
 	R *companyR `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -101,20 +101,23 @@ var CompanyWhere = struct {
 
 // CompanyRels is where relationship names are stored.
 var CompanyRels = struct {
-	MotherCompanyCompanies   string
-	DaughterCompanyCompanies string
-	Persons                  string
+	BadCompanies                      string
+	DaughterCompanyCompanyToCompanies string
+	MotherCompanyCompanyToCompanies   string
+	CompanyToPeople                   string
 }{
-	MotherCompanyCompanies:   "MotherCompanyCompanies",
-	DaughterCompanyCompanies: "DaughterCompanyCompanies",
-	Persons:                  "Persons",
+	BadCompanies:                      "BadCompanies",
+	DaughterCompanyCompanyToCompanies: "DaughterCompanyCompanyToCompanies",
+	MotherCompanyCompanyToCompanies:   "MotherCompanyCompanyToCompanies",
+	CompanyToPeople:                   "CompanyToPeople",
 }
 
 // companyR is where relationships are stored.
 type companyR struct {
-	MotherCompanyCompanies   CompanySlice
-	DaughterCompanyCompanies CompanySlice
-	Persons                  PersonSlice
+	BadCompanies                      BadCompanySlice
+	DaughterCompanyCompanyToCompanies CompanyToCompanySlice
+	MotherCompanyCompanyToCompanies   CompanyToCompanySlice
+	CompanyToPeople                   CompanyToPersonSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -223,75 +226,94 @@ func (q companyQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bo
 	return count > 0, nil
 }
 
-// MotherCompanyCompanies retrieves all the company's Companies with an executor via id column.
-func (o *Company) MotherCompanyCompanies(mods ...qm.QueryMod) companyQuery {
+// BadCompanies retrieves all the bad_company's BadCompanies with an executor.
+func (o *Company) BadCompanies(mods ...qm.QueryMod) badCompanyQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.InnerJoin("\"company_to_company\" on \"companies\".\"id\" = \"company_to_company\".\"mother_company_id\""),
+		qm.InnerJoin("\"bad_company_to_company\" on \"bad_companies\".\"id\" = \"bad_company_to_company\".\"bad_company_id\""),
+		qm.Where("\"bad_company_to_company\".\"company_id\"=?", o.ID),
+	)
+
+	query := BadCompanies(queryMods...)
+	queries.SetFrom(query.Query, "\"bad_companies\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"bad_companies\".*"})
+	}
+
+	return query
+}
+
+// DaughterCompanyCompanyToCompanies retrieves all the company_to_company's CompanyToCompanies with an executor via daughter_company_id column.
+func (o *Company) DaughterCompanyCompanyToCompanies(mods ...qm.QueryMod) companyToCompanyQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
 		qm.Where("\"company_to_company\".\"daughter_company_id\"=?", o.ID),
 	)
 
-	query := Companies(queryMods...)
-	queries.SetFrom(query.Query, "\"companies\"")
+	query := CompanyToCompanies(queryMods...)
+	queries.SetFrom(query.Query, "\"company_to_company\"")
 
 	if len(queries.GetSelect(query.Query)) == 0 {
-		queries.SetSelect(query.Query, []string{"\"companies\".*"})
+		queries.SetSelect(query.Query, []string{"\"company_to_company\".*"})
 	}
 
 	return query
 }
 
-// DaughterCompanyCompanies retrieves all the company's Companies with an executor via id column.
-func (o *Company) DaughterCompanyCompanies(mods ...qm.QueryMod) companyQuery {
+// MotherCompanyCompanyToCompanies retrieves all the company_to_company's CompanyToCompanies with an executor via mother_company_id column.
+func (o *Company) MotherCompanyCompanyToCompanies(mods ...qm.QueryMod) companyToCompanyQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.InnerJoin("\"company_to_company\" on \"companies\".\"id\" = \"company_to_company\".\"daughter_company_id\""),
 		qm.Where("\"company_to_company\".\"mother_company_id\"=?", o.ID),
 	)
 
-	query := Companies(queryMods...)
-	queries.SetFrom(query.Query, "\"companies\"")
+	query := CompanyToCompanies(queryMods...)
+	queries.SetFrom(query.Query, "\"company_to_company\"")
 
 	if len(queries.GetSelect(query.Query)) == 0 {
-		queries.SetSelect(query.Query, []string{"\"companies\".*"})
+		queries.SetSelect(query.Query, []string{"\"company_to_company\".*"})
 	}
 
 	return query
 }
 
-// Persons retrieves all the person's Persons with an executor.
-func (o *Company) Persons(mods ...qm.QueryMod) personQuery {
+// CompanyToPeople retrieves all the company_to_person's CompanyToPeople with an executor.
+func (o *Company) CompanyToPeople(mods ...qm.QueryMod) companyToPersonQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.InnerJoin("\"company_to_person\" on \"persons\".\"id\" = \"company_to_person\".\"person_id\""),
 		qm.Where("\"company_to_person\".\"company_id\"=?", o.ID),
 	)
 
-	query := Persons(queryMods...)
-	queries.SetFrom(query.Query, "\"persons\"")
+	query := CompanyToPeople(queryMods...)
+	queries.SetFrom(query.Query, "\"company_to_person\"")
 
 	if len(queries.GetSelect(query.Query)) == 0 {
-		queries.SetSelect(query.Query, []string{"\"persons\".*"})
+		queries.SetSelect(query.Query, []string{"\"company_to_person\".*"})
 	}
 
 	return query
 }
 
-// LoadMotherCompanyCompanies allows an eager lookup of values, cached into the
+// LoadBadCompanies allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (companyL) LoadMotherCompanyCompanies(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCompany interface{}, mods queries.Applicator) error {
+func (companyL) LoadBadCompanies(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCompany interface{}, mods queries.Applicator) error {
 	var slice []*Company
 	var object *Company
 
@@ -329,225 +351,9 @@ func (companyL) LoadMotherCompanyCompanies(ctx context.Context, e boil.ContextEx
 	}
 
 	query := NewQuery(
-		qm.Select("\"companies\".*, \"a\".\"daughter_company_id\""),
-		qm.From("\"companies\""),
-		qm.InnerJoin("\"company_to_company\" as \"a\" on \"companies\".\"id\" = \"a\".\"mother_company_id\""),
-		qm.WhereIn("\"a\".\"daughter_company_id\" in ?", args...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load companies")
-	}
-
-	var resultSlice []*Company
-
-	var localJoinCols []string
-	for results.Next() {
-		one := new(Company)
-		var localJoinCol string
-
-		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &one.Type, &localJoinCol)
-		if err != nil {
-			return errors.Wrap(err, "failed to scan eager loaded results for companies")
-		}
-		if err = results.Err(); err != nil {
-			return errors.Wrap(err, "failed to plebian-bind eager loaded slice companies")
-		}
-
-		resultSlice = append(resultSlice, one)
-		localJoinCols = append(localJoinCols, localJoinCol)
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on companies")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for companies")
-	}
-
-	if singular {
-		object.R.MotherCompanyCompanies = resultSlice
-		for _, foreign := range resultSlice {
-			if foreign.R == nil {
-				foreign.R = &companyR{}
-			}
-			foreign.R.DaughterCompanyCompanies = append(foreign.R.DaughterCompanyCompanies, object)
-		}
-		return nil
-	}
-
-	for i, foreign := range resultSlice {
-		localJoinCol := localJoinCols[i]
-		for _, local := range slice {
-			if local.ID == localJoinCol {
-				local.R.MotherCompanyCompanies = append(local.R.MotherCompanyCompanies, foreign)
-				if foreign.R == nil {
-					foreign.R = &companyR{}
-				}
-				foreign.R.DaughterCompanyCompanies = append(foreign.R.DaughterCompanyCompanies, local)
-				break
-			}
-		}
-	}
-
-	return nil
-}
-
-// LoadDaughterCompanyCompanies allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (companyL) LoadDaughterCompanyCompanies(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCompany interface{}, mods queries.Applicator) error {
-	var slice []*Company
-	var object *Company
-
-	if singular {
-		object = maybeCompany.(*Company)
-	} else {
-		slice = *maybeCompany.(*[]*Company)
-	}
-
-	args := make([]interface{}, 0, 1)
-	if singular {
-		if object.R == nil {
-			object.R = &companyR{}
-		}
-		args = append(args, object.ID)
-	} else {
-	Outer:
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &companyR{}
-			}
-
-			for _, a := range args {
-				if a == obj.ID {
-					continue Outer
-				}
-			}
-
-			args = append(args, obj.ID)
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	query := NewQuery(
-		qm.Select("\"companies\".*, \"a\".\"mother_company_id\""),
-		qm.From("\"companies\""),
-		qm.InnerJoin("\"company_to_company\" as \"a\" on \"companies\".\"id\" = \"a\".\"daughter_company_id\""),
-		qm.WhereIn("\"a\".\"mother_company_id\" in ?", args...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load companies")
-	}
-
-	var resultSlice []*Company
-
-	var localJoinCols []string
-	for results.Next() {
-		one := new(Company)
-		var localJoinCol string
-
-		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &one.Type, &localJoinCol)
-		if err != nil {
-			return errors.Wrap(err, "failed to scan eager loaded results for companies")
-		}
-		if err = results.Err(); err != nil {
-			return errors.Wrap(err, "failed to plebian-bind eager loaded slice companies")
-		}
-
-		resultSlice = append(resultSlice, one)
-		localJoinCols = append(localJoinCols, localJoinCol)
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on companies")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for companies")
-	}
-
-	if singular {
-		object.R.DaughterCompanyCompanies = resultSlice
-		for _, foreign := range resultSlice {
-			if foreign.R == nil {
-				foreign.R = &companyR{}
-			}
-			foreign.R.MotherCompanyCompanies = append(foreign.R.MotherCompanyCompanies, object)
-		}
-		return nil
-	}
-
-	for i, foreign := range resultSlice {
-		localJoinCol := localJoinCols[i]
-		for _, local := range slice {
-			if local.ID == localJoinCol {
-				local.R.DaughterCompanyCompanies = append(local.R.DaughterCompanyCompanies, foreign)
-				if foreign.R == nil {
-					foreign.R = &companyR{}
-				}
-				foreign.R.MotherCompanyCompanies = append(foreign.R.MotherCompanyCompanies, local)
-				break
-			}
-		}
-	}
-
-	return nil
-}
-
-// LoadPersons allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (companyL) LoadPersons(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCompany interface{}, mods queries.Applicator) error {
-	var slice []*Company
-	var object *Company
-
-	if singular {
-		object = maybeCompany.(*Company)
-	} else {
-		slice = *maybeCompany.(*[]*Company)
-	}
-
-	args := make([]interface{}, 0, 1)
-	if singular {
-		if object.R == nil {
-			object.R = &companyR{}
-		}
-		args = append(args, object.ID)
-	} else {
-	Outer:
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &companyR{}
-			}
-
-			for _, a := range args {
-				if a == obj.ID {
-					continue Outer
-				}
-			}
-
-			args = append(args, obj.ID)
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	query := NewQuery(
-		qm.Select("\"persons\".*, \"a\".\"company_id\""),
-		qm.From("\"persons\""),
-		qm.InnerJoin("\"company_to_person\" as \"a\" on \"persons\".\"id\" = \"a\".\"person_id\""),
+		qm.Select("\"bad_companies\".*, \"a\".\"company_id\""),
+		qm.From("\"bad_companies\""),
+		qm.InnerJoin("\"bad_company_to_company\" as \"a\" on \"bad_companies\".\"id\" = \"a\".\"bad_company_id\""),
 		qm.WhereIn("\"a\".\"company_id\" in ?", args...),
 	)
 	if mods != nil {
@@ -556,22 +362,22 @@ func (companyL) LoadPersons(ctx context.Context, e boil.ContextExecutor, singula
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load persons")
+		return errors.Wrap(err, "failed to eager load bad_companies")
 	}
 
-	var resultSlice []*Person
+	var resultSlice []*BadCompany
 
 	var localJoinCols []string
 	for results.Next() {
-		one := new(Person)
+		one := new(BadCompany)
 		var localJoinCol string
 
-		err = results.Scan(&one.ID, &one.FirstName, &one.LastName, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.NameVector, &one.FullName, &localJoinCol)
+		err = results.Scan(&one.ID, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.NameVector, &one.Address, &one.Source, &one.CitizenshipRegion, &one.Type, &one.CitizenshipCountryCode, &localJoinCol)
 		if err != nil {
-			return errors.Wrap(err, "failed to scan eager loaded results for persons")
+			return errors.Wrap(err, "failed to scan eager loaded results for bad_companies")
 		}
 		if err = results.Err(); err != nil {
-			return errors.Wrap(err, "failed to plebian-bind eager loaded slice persons")
+			return errors.Wrap(err, "failed to plebian-bind eager loaded slice bad_companies")
 		}
 
 		resultSlice = append(resultSlice, one)
@@ -579,17 +385,17 @@ func (companyL) LoadPersons(ctx context.Context, e boil.ContextExecutor, singula
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on persons")
+		return errors.Wrap(err, "failed to close results in eager load on bad_companies")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for persons")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for bad_companies")
 	}
 
 	if singular {
-		object.R.Persons = resultSlice
+		object.R.BadCompanies = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
-				foreign.R = &personR{}
+				foreign.R = &badCompanyR{}
 			}
 			foreign.R.Companies = append(foreign.R.Companies, object)
 		}
@@ -600,9 +406,9 @@ func (companyL) LoadPersons(ctx context.Context, e boil.ContextExecutor, singula
 		localJoinCol := localJoinCols[i]
 		for _, local := range slice {
 			if local.ID == localJoinCol {
-				local.R.Persons = append(local.R.Persons, foreign)
+				local.R.BadCompanies = append(local.R.BadCompanies, foreign)
 				if foreign.R == nil {
-					foreign.R = &personR{}
+					foreign.R = &badCompanyR{}
 				}
 				foreign.R.Companies = append(foreign.R.Companies, local)
 				break
@@ -613,291 +419,275 @@ func (companyL) LoadPersons(ctx context.Context, e boil.ContextExecutor, singula
 	return nil
 }
 
-// AddMotherCompanyCompanies adds the given related objects to the existing relationships
-// of the company, optionally inserting them as new records.
-// Appends related to o.R.MotherCompanyCompanies.
-// Sets related.R.DaughterCompanyCompanies appropriately.
-func (o *Company) AddMotherCompanyCompanies(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Company) error {
-	var err error
-	for _, rel := range related {
-		if insert {
-			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
-				return errors.Wrap(err, "failed to insert into foreign table")
-			}
-		}
-	}
+// LoadDaughterCompanyCompanyToCompanies allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (companyL) LoadDaughterCompanyCompanyToCompanies(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCompany interface{}, mods queries.Applicator) error {
+	var slice []*Company
+	var object *Company
 
-	for _, rel := range related {
-		query := "insert into \"company_to_company\" (\"daughter_company_id\", \"mother_company_id\") values ($1, $2)"
-		values := []interface{}{o.ID, rel.ID}
-
-		if boil.DebugMode {
-			fmt.Fprintln(boil.DebugWriter, query)
-			fmt.Fprintln(boil.DebugWriter, values)
-		}
-
-		_, err = exec.ExecContext(ctx, query, values...)
-		if err != nil {
-			return errors.Wrap(err, "failed to insert into join table")
-		}
-	}
-	if o.R == nil {
-		o.R = &companyR{
-			MotherCompanyCompanies: related,
-		}
+	if singular {
+		object = maybeCompany.(*Company)
 	} else {
-		o.R.MotherCompanyCompanies = append(o.R.MotherCompanyCompanies, related...)
+		slice = *maybeCompany.(*[]*Company)
 	}
 
-	for _, rel := range related {
-		if rel.R == nil {
-			rel.R = &companyR{
-				DaughterCompanyCompanies: CompanySlice{o},
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &companyR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &companyR{}
 			}
-		} else {
-			rel.R.DaughterCompanyCompanies = append(rel.R.DaughterCompanyCompanies, o)
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
 		}
 	}
-	return nil
-}
 
-// SetMotherCompanyCompanies removes all previously related items of the
-// company replacing them completely with the passed
-// in related items, optionally inserting them as new records.
-// Sets o.R.DaughterCompanyCompanies's MotherCompanyCompanies accordingly.
-// Replaces o.R.MotherCompanyCompanies with related.
-// Sets related.R.DaughterCompanyCompanies's MotherCompanyCompanies accordingly.
-func (o *Company) SetMotherCompanyCompanies(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Company) error {
-	query := "delete from \"company_to_company\" where \"daughter_company_id\" = $1"
-	values := []interface{}{o.ID}
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, query)
-		fmt.Fprintln(boil.DebugWriter, values)
-	}
-
-	_, err := exec.ExecContext(ctx, query, values...)
-	if err != nil {
-		return errors.Wrap(err, "failed to remove relationships before set")
-	}
-
-	removeMotherCompanyCompaniesFromDaughterCompanyCompaniesSlice(o, related)
-	if o.R != nil {
-		o.R.MotherCompanyCompanies = nil
-	}
-	return o.AddMotherCompanyCompanies(ctx, exec, insert, related...)
-}
-
-// RemoveMotherCompanyCompanies relationships from objects passed in.
-// Removes related items from R.MotherCompanyCompanies (uses pointer comparison, removal does not keep order)
-// Sets related.R.DaughterCompanyCompanies.
-func (o *Company) RemoveMotherCompanyCompanies(ctx context.Context, exec boil.ContextExecutor, related ...*Company) error {
-	var err error
-	query := fmt.Sprintf(
-		"delete from \"company_to_company\" where \"daughter_company_id\" = $1 and \"mother_company_id\" in (%s)",
-		strmangle.Placeholders(dialect.UseIndexPlaceholders, len(related), 2, 1),
-	)
-	values := []interface{}{o.ID}
-	for _, rel := range related {
-		values = append(values, rel.ID)
-	}
-
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, query)
-		fmt.Fprintln(boil.DebugWriter, values)
-	}
-
-	_, err = exec.ExecContext(ctx, query, values...)
-	if err != nil {
-		return errors.Wrap(err, "failed to remove relationships before set")
-	}
-	removeMotherCompanyCompaniesFromDaughterCompanyCompaniesSlice(o, related)
-	if o.R == nil {
+	if len(args) == 0 {
 		return nil
 	}
 
-	for _, rel := range related {
-		for i, ri := range o.R.MotherCompanyCompanies {
-			if rel != ri {
-				continue
-			}
-
-			ln := len(o.R.MotherCompanyCompanies)
-			if ln > 1 && i < ln-1 {
-				o.R.MotherCompanyCompanies[i] = o.R.MotherCompanyCompanies[ln-1]
-			}
-			o.R.MotherCompanyCompanies = o.R.MotherCompanyCompanies[:ln-1]
-			break
-		}
+	query := NewQuery(qm.From(`company_to_company`), qm.WhereIn(`company_to_company.daughter_company_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
 	}
 
-	return nil
-}
-
-func removeMotherCompanyCompaniesFromDaughterCompanyCompaniesSlice(o *Company, related []*Company) {
-	for _, rel := range related {
-		if rel.R == nil {
-			continue
-		}
-		for i, ri := range rel.R.DaughterCompanyCompanies {
-			if o.ID != ri.ID {
-				continue
-			}
-
-			ln := len(rel.R.DaughterCompanyCompanies)
-			if ln > 1 && i < ln-1 {
-				rel.R.DaughterCompanyCompanies[i] = rel.R.DaughterCompanyCompanies[ln-1]
-			}
-			rel.R.DaughterCompanyCompanies = rel.R.DaughterCompanyCompanies[:ln-1]
-			break
-		}
-	}
-}
-
-// AddDaughterCompanyCompanies adds the given related objects to the existing relationships
-// of the company, optionally inserting them as new records.
-// Appends related to o.R.DaughterCompanyCompanies.
-// Sets related.R.MotherCompanyCompanies appropriately.
-func (o *Company) AddDaughterCompanyCompanies(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Company) error {
-	var err error
-	for _, rel := range related {
-		if insert {
-			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
-				return errors.Wrap(err, "failed to insert into foreign table")
-			}
-		}
-	}
-
-	for _, rel := range related {
-		query := "insert into \"company_to_company\" (\"mother_company_id\", \"daughter_company_id\") values ($1, $2)"
-		values := []interface{}{o.ID, rel.ID}
-
-		if boil.DebugMode {
-			fmt.Fprintln(boil.DebugWriter, query)
-			fmt.Fprintln(boil.DebugWriter, values)
-		}
-
-		_, err = exec.ExecContext(ctx, query, values...)
-		if err != nil {
-			return errors.Wrap(err, "failed to insert into join table")
-		}
-	}
-	if o.R == nil {
-		o.R = &companyR{
-			DaughterCompanyCompanies: related,
-		}
-	} else {
-		o.R.DaughterCompanyCompanies = append(o.R.DaughterCompanyCompanies, related...)
-	}
-
-	for _, rel := range related {
-		if rel.R == nil {
-			rel.R = &companyR{
-				MotherCompanyCompanies: CompanySlice{o},
-			}
-		} else {
-			rel.R.MotherCompanyCompanies = append(rel.R.MotherCompanyCompanies, o)
-		}
-	}
-	return nil
-}
-
-// SetDaughterCompanyCompanies removes all previously related items of the
-// company replacing them completely with the passed
-// in related items, optionally inserting them as new records.
-// Sets o.R.MotherCompanyCompanies's DaughterCompanyCompanies accordingly.
-// Replaces o.R.DaughterCompanyCompanies with related.
-// Sets related.R.MotherCompanyCompanies's DaughterCompanyCompanies accordingly.
-func (o *Company) SetDaughterCompanyCompanies(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Company) error {
-	query := "delete from \"company_to_company\" where \"mother_company_id\" = $1"
-	values := []interface{}{o.ID}
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, query)
-		fmt.Fprintln(boil.DebugWriter, values)
-	}
-
-	_, err := exec.ExecContext(ctx, query, values...)
+	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to remove relationships before set")
+		return errors.Wrap(err, "failed to eager load company_to_company")
 	}
 
-	removeDaughterCompanyCompaniesFromMotherCompanyCompaniesSlice(o, related)
-	if o.R != nil {
-		o.R.DaughterCompanyCompanies = nil
-	}
-	return o.AddDaughterCompanyCompanies(ctx, exec, insert, related...)
-}
-
-// RemoveDaughterCompanyCompanies relationships from objects passed in.
-// Removes related items from R.DaughterCompanyCompanies (uses pointer comparison, removal does not keep order)
-// Sets related.R.MotherCompanyCompanies.
-func (o *Company) RemoveDaughterCompanyCompanies(ctx context.Context, exec boil.ContextExecutor, related ...*Company) error {
-	var err error
-	query := fmt.Sprintf(
-		"delete from \"company_to_company\" where \"mother_company_id\" = $1 and \"daughter_company_id\" in (%s)",
-		strmangle.Placeholders(dialect.UseIndexPlaceholders, len(related), 2, 1),
-	)
-	values := []interface{}{o.ID}
-	for _, rel := range related {
-		values = append(values, rel.ID)
+	var resultSlice []*CompanyToCompany
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice company_to_company")
 	}
 
-	if boil.DebugMode {
-		fmt.Fprintln(boil.DebugWriter, query)
-		fmt.Fprintln(boil.DebugWriter, values)
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on company_to_company")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for company_to_company")
 	}
 
-	_, err = exec.ExecContext(ctx, query, values...)
-	if err != nil {
-		return errors.Wrap(err, "failed to remove relationships before set")
-	}
-	removeDaughterCompanyCompaniesFromMotherCompanyCompaniesSlice(o, related)
-	if o.R == nil {
+	if singular {
+		object.R.DaughterCompanyCompanyToCompanies = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &companyToCompanyR{}
+			}
+			foreign.R.DaughterCompany = object
+		}
 		return nil
 	}
 
-	for _, rel := range related {
-		for i, ri := range o.R.DaughterCompanyCompanies {
-			if rel != ri {
-				continue
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.DaughterCompanyID {
+				local.R.DaughterCompanyCompanyToCompanies = append(local.R.DaughterCompanyCompanyToCompanies, foreign)
+				if foreign.R == nil {
+					foreign.R = &companyToCompanyR{}
+				}
+				foreign.R.DaughterCompany = local
+				break
 			}
-
-			ln := len(o.R.DaughterCompanyCompanies)
-			if ln > 1 && i < ln-1 {
-				o.R.DaughterCompanyCompanies[i] = o.R.DaughterCompanyCompanies[ln-1]
-			}
-			o.R.DaughterCompanyCompanies = o.R.DaughterCompanyCompanies[:ln-1]
-			break
 		}
 	}
 
 	return nil
 }
 
-func removeDaughterCompanyCompaniesFromMotherCompanyCompaniesSlice(o *Company, related []*Company) {
-	for _, rel := range related {
-		if rel.R == nil {
-			continue
+// LoadMotherCompanyCompanyToCompanies allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (companyL) LoadMotherCompanyCompanyToCompanies(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCompany interface{}, mods queries.Applicator) error {
+	var slice []*Company
+	var object *Company
+
+	if singular {
+		object = maybeCompany.(*Company)
+	} else {
+		slice = *maybeCompany.(*[]*Company)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &companyR{}
 		}
-		for i, ri := range rel.R.MotherCompanyCompanies {
-			if o.ID != ri.ID {
-				continue
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &companyR{}
 			}
 
-			ln := len(rel.R.MotherCompanyCompanies)
-			if ln > 1 && i < ln-1 {
-				rel.R.MotherCompanyCompanies[i] = rel.R.MotherCompanyCompanies[ln-1]
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
 			}
-			rel.R.MotherCompanyCompanies = rel.R.MotherCompanyCompanies[:ln-1]
-			break
+
+			args = append(args, obj.ID)
 		}
 	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`company_to_company`), qm.WhereIn(`company_to_company.mother_company_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load company_to_company")
+	}
+
+	var resultSlice []*CompanyToCompany
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice company_to_company")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on company_to_company")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for company_to_company")
+	}
+
+	if singular {
+		object.R.MotherCompanyCompanyToCompanies = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &companyToCompanyR{}
+			}
+			foreign.R.MotherCompany = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.MotherCompanyID {
+				local.R.MotherCompanyCompanyToCompanies = append(local.R.MotherCompanyCompanyToCompanies, foreign)
+				if foreign.R == nil {
+					foreign.R = &companyToCompanyR{}
+				}
+				foreign.R.MotherCompany = local
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
-// AddPersons adds the given related objects to the existing relationships
+// LoadCompanyToPeople allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (companyL) LoadCompanyToPeople(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCompany interface{}, mods queries.Applicator) error {
+	var slice []*Company
+	var object *Company
+
+	if singular {
+		object = maybeCompany.(*Company)
+	} else {
+		slice = *maybeCompany.(*[]*Company)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &companyR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &companyR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`company_to_person`), qm.WhereIn(`company_to_person.company_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load company_to_person")
+	}
+
+	var resultSlice []*CompanyToPerson
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice company_to_person")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on company_to_person")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for company_to_person")
+	}
+
+	if singular {
+		object.R.CompanyToPeople = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &companyToPersonR{}
+			}
+			foreign.R.Company = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.CompanyID {
+				local.R.CompanyToPeople = append(local.R.CompanyToPeople, foreign)
+				if foreign.R == nil {
+					foreign.R = &companyToPersonR{}
+				}
+				foreign.R.Company = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// AddBadCompanies adds the given related objects to the existing relationships
 // of the company, optionally inserting them as new records.
-// Appends related to o.R.Persons.
+// Appends related to o.R.BadCompanies.
 // Sets related.R.Companies appropriately.
-func (o *Company) AddPersons(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Person) error {
+func (o *Company) AddBadCompanies(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*BadCompany) error {
 	var err error
 	for _, rel := range related {
 		if insert {
@@ -908,7 +698,7 @@ func (o *Company) AddPersons(ctx context.Context, exec boil.ContextExecutor, ins
 	}
 
 	for _, rel := range related {
-		query := "insert into \"company_to_person\" (\"company_id\", \"person_id\") values ($1, $2)"
+		query := "insert into \"bad_company_to_company\" (\"company_id\", \"bad_company_id\") values ($1, $2)"
 		values := []interface{}{o.ID, rel.ID}
 
 		if boil.DebugMode {
@@ -923,15 +713,15 @@ func (o *Company) AddPersons(ctx context.Context, exec boil.ContextExecutor, ins
 	}
 	if o.R == nil {
 		o.R = &companyR{
-			Persons: related,
+			BadCompanies: related,
 		}
 	} else {
-		o.R.Persons = append(o.R.Persons, related...)
+		o.R.BadCompanies = append(o.R.BadCompanies, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
-			rel.R = &personR{
+			rel.R = &badCompanyR{
 				Companies: CompanySlice{o},
 			}
 		} else {
@@ -941,14 +731,14 @@ func (o *Company) AddPersons(ctx context.Context, exec boil.ContextExecutor, ins
 	return nil
 }
 
-// SetPersons removes all previously related items of the
+// SetBadCompanies removes all previously related items of the
 // company replacing them completely with the passed
 // in related items, optionally inserting them as new records.
-// Sets o.R.Companies's Persons accordingly.
-// Replaces o.R.Persons with related.
-// Sets related.R.Companies's Persons accordingly.
-func (o *Company) SetPersons(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Person) error {
-	query := "delete from \"company_to_person\" where \"company_id\" = $1"
+// Sets o.R.Companies's BadCompanies accordingly.
+// Replaces o.R.BadCompanies with related.
+// Sets related.R.Companies's BadCompanies accordingly.
+func (o *Company) SetBadCompanies(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*BadCompany) error {
+	query := "delete from \"bad_company_to_company\" where \"company_id\" = $1"
 	values := []interface{}{o.ID}
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, query)
@@ -960,20 +750,20 @@ func (o *Company) SetPersons(ctx context.Context, exec boil.ContextExecutor, ins
 		return errors.Wrap(err, "failed to remove relationships before set")
 	}
 
-	removePersonsFromCompaniesSlice(o, related)
+	removeBadCompaniesFromCompaniesSlice(o, related)
 	if o.R != nil {
-		o.R.Persons = nil
+		o.R.BadCompanies = nil
 	}
-	return o.AddPersons(ctx, exec, insert, related...)
+	return o.AddBadCompanies(ctx, exec, insert, related...)
 }
 
-// RemovePersons relationships from objects passed in.
-// Removes related items from R.Persons (uses pointer comparison, removal does not keep order)
+// RemoveBadCompanies relationships from objects passed in.
+// Removes related items from R.BadCompanies (uses pointer comparison, removal does not keep order)
 // Sets related.R.Companies.
-func (o *Company) RemovePersons(ctx context.Context, exec boil.ContextExecutor, related ...*Person) error {
+func (o *Company) RemoveBadCompanies(ctx context.Context, exec boil.ContextExecutor, related ...*BadCompany) error {
 	var err error
 	query := fmt.Sprintf(
-		"delete from \"company_to_person\" where \"company_id\" = $1 and \"person_id\" in (%s)",
+		"delete from \"bad_company_to_company\" where \"company_id\" = $1 and \"bad_company_id\" in (%s)",
 		strmangle.Placeholders(dialect.UseIndexPlaceholders, len(related), 2, 1),
 	)
 	values := []interface{}{o.ID}
@@ -990,22 +780,22 @@ func (o *Company) RemovePersons(ctx context.Context, exec boil.ContextExecutor, 
 	if err != nil {
 		return errors.Wrap(err, "failed to remove relationships before set")
 	}
-	removePersonsFromCompaniesSlice(o, related)
+	removeBadCompaniesFromCompaniesSlice(o, related)
 	if o.R == nil {
 		return nil
 	}
 
 	for _, rel := range related {
-		for i, ri := range o.R.Persons {
+		for i, ri := range o.R.BadCompanies {
 			if rel != ri {
 				continue
 			}
 
-			ln := len(o.R.Persons)
+			ln := len(o.R.BadCompanies)
 			if ln > 1 && i < ln-1 {
-				o.R.Persons[i] = o.R.Persons[ln-1]
+				o.R.BadCompanies[i] = o.R.BadCompanies[ln-1]
 			}
-			o.R.Persons = o.R.Persons[:ln-1]
+			o.R.BadCompanies = o.R.BadCompanies[:ln-1]
 			break
 		}
 	}
@@ -1013,7 +803,7 @@ func (o *Company) RemovePersons(ctx context.Context, exec boil.ContextExecutor, 
 	return nil
 }
 
-func removePersonsFromCompaniesSlice(o *Company, related []*Person) {
+func removeBadCompaniesFromCompaniesSlice(o *Company, related []*BadCompany) {
 	for _, rel := range related {
 		if rel.R == nil {
 			continue
@@ -1031,6 +821,165 @@ func removePersonsFromCompaniesSlice(o *Company, related []*Person) {
 			break
 		}
 	}
+}
+
+// AddDaughterCompanyCompanyToCompanies adds the given related objects to the existing relationships
+// of the company, optionally inserting them as new records.
+// Appends related to o.R.DaughterCompanyCompanyToCompanies.
+// Sets related.R.DaughterCompany appropriately.
+func (o *Company) AddDaughterCompanyCompanyToCompanies(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*CompanyToCompany) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.DaughterCompanyID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"company_to_company\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"daughter_company_id"}),
+				strmangle.WhereClause("\"", "\"", 2, companyToCompanyPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.MotherCompanyID, rel.DaughterCompanyID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.DaughterCompanyID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &companyR{
+			DaughterCompanyCompanyToCompanies: related,
+		}
+	} else {
+		o.R.DaughterCompanyCompanyToCompanies = append(o.R.DaughterCompanyCompanyToCompanies, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &companyToCompanyR{
+				DaughterCompany: o,
+			}
+		} else {
+			rel.R.DaughterCompany = o
+		}
+	}
+	return nil
+}
+
+// AddMotherCompanyCompanyToCompanies adds the given related objects to the existing relationships
+// of the company, optionally inserting them as new records.
+// Appends related to o.R.MotherCompanyCompanyToCompanies.
+// Sets related.R.MotherCompany appropriately.
+func (o *Company) AddMotherCompanyCompanyToCompanies(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*CompanyToCompany) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.MotherCompanyID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"company_to_company\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"mother_company_id"}),
+				strmangle.WhereClause("\"", "\"", 2, companyToCompanyPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.MotherCompanyID, rel.DaughterCompanyID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.MotherCompanyID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &companyR{
+			MotherCompanyCompanyToCompanies: related,
+		}
+	} else {
+		o.R.MotherCompanyCompanyToCompanies = append(o.R.MotherCompanyCompanyToCompanies, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &companyToCompanyR{
+				MotherCompany: o,
+			}
+		} else {
+			rel.R.MotherCompany = o
+		}
+	}
+	return nil
+}
+
+// AddCompanyToPeople adds the given related objects to the existing relationships
+// of the company, optionally inserting them as new records.
+// Appends related to o.R.CompanyToPeople.
+// Sets related.R.Company appropriately.
+func (o *Company) AddCompanyToPeople(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*CompanyToPerson) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.CompanyID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"company_to_person\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"company_id"}),
+				strmangle.WhereClause("\"", "\"", 2, companyToPersonPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.CompanyID, rel.PersonID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.CompanyID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &companyR{
+			CompanyToPeople: related,
+		}
+	} else {
+		o.R.CompanyToPeople = append(o.R.CompanyToPeople, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &companyToPersonR{
+				Company: o,
+			}
+		} else {
+			rel.R.Company = o
+		}
+	}
+	return nil
 }
 
 // Companies retrieves all the records using an executor.

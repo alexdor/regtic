@@ -353,6 +353,90 @@ func testBadPersonsInsertWhitelist(t *testing.T) {
 	}
 }
 
+func testBadPersonToManyPersons(t *testing.T) {
+	var err error
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a BadPerson
+	var b, c Person
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, badPersonDBTypes, true, badPersonColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadPerson struct: %s", err)
+	}
+
+	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	if err = randomize.Struct(seed, &b, personDBTypes, false, personColumnsWithDefault...); err != nil {
+		t.Fatal(err)
+	}
+	if err = randomize.Struct(seed, &c, personDBTypes, false, personColumnsWithDefault...); err != nil {
+		t.Fatal(err)
+	}
+
+	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = c.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = tx.Exec("insert into \"bad_person_to_person\" (\"bad_person_id\", \"person_id\") values ($1, $2)", a.ID, b.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = tx.Exec("insert into \"bad_person_to_person\" (\"bad_person_id\", \"person_id\") values ($1, $2)", a.ID, c.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	check, err := a.Persons().All(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	bFound, cFound := false, false
+	for _, v := range check {
+		if v.ID == b.ID {
+			bFound = true
+		}
+		if v.ID == c.ID {
+			cFound = true
+		}
+	}
+
+	if !bFound {
+		t.Error("expected to find b")
+	}
+	if !cFound {
+		t.Error("expected to find c")
+	}
+
+	slice := BadPersonSlice{&a}
+	if err = a.L.LoadPersons(ctx, tx, false, (*[]*BadPerson)(&slice), nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := len(a.R.Persons); got != 2 {
+		t.Error("number of eager loaded records wrong, got:", got)
+	}
+
+	a.R.Persons = nil
+	if err = a.L.LoadPersons(ctx, tx, true, &a, nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := len(a.R.Persons); got != 2 {
+		t.Error("number of eager loaded records wrong, got:", got)
+	}
+
+	if t.Failed() {
+		t.Logf("%#v", check)
+	}
+}
+
 func testBadPersonToManyBadPersonsAddresses(t *testing.T) {
 	var err error
 	ctx := context.Background()
@@ -430,14 +514,14 @@ func testBadPersonToManyBadPersonsAddresses(t *testing.T) {
 	}
 }
 
-func testBadPersonToManyBadPersonsAliases(t *testing.T) {
+func testBadPersonToManyBadPersonsAllNames(t *testing.T) {
 	var err error
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
 	var a BadPerson
-	var b, c BadPersonsAlias
+	var b, c BadPersonsAllName
 
 	seed := randomize.NewSeed()
 	if err = randomize.Struct(seed, &a, badPersonDBTypes, true, badPersonColumnsWithDefault...); err != nil {
@@ -448,10 +532,10 @@ func testBadPersonToManyBadPersonsAliases(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err = randomize.Struct(seed, &b, badPersonsAliasDBTypes, false, badPersonsAliasColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &b, badPersonsAllNameDBTypes, false, badPersonsAllNameColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
-	if err = randomize.Struct(seed, &c, badPersonsAliasDBTypes, false, badPersonsAliasColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &c, badPersonsAllNameDBTypes, false, badPersonsAllNameColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
 
@@ -465,7 +549,7 @@ func testBadPersonToManyBadPersonsAliases(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	check, err := a.BadPersonsAliases().All(ctx, tx)
+	check, err := a.BadPersonsAllNames().All(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -488,23 +572,251 @@ func testBadPersonToManyBadPersonsAliases(t *testing.T) {
 	}
 
 	slice := BadPersonSlice{&a}
-	if err = a.L.LoadBadPersonsAliases(ctx, tx, false, (*[]*BadPerson)(&slice), nil); err != nil {
+	if err = a.L.LoadBadPersonsAllNames(ctx, tx, false, (*[]*BadPerson)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.BadPersonsAliases); got != 2 {
+	if got := len(a.R.BadPersonsAllNames); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
-	a.R.BadPersonsAliases = nil
-	if err = a.L.LoadBadPersonsAliases(ctx, tx, true, &a, nil); err != nil {
+	a.R.BadPersonsAllNames = nil
+	if err = a.L.LoadBadPersonsAllNames(ctx, tx, true, &a, nil); err != nil {
 		t.Fatal(err)
 	}
-	if got := len(a.R.BadPersonsAliases); got != 2 {
+	if got := len(a.R.BadPersonsAllNames); got != 2 {
 		t.Error("number of eager loaded records wrong, got:", got)
 	}
 
 	if t.Failed() {
 		t.Logf("%#v", check)
+	}
+}
+
+func testBadPersonToManyAddOpPersons(t *testing.T) {
+	var err error
+
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a BadPerson
+	var b, c, d, e Person
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, badPersonDBTypes, false, strmangle.SetComplement(badPersonPrimaryKeyColumns, badPersonColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	foreigners := []*Person{&b, &c, &d, &e}
+	for _, x := range foreigners {
+		if err = randomize.Struct(seed, x, personDBTypes, false, strmangle.SetComplement(personPrimaryKeyColumns, personColumnsWithoutDefault)...); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = c.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	foreignersSplitByInsertion := [][]*Person{
+		{&b, &c},
+		{&d, &e},
+	}
+
+	for i, x := range foreignersSplitByInsertion {
+		err = a.AddPersons(ctx, tx, i != 0, x...)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		first := x[0]
+		second := x[1]
+
+		if first.R.BadPersons[0] != &a {
+			t.Error("relationship was not added properly to the slice")
+		}
+		if second.R.BadPersons[0] != &a {
+			t.Error("relationship was not added properly to the slice")
+		}
+
+		if a.R.Persons[i*2] != first {
+			t.Error("relationship struct slice not set to correct value")
+		}
+		if a.R.Persons[i*2+1] != second {
+			t.Error("relationship struct slice not set to correct value")
+		}
+
+		count, err := a.Persons().Count(ctx, tx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if want := int64((i + 1) * 2); count != want {
+			t.Error("want", want, "got", count)
+		}
+	}
+}
+
+func testBadPersonToManySetOpPersons(t *testing.T) {
+	var err error
+
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a BadPerson
+	var b, c, d, e Person
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, badPersonDBTypes, false, strmangle.SetComplement(badPersonPrimaryKeyColumns, badPersonColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	foreigners := []*Person{&b, &c, &d, &e}
+	for _, x := range foreigners {
+		if err = randomize.Struct(seed, x, personDBTypes, false, strmangle.SetComplement(personPrimaryKeyColumns, personColumnsWithoutDefault)...); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err = a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = c.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	err = a.SetPersons(ctx, tx, false, &b, &c)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err := a.Persons().Count(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 2 {
+		t.Error("count was wrong:", count)
+	}
+
+	err = a.SetPersons(ctx, tx, true, &d, &e)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err = a.Persons().Count(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 2 {
+		t.Error("count was wrong:", count)
+	}
+
+	// The following checks cannot be implemented since we have no handle
+	// to these when we call Set(). Leaving them here as wishful thinking
+	// and to let people know there's dragons.
+	//
+	// if len(b.R.BadPersons) != 0 {
+	// 	t.Error("relationship was not removed properly from the slice")
+	// }
+	// if len(c.R.BadPersons) != 0 {
+	// 	t.Error("relationship was not removed properly from the slice")
+	// }
+	if d.R.BadPersons[0] != &a {
+		t.Error("relationship was not added properly to the slice")
+	}
+	if e.R.BadPersons[0] != &a {
+		t.Error("relationship was not added properly to the slice")
+	}
+
+	if a.R.Persons[0] != &d {
+		t.Error("relationship struct slice not set to correct value")
+	}
+	if a.R.Persons[1] != &e {
+		t.Error("relationship struct slice not set to correct value")
+	}
+}
+
+func testBadPersonToManyRemoveOpPersons(t *testing.T) {
+	var err error
+
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a BadPerson
+	var b, c, d, e Person
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, badPersonDBTypes, false, strmangle.SetComplement(badPersonPrimaryKeyColumns, badPersonColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	foreigners := []*Person{&b, &c, &d, &e}
+	for _, x := range foreigners {
+		if err = randomize.Struct(seed, x, personDBTypes, false, strmangle.SetComplement(personPrimaryKeyColumns, personColumnsWithoutDefault)...); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	err = a.AddPersons(ctx, tx, true, foreigners...)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err := a.Persons().Count(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 4 {
+		t.Error("count was wrong:", count)
+	}
+
+	err = a.RemovePersons(ctx, tx, foreigners[:2]...)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	count, err = a.Persons().Count(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 2 {
+		t.Error("count was wrong:", count)
+	}
+
+	if len(b.R.BadPersons) != 0 {
+		t.Error("relationship was not removed properly from the slice")
+	}
+	if len(c.R.BadPersons) != 0 {
+		t.Error("relationship was not removed properly from the slice")
+	}
+	if d.R.BadPersons[0] != &a {
+		t.Error("relationship was not added properly to the foreign struct")
+	}
+	if e.R.BadPersons[0] != &a {
+		t.Error("relationship was not added properly to the foreign struct")
+	}
+
+	if len(a.R.Persons) != 2 {
+		t.Error("should have preserved two relationships")
+	}
+
+	// Removal doesn't do a stable deletion for performance so we have to flip the order
+	if a.R.Persons[1] != &d {
+		t.Error("relationship to d should have been preserved")
+	}
+	if a.R.Persons[0] != &e {
+		t.Error("relationship to e should have been preserved")
 	}
 }
 
@@ -759,7 +1071,7 @@ func testBadPersonToManyRemoveOpBadPersonsAddresses(t *testing.T) {
 	}
 }
 
-func testBadPersonToManyAddOpBadPersonsAliases(t *testing.T) {
+func testBadPersonToManyAddOpBadPersonsAllNames(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
@@ -767,15 +1079,15 @@ func testBadPersonToManyAddOpBadPersonsAliases(t *testing.T) {
 	defer func() { _ = tx.Rollback() }()
 
 	var a BadPerson
-	var b, c, d, e BadPersonsAlias
+	var b, c, d, e BadPersonsAllName
 
 	seed := randomize.NewSeed()
 	if err = randomize.Struct(seed, &a, badPersonDBTypes, false, strmangle.SetComplement(badPersonPrimaryKeyColumns, badPersonColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	foreigners := []*BadPersonsAlias{&b, &c, &d, &e}
+	foreigners := []*BadPersonsAllName{&b, &c, &d, &e}
 	for _, x := range foreigners {
-		if err = randomize.Struct(seed, x, badPersonsAliasDBTypes, false, strmangle.SetComplement(badPersonsAliasPrimaryKeyColumns, badPersonsAliasColumnsWithoutDefault)...); err != nil {
+		if err = randomize.Struct(seed, x, badPersonsAllNameDBTypes, false, strmangle.SetComplement(badPersonsAllNamePrimaryKeyColumns, badPersonsAllNameColumnsWithoutDefault)...); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -790,13 +1102,13 @@ func testBadPersonToManyAddOpBadPersonsAliases(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	foreignersSplitByInsertion := [][]*BadPersonsAlias{
+	foreignersSplitByInsertion := [][]*BadPersonsAllName{
 		{&b, &c},
 		{&d, &e},
 	}
 
 	for i, x := range foreignersSplitByInsertion {
-		err = a.AddBadPersonsAliases(ctx, tx, i != 0, x...)
+		err = a.AddBadPersonsAllNames(ctx, tx, i != 0, x...)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -818,14 +1130,14 @@ func testBadPersonToManyAddOpBadPersonsAliases(t *testing.T) {
 			t.Error("relationship was not added properly to the foreign slice")
 		}
 
-		if a.R.BadPersonsAliases[i*2] != first {
+		if a.R.BadPersonsAllNames[i*2] != first {
 			t.Error("relationship struct slice not set to correct value")
 		}
-		if a.R.BadPersonsAliases[i*2+1] != second {
+		if a.R.BadPersonsAllNames[i*2+1] != second {
 			t.Error("relationship struct slice not set to correct value")
 		}
 
-		count, err := a.BadPersonsAliases().Count(ctx, tx)
+		count, err := a.BadPersonsAllNames().Count(ctx, tx)
 		if err != nil {
 			t.Fatal(err)
 		}
