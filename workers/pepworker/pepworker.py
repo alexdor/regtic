@@ -34,16 +34,18 @@ def parse_pep_xlsx(link):
         "Stillingsbetegnelse ": "occupation",
         "Tilføjet på PEP-listen (dato)": "date_added",
     }
-    returned_cols = ["full_name", "type", "source", "address"]
+    returned_cols = ["full_name", "type", "source", "country_code"]
 
     names_df = data[parsing_cols]
     names_df = names_df.dropna(axis="index")
     names_df = names_df.rename(columns=rename_dict)
     names_df["type"] = BAD_PERSON_TYPE.PEP
     names_df["source"] = link
-    names_df["address"] = None
+    names_df["country_code"] = "DK"
     names_df["full_name"] = names_df["first_name"] + " " + names_df["sur_name"]
     names_df = names_df[returned_cols]
+    names_df.drop_duplicates(keep="first", inplace=True)
+    names_df["country_code"] = names_df["country_code"].apply(lambda x: [x])
     return names_df
 
 
@@ -53,6 +55,11 @@ def remove_pep_from_db():
 
 def add_new_pep_to_db(df):
     dbtools.update_df(df, list_type=BAD_PERSON_TYPE.PEP)
+
+
+def upsert_new_pep_to_db(df):
+    result_string = dbtools.upsert_df(df, list_type=BAD_PERSON_TYPE.PEP)
+    return result_string
 
 
 def run(event, context):
@@ -66,9 +73,36 @@ def run(event, context):
             "headers": {"Content-Type": "application/json"},
         }
     except Exception as err:
+        body_dict = {
+            "error": "pepworker failed",
+            "error message": traceback.format_exc().split("\n"),
+        }
         return {
             "statusCode": 500,
-            "body": f'\{"error": "pepworker failed, error:{traceback.format_exc()}"\}',
+            "body": json.dumps(body_dict),
+            "headers": {"Content-Type": "application/json"},
+        }
+
+
+def upsert_run(event, context):
+    try:
+        file_link = get_link_to_file()
+        parsed_df = parse_pep_xlsx(file_link)
+        result_string = upsert_new_pep_to_db(parsed_df)
+        body_dict = {"data": "pepworker finished", "message": result_string.split("\n")}
+        return {
+            "statusCode": 200,
+            "body": json.dumps(body_dict),
+            "headers": {"Content-Type": "application/json"},
+        }
+    except Exception as err:
+        body_dict = {
+            "error": "pepworker failed",
+            "error message": traceback.format_exc().split("\n"),
+        }
+        return {
+            "statusCode": 500,
+            "body": json.dumps(body_dict),
             "headers": {"Content-Type": "application/json"},
         }
 
@@ -76,4 +110,4 @@ def run(event, context):
 if __name__ == "__main__":
     file_link = get_link_to_file()
     parsed_df = parse_pep_xlsx(file_link)
-    add_new_pep_to_db(parsed_df)
+    upsert_new_pep_to_db(parsed_df)

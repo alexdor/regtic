@@ -61,6 +61,83 @@ function parseCompany(company) {
   };
 }
 
+function parseMetaData(organizations) {
+  function getRights(organizations) {
+    const ownershipAmountMatch = "EJERANDEL_PROCENT";
+    const votingRightsAmountMatch = "EJERANDEL_STEMMERET_PROCENT";
+
+    function getActiveValueFromAttribute(attribute) {
+      const isAttributeSet = !!attribute;
+      if (!isAttributeSet) return 0;
+      // find the attribute value which is active
+      const activeAttribute =
+        attribute.vaerdier.find(vaerdi => vaerdi.periode.gyldigTil === null) ||
+        {};
+      return activeAttribute.vaerdi;
+    }
+
+    // quickly filter out the non-essential organizations/relations
+    const registrantOrganization = organizations.find(
+      organization => organization.hovedtype === "REGISTER"
+    );
+    if (!registrantOrganization)
+      return { ownershipPercentage: 0, votingsRightsPercentage: 0 };
+
+    // find the attribute that maches the type we are searching for
+    const ownershipAttribute = registrantOrganization.medlemsData[0].attributter.find(
+      attribute => attribute.type === ownershipAmountMatch
+    );
+
+    const votingRightsAttribute = registrantOrganization.medlemsData[0].attributter.find(
+      attribute => attribute.type === votingRightsAmountMatch
+    );
+
+    return {
+      ownershipPercentage: getActiveValueFromAttribute(ownershipAttribute) || 0,
+      votingsRightsPercentage:
+        getActiveValueFromAttribute(votingRightsAttribute) || 0
+    };
+  }
+
+  function translateTitle(title) {
+    const titleMapping = {
+      bestyrelse: "board of directors",
+      direktion: "direction",
+      ejerregister: "legal owner",
+      "reelle ejere": "ultimate beneficial owner",
+      revision: "accountant",
+      stiftere: "founder"
+    };
+
+    title = title.toLowerCase();
+
+    return titleMapping[title];
+  }
+
+  const relations = organizations.reduce((result, relation) => {
+    const isActiveRelation =
+      relation.organisationsNavn[0].periode.gyldigTil === null;
+    if (!isActiveRelation) return result;
+
+    const translatedRelation = translateTitle(
+      relation.organisationsNavn[0].navn
+    );
+
+    const isTranslatedRelationValid = !!translatedRelation;
+    if (!isTranslatedRelationValid) return result;
+
+    result.push(translatedRelation);
+
+    return result;
+  }, []);
+
+  const { ownershipPercentage, votingsRightsPercentage } = getRights(
+    organizations
+  );
+
+  return { relations, ownershipPercentage, votingsRightsPercentage };
+}
+
 function parse(hit) {
   const entry = hit._source.Vrvirksomhed;
   const persons = [];
@@ -72,18 +149,27 @@ function parse(hit) {
   if (!isEntryValid) return;
 
   entry.deltagerRelation.forEach(entity => {
-    const isTypeOfOwner = !!entity.organisationer.hovedtype === "REGISTER";
-    if (!isTypeOfOwner) return;
-
     const hasDeltager = !!entity.deltager;
     const hasType = hasDeltager && entity.deltager.enhedstype;
     if (!hasType) return;
 
+    const metaData = parseMetaData(entity.organisationer);
+
     const isPerson = entity.deltager.enhedstype === "PERSON";
-    if (isPerson) persons.push(parsePerson(entity.deltager));
+    if (isPerson) {
+      persons.push({
+        ...parsePerson(entity.deltager),
+        ...metaData
+      });
+    }
 
     const isCompany = entity.deltager.enhedstype === "VIRKSOMHED";
-    if (isCompany) motherCompanies.push(parseMotherCompany(entity.deltager));
+    if (isCompany) {
+      motherCompanies.push({
+        ...parseMotherCompany(entity.deltager),
+        ...metaData
+      });
+    }
   });
 
   company.persons = persons;
