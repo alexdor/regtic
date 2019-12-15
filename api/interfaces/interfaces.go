@@ -25,35 +25,35 @@ type CompaniesJson []CompanyJson
 type Person struct {
 	ID          string          `boil:"id" json:"id" toml:"id" yaml:"id"`
 	CountryCode string          `boil:"countryCode" json:"countryCode" toml:"countryCode" yaml:"countryCode"`
-	Name        null.String     `boil:"name,omitempty" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
-	CheckStatus CheckStatusEnum `json:"checkStatus,omitempty" toml:"checkStatus" yaml:"checkStatus,omitempty"`
-	BadType     null.String     `json:"statusType,omitempty" toml:"statusType" yaml:"statusType,omitempty"`
-	Source      null.String     `json:"source,omitempty" toml:"source" yaml:"source,omitempty"`
-	OwnedBy     []Relationship  `json:"ownedBy,omitempty" toml:"ownedBy" yaml:"ownedBy,omitempty"`
-	EntityType  EntityTypeEnum  `json:"entityType,omitempty" toml:"entityType" yaml:"entityType,omitempty"`
+	Name        null.String     `boil:"name" json:"name" toml:"name" yaml:"name"`
+	CheckStatus CheckStatusEnum `json:"checkStatus" toml:"checkStatus" yaml:"checkStatus"`
+	BadType     null.String     `json:"statusType" toml:"statusType" yaml:"statusType"`
+	Source      null.String     `json:"source" toml:"source" yaml:"source"`
+	OwnedBy     []Relationship  `json:"ownedBy" toml:"ownedBy" yaml:"ownedBy"`
+	EntityType  EntityTypeEnum  `json:"entityType" toml:"entityType" yaml:"entityType"`
 }
 type People []Person
 type Company struct {
 	ID           string          `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Address      null.String     `boil:"address,omitempty" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
+	Address      null.String     `boil:"address" json:"address" toml:"address" yaml:"address"`
 	CountryCode  string          `boil:"countryCode" json:"countryCode" toml:"countryCode" yaml:"countryCode"`
-	Name         null.String     `boil:"name,omitempty" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
-	CheckStatus  CheckStatusEnum `json:"checkStatus,omitempty" toml:"checkStatus" yaml:"checkStatus,omitempty"`
-	BadType      null.String     `json:"statusType,omitempty" toml:"statusType" yaml:"statusType,omitempty"`
-	Source       null.String     `json:"source,omitempty" toml:"source" yaml:"source,omitempty"`
-	OwnedBy      []Relationship  `json:"ownedBy,omitempty" toml:"ownedBy" yaml:"ownedBy,omitempty"`
-	EntityType   EntityTypeEnum  `json:"entityType,omitempty" toml:"entityType" yaml:"entityType,omitempty"`
+	Name         null.String     `boil:"name" json:"name" toml:"name" yaml:"name"`
+	CheckStatus  CheckStatusEnum `json:"checkStatus" toml:"checkStatus" yaml:"checkStatus"`
+	BadType      null.String     `json:"statusType" toml:"statusType" yaml:"statusType"`
+	Source       null.String     `json:"source" toml:"source" yaml:"source"`
+	OwnedBy      []Relationship  `json:"ownedBy" toml:"ownedBy" yaml:"ownedBy"`
+	EntityType   EntityTypeEnum  `json:"entityType" toml:"entityType" yaml:"entityType"`
 	Vat          string          `json:"vat" toml:"vat" yaml:"vat"`
-	StartingDate null.String     `json:"startingDate,omitempty" toml:"startingDate" yaml:"startingDate,omitempty"`
-	Status       null.String     `json:"status,omitempty" toml:"status" yaml:"status,omitempty"`
-	StatusNotes  null.String     `json:"statusNotes,omitempty" toml:"statusNotes" yaml:"statusNotes,omitempty"`
-	Type         null.String     `json:"type,omitempty" toml:"type" yaml:"type,omitempty"`
+	StartingDate null.String     `json:"startingDate" toml:"startingDate" yaml:"startingDate"`
+	Status       null.String     `json:"status" toml:"status" yaml:"status"`
+	StatusNotes  null.String     `json:"statusNotes" toml:"statusNotes" yaml:"statusNotes"`
+	Type         null.String     `json:"type" toml:"type" yaml:"type"`
 }
 type Companies []Company
 type ValidationResponse struct {
-	Info      CompanyJson `json:"info,omitempty" toml:"info" yaml:"info,omitempty"`
-	People    People      `json:"people,omitempty" toml:"people" yaml:"people,omitempty"`
-	Companies Companies   `json:"companies,omitempty" toml:"companies" yaml:"companies,omitempty"`
+	Info      CompanyJson `json:"info" toml:"info" yaml:"info"`
+	People    People      `json:"people" toml:"people" yaml:"people"`
+	Companies Companies   `json:"companies" toml:"companies" yaml:"companies"`
 	Errors    []error     `json:"errors"`
 }
 
