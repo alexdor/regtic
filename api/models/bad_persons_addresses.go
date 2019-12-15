@@ -25,16 +25,16 @@ import (
 // BadPersonsAddress is an object representing the database table.
 type BadPersonsAddress struct {
 	ID          string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	UpdatedAt   time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	CreatedAt   time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	BadPersonID null.String `boil:"bad_person_id" json:"bad_person_id,omitempty" toml:"bad_person_id" yaml:"bad_person_id,omitempty"`
-	CountryCode string      `boil:"country_code" json:"country_code" toml:"country_code" yaml:"country_code"`
+	UpdatedAt   time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	CreatedAt   time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	BadPersonID null.String `boil:"bad_person_id" json:"badPersonID,omitempty" toml:"badPersonID" yaml:"badPersonID,omitempty"`
+	CountryCode string      `boil:"country_code" json:"countryCode" toml:"countryCode" yaml:"countryCode"`
 	Street      null.String `boil:"street" json:"street,omitempty" toml:"street" yaml:"street,omitempty"`
 	City        null.String `boil:"city" json:"city,omitempty" toml:"city" yaml:"city,omitempty"`
-	ZipCode     null.String `boil:"zip_code" json:"zip_code,omitempty" toml:"zip_code" yaml:"zip_code,omitempty"`
+	ZipCode     null.String `boil:"zip_code" json:"zipCode,omitempty" toml:"zipCode" yaml:"zipCode,omitempty"`
 	Region      null.String `boil:"region" json:"region,omitempty" toml:"region" yaml:"region,omitempty"`
 	Place       null.String `boil:"place" json:"place,omitempty" toml:"place" yaml:"place,omitempty"`
-	PoBox       null.String `boil:"po_box" json:"po_box,omitempty" toml:"po_box" yaml:"po_box,omitempty"`
+	PoBox       null.String `boil:"po_box" json:"poBox,omitempty" toml:"poBox" yaml:"poBox,omitempty"`
 	Type        string      `boil:"type" json:"type" toml:"type" yaml:"type"`
 
 	R *badPersonsAddressR `boil:"-" json:"-" toml:"-" yaml:"-"`

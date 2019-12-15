@@ -6,10 +6,12 @@ package models
 var TableNames = struct {
 	BadCompanies          string
 	BadCompaniesAddresses string
-	BadCompaniesAliases   string
+	BadCompaniesAllNames  string
+	BadCompanyToCompany   string
+	BadPersonToPerson     string
 	BadPersons            string
 	BadPersonsAddresses   string
-	BadPersonsAliases     string
+	BadPersonsAllNames    string
 	Companies             string
 	CompanyToCompany      string
 	CompanyToPerson       string
@@ -17,10 +19,12 @@ var TableNames = struct {
 }{
 	BadCompanies:          "bad_companies",
 	BadCompaniesAddresses: "bad_companies_addresses",
-	BadCompaniesAliases:   "bad_companies_aliases",
+	BadCompaniesAllNames:  "bad_companies_all_names",
+	BadCompanyToCompany:   "bad_company_to_company",
+	BadPersonToPerson:     "bad_person_to_person",
 	BadPersons:            "bad_persons",
 	BadPersonsAddresses:   "bad_persons_addresses",
-	BadPersonsAliases:     "bad_persons_aliases",
+	BadPersonsAllNames:    "bad_persons_all_names",
 	Companies:             "companies",
 	CompanyToCompany:      "company_to_company",
 	CompanyToPerson:       "company_to_person",

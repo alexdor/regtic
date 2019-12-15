@@ -10,15 +10,19 @@ func TestUpsert(t *testing.T) {
 
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesUpsert)
 
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesUpsert)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesUpsert)
 
 	t.Run("BadPersons", testBadPersonsUpsert)
 
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesUpsert)
 
-	t.Run("BadPersonsAliases", testBadPersonsAliasesUpsert)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesUpsert)
 
 	t.Run("Companies", testCompaniesUpsert)
+
+	t.Run("CompanyToCompanies", testCompanyToCompaniesUpsert)
+
+	t.Run("CompanyToPeople", testCompanyToPeopleUpsert)
 
 	t.Run("Persons", testPersonsUpsert)
 }
