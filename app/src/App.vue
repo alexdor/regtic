@@ -81,4 +81,8 @@ export default {
 .container-width-small {
   width: 524px;
 }
+
+.container-width-medium {
+  width: 924px;
+}
 </style>

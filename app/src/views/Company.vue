@@ -38,7 +38,7 @@
           <div class="header-small">Beneficiaries</div>
           <table class="padding-all-small full-width">
             <tbody>
-              <BeneficiaryListItem :entity="entityById(item.id)" :relation="item" v-for="item in selectedCompany.data.owns" v-bind:key="item.id"></BeneficiaryListItem>
+              <BeneficiaryListItem :entity="entityById(item.id)" :relation="item" v-for="item in selectedCompany.data.ownedBy" v-bind:key="item.id"></BeneficiaryListItem>
             </tbody>
           </table>
         </div>
@@ -116,8 +116,8 @@
       for (let depth = 0; depth < companyGrid.length; depth++) {
         for (let i = 0; i < companyGrid[depth].length; i++) {
           const company = companyGrid[depth][i];
-          for (let ei = 0; ei < company.owns.length; ei++) {
-            const otherCompany = this.entityById(company.owns[ei].id);
+          for (let ei = 0; ei < company.ownedBy.length; ei++) {
+            const otherCompany = this.entityById(company.ownedBy[ei].id);
             if (otherCompany != undefined && otherCompany.entityType == "company") {
               const line = new LineCurveClass({
                 propsData: {
@@ -132,7 +132,7 @@
               line.$mount();
               canvas.append(line.$el);
             }
-            const person = this.entityById(company.owns[ei].id);
+            const person = this.entityById(company.ownedBy[ei].id);
             if (person != undefined && person.entityType == "person") {
               const line = new LineCurveClass({
                 propsData: {
@@ -225,8 +225,8 @@
         grid[depth].push(company);
         visited[company.id] = { depth: depth, index: grid[depth].length - 1 };
         company.x = 20 + depth * 450;
-        for (let i = 0; i < company.owns.length; i++) {
-          const otherCompany = this.entityById(company.owns[i].id);
+        for (let i = 0; i < company.ownedBy.length; i++) {
+          const otherCompany = this.entityById(company.ownedBy[i].id);
           if (otherCompany != undefined && otherCompany.entityType == "company")
             this.mapCompaniesToGrid(companies, grid, visited, otherCompany, depth + 1);
         }

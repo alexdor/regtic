@@ -86,7 +86,7 @@ export default {
         status: "warning",
         statusType: "pep",
         statusNotes: "Inherited from beneficiaries",
-        owns: [
+        ownedBy: [
           { id: "2345-56789-01234-5678", relation: "Legal Owner", ownership: 0.3, votingRight: 0.2 },
           { id: "3456-56789-01234-5678", relation: "Ultimate Beneficial Owner", ownership: 0.14, votingRight: 0.25 }
         ],
@@ -104,7 +104,7 @@ export default {
           status: "warning",
           statusType: "pep",
           statusNotes: "Inherited from beneficiaries",
-          owns: [
+          ownedBy: [
             { id: "1234-67890-12345-6789", relation: "Ultimate Beneficial Owner", ownership: 0.2, votingRight: 0.3 }
           ],
           entityType: "company"
@@ -120,7 +120,7 @@ export default {
           status: "warning",
           statusType: "pep",
           source: "https://www.example.org/link/pep-2019-list.pdf",
-          owns: [
+          ownedBy: [
             { id: "4567-56789-01234-5678", relation: "Legal Owner", ownership: 0.2, votingRight: 0.3 },
             { id: "1234-67890-12345-6789", relation: "Accountant", ownership: 0.2, votingRight: 0.3 },
             { id: "2345-67890-12345-6789", relation: "Ultimate Beneficial Owner", ownership: 0.6, votingRight: 0 }
@@ -136,7 +136,7 @@ export default {
           countryCode: "DK",
           name: "Demo Company 4 ApS",
           status: "ok",
-          owns: [
+          ownedBy: [
             { id: "4567-67890-12345-6789", relation: "Ultimate Beneficial Owner", ownership: 0.25, votingRight: 0.16 }
           ],
           entityType: "company"
@@ -203,7 +203,7 @@ export interface CommonFields {
   statusType?: "saction" | "pep";
   source?: string;
   statusNotes?: string;
-  owns: Relationship[];
+  ownedBy: Relationship[];
   entityType: 'person' | 'company';
 }
 
