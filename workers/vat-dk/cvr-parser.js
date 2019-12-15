@@ -67,6 +67,8 @@ function parseMetaData(organizations) {
     const votingRightsAmountMatch = "EJERANDEL_STEMMERET_PROCENT";
 
     function getActiveValueFromAttribute(attribute) {
+      const isAttributeSet = !!attribute;
+      if (!isAttributeSet) return 0;
       // find the attribute value which is active
       const activeAttribute =
         attribute.vaerdier.find(vaerdi => vaerdi.periode.gyldigTil === null) ||
@@ -89,11 +91,6 @@ function parseMetaData(organizations) {
     const votingRightsAttribute = registrantOrganization.medlemsData[0].attributter.find(
       attribute => attribute.type === votingRightsAmountMatch
     );
-
-    const areAttributesValids = ownershipAttribute && votingRightsAttribute;
-
-    if (!areAttributesValids)
-      return { ownershipPercentage: 0, votingsRightsPercentage: 0 };
 
     return {
       ownershipPercentage: getActiveValueFromAttribute(ownershipAttribute) || 0,
