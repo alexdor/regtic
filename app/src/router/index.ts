@@ -29,6 +29,16 @@ export default new Router({
       component: () => import("@/views/Company.vue")
     },
     {
+      path: "/company/:id/info",
+      name: "companyinfo",
+      component: () => import("@/views/CompanyInfo.vue")
+    },
+    {
+      path: "/person/:id/info",
+      name: "personinfo",
+      component: () => import("@/views/PersonInfo.vue")
+    },
+    {
       path: "/watchlist",
       name: "watchlist",
       component: () => import("@/views/Watchlist.vue")
