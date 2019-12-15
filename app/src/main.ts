@@ -24,7 +24,7 @@ new Vue({
   },
   methods: {
     fetchCountries() {
-      api.getCountries(result => store.state.countries = result.data);
+      api.getCountries(function (result: any) { store.state.countries = result.data; });
     }
   }
 }).$mount("#root");
