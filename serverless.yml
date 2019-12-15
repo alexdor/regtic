@@ -26,7 +26,7 @@ plugins:
   # - serverless-python-requirements
   - serverless-iam-roles-per-function
 custom:
-  version: /v1/
+  version: /v2/
 
   vpc:
     securityGroupIds:
@@ -126,7 +126,6 @@ functions:
   api:
     handler: api/bin/main
     runtime: go1.x
-    timeout: 50
     events:
       - http:
           path: ${self:custom.version}find_companies

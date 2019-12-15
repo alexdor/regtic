@@ -57,8 +57,8 @@ func validate(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 func Start() {
 	router := httprouter.New()
-	router.GET("/v1/find_companies", find)
-	router.GET("/v1/validate_company", validate)
+	router.GET("/v2/find_companies", find)
+	router.GET("/v2/validate_company", validate)
 
 	log.Fatal(http.ListenAndServe(":8090", router))
 }
