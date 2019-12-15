@@ -124,6 +124,7 @@ $card-width-person: 390px;
 $card-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.15);
 
 .entity-card {
+  cursor: pointer;
   position: absolute;
   padding: 1rem;
   border-radius: 1.125rem;
@@ -194,10 +195,7 @@ $card-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.15);
 .expand-collapse i {
   display: inline-block;
   position: relative;
-}
-
-.expand-collapse.expand i {
-  top: 0.125rem;
+  top: -0.08rem;
 }
 
 table {
