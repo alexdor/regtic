@@ -5,7 +5,7 @@
         <div class="entity-type" :aria-label="data.entityType" :title="data.entityType"></div>
         <span class="title">{{data.full_name || data.name}}</span>
       </div>
-      <StatusIcon :status="data.status" :statusType="data.statusType" :source="data.source" :statusNotes="data.statusNotes"></StatusIcon>
+      <StatusIcon :status="data.checkStatus" :statusType="data.statusType" :source="data.source" :statusNotes="data.statusNotes"></StatusIcon>
     </div>
     <table class="info" v-show="openState">
       <tr v-for="info in info[data.entityType]" v-bind:key="info.key">
@@ -41,13 +41,13 @@
         active: false,
         openState: this.$props.open,
         info: {
-          company: [
+          COMPANY: [
             { name: "VAT", key: "vat", type: "literal" },
             { name: "Country", key: "countryCode", type: "country" },
             { name: "Address", key: "address", type: "literal" },
             { name: "Type", key: "type", type: "literal" }
           ],
-          person: [
+          PERSON: [
             { name: "Address", key: "address", type: "literal" },
             { name: "Country", key: "countryCode", type: "country" }
           ]
@@ -100,7 +100,7 @@
     margin-bottom: 34px;
   }
 
-  .entity-card.person {
+  .entity-card.PERSON {
     width: $card-width-person;
   }
 
@@ -193,11 +193,11 @@
     margin-right: 1rem;
   }
 
-   .entity-card.company .entity-type {
+   .entity-card.COMPANY .entity-type {
       background-image: url('../assets/icon-company.svg');
     }
 
-   .entity-card.person .entity-type {
+   .entity-card.PERSON .entity-type {
       background-image: url('../assets/icon-person.svg');
     }
 
@@ -209,17 +209,17 @@
     background-position: center;
   }
 
-    .status-icon.good {
+    .status-icon.OK {
       background-color: $green;
       background-image: url('../assets/icon-good.svg');
     }
 
-    .status-icon.warning {
+    .status-icon.WARNING {
       background-color: $orange;
       background-image: url('../assets/icon-warning.svg');
     }
 
-    .status-icon.bad {
+    .status-icon.ISSUE {
       background-color: $red;
       background-image: url('../assets/icon-bad.svg');
     }

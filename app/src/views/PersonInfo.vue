@@ -63,6 +63,7 @@
     data() {
       return {
         beneficiariesOpen: true,
+        detectedListsOpen: true,
         result: {
           info: {},
           companies: [],
@@ -78,15 +79,12 @@
       };
     },
     async mounted() {
-      const companyId = this.$route.params.id;
-      this.result = await api.validateCompany(companyId);
-
-      this.entities.push(...this.result.people);
-      this.entities.push(...this.result.companies);
-
-      this.status.ok = this.entities.filter(entity => entity.status == 'ok').length;
-      this.status.warning = this.entities.filter(entity => entity.status == 'warning').length;
-      this.status.issue = this.entities.filter(entity => entity.status == 'issue').length;
+      const personId = this.$route.params.id;
+      this.result = await api.getPerson(personId);
+      
+      this.status.ok = this.result.owns.filter(entity => entity.status == 'ok').length;
+      this.status.warning = this.result.owns.filter(entity => entity.status == 'warning').length;
+      this.status.issue = this.result.owns.filter(entity => entity.status == 'issue').length;
 
       this.loading = false;
     },

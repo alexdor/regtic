@@ -1,9 +1,9 @@
 <template>
   <div>
-    <el-tooltip v-if="status == 'ok'" class="item" effect="dark" content="Not detected on any list" placement="top">
+    <el-tooltip v-if="status == 'OK'" class="item" effect="dark" content="Not detected on any list" placement="top">
       <div :class="'status-icon ' + status" :aria-label="status"></div>
     </el-tooltip>
-    <el-tooltip v-if="status != 'ok'" class="item" effect="dark" placement="top">
+    <el-tooltip v-if="status != 'OK'" class="item" effect="dark" placement="top">
       <div slot="content">
         <a :href="source">{{source}}</a>
         <br v-if="source != undefined && statusNotes != undefined" />
@@ -41,17 +41,17 @@
     background-position: center;
   }
 
-    .status-icon.ok {
+    .status-icon.OK {
       background-color: $green;
       background-image: url('../assets/icon-good.svg');
     }
 
-    .status-icon.warning {
+    .status-icon.WARNING {
       background-color: $orange;
       background-image: url('../assets/icon-warning.svg');
     }
 
-    .status-icon.issue {
+    .status-icon.ISSUE {
       background-color: $red;
       background-image: url('../assets/icon-bad.svg');
     }

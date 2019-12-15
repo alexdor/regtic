@@ -74,6 +74,9 @@
       console.log(this, this.$el);
       const canvas = this.$el.querySelector(".canvas");
 
+      const COMPANY = "COMPANY";
+      const PERSON = "PERSON";
+
       const companyId = this.$route.params.id;
       this.result = await api.validateCompany(companyId);
       
@@ -93,6 +96,10 @@
       this.entities.push(this.result.info);
       this.entities.push(...this.result.companies);
       this.entities.push(...people);
+
+      this.entities.forEach(entity => entity.checkStatus = entity.checkStatus || "OK");
+      this.entities.forEach(entity => { if (entity.checkStatus != "OK" && entity.source == undefined) { entity.statusNotes = entity.statusNotes || "Inherited from beneficiaries"; } });
+
       console.log(this.entities, people);
       
       this.mapCompaniesToGrid(this.result.companies, companyGrid, visitedCompanies, this.result.info, 0);
@@ -118,7 +125,7 @@
           const company = companyGrid[depth][i];
           for (let ei = 0; ei < company.ownedBy.length; ei++) {
             const otherCompany = this.entityById(company.ownedBy[ei].id);
-            if (otherCompany != undefined && otherCompany.entityType == "company") {
+            if (otherCompany != undefined && otherCompany.entityType == COMPANY) {
               const line = new LineCurveClass({
                 propsData: {
                   x1: company.x + companyCardWidth - 10,
@@ -133,7 +140,7 @@
               canvas.append(line.$el);
             }
             const person = this.entityById(company.ownedBy[ei].id);
-            if (person != undefined && person.entityType == "person") {
+            if (person != undefined && person.entityType == PERSON) {
               const line = new LineCurveClass({
                 propsData: {
                   x1: company.x + companyCardWidth - 10,
@@ -207,8 +214,8 @@
       let canvasWidth = 300;
       let canvasHeight = 200;
       for (let i = 0; i < this.cards.length; i++) {
-        canvasWidth = Math.max(canvasWidth, this.cards[i].x + (this.cards[i].entityType == "person" ? personCardWidthBase : companyCardWidthBase) + 32);
-        canvasHeight = Math.max(canvasHeight, this.cards[i].y + (this.cards[i].entityType == "person" ? personCardHeightBase : companyCardHeightBase) + 32);
+        canvasWidth = Math.max(canvasWidth, this.cards[i].x + (this.cards[i].entityType == PERSON ? personCardWidthBase : companyCardWidthBase) + 32);
+        canvasHeight = Math.max(canvasHeight, this.cards[i].y + (this.cards[i].entityType == PERSON ? personCardHeightBase : companyCardHeightBase) + 32);
       }
       
       canvas.style.width = canvasWidth + "px";
@@ -220,6 +227,8 @@
       },
       // Recursively scans and maps companies into a 2D array, and avoids recursive loops.
       mapCompaniesToGrid(companies, grid, visited, company, depth) {
+        const COMPANY = "COMPANY";
+
         if (company.id in visited) return;
         grid[depth] = grid[depth] || [];
         grid[depth].push(company);
@@ -227,7 +236,7 @@
         company.x = 20 + depth * 450;
         for (let i = 0; i < company.ownedBy.length; i++) {
           const otherCompany = this.entityById(company.ownedBy[i].id);
-          if (otherCompany != undefined && otherCompany.entityType == "company")
+          if (otherCompany != undefined && otherCompany.entityType == COMPANY)
             this.mapCompaniesToGrid(companies, grid, visited, otherCompany, depth + 1);
         }
       },
@@ -242,7 +251,9 @@
           this.cards[i].open = expanded;
       },
       entityCardSelected(card) {
-        if (card.data.entityType == "company") {
+        const COMPANY = "COMPANY";
+
+        if (card.data.entityType == COMPANY) {
           if (this.selectedCompany != null)
             this.selectedCompany.active = false;
           if (this.selectedCompany != card)
@@ -275,6 +286,7 @@
     width: 100%;
     flex-grow: 1;
     overflow: auto;
+    min-height: 40vh;
   }
 
   .canvas {

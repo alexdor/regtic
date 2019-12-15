@@ -89,6 +89,9 @@
       this.status.warning = this.entities.filter(entity => entity.status == 'warning').length;
       this.status.issue = this.entities.filter(entity => entity.status == 'issue').length;
 
+      this.entities.forEach(entity => entity.checkStatus = entity.checkStatus || "OK");
+      this.entities.forEach(entity => { if (entity.checkStatus != "OK" && entity.source == undefined) { entity.statusNotes = entity.statusNotes || "Inherited from beneficiaries"; } })
+
       this.loading = false;
     },
     methods: {
