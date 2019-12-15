@@ -10,21 +10,24 @@
       <table class="padding-all-small">
         <tbody>
           <tr>
-            <td class="key">VAT</td><td class="value">{{result.vat}}</td>
-          </tr>
-          <tr>
             <td class="key">Country</td><td class="value">{{getCountry(result.countryCode)}}</td>
           </tr>
           <tr>
-            <td class="key">Address</td><td class="value">{{result.address}}</td>
-          </tr>
-          <tr>
-            <td class="key">Type</td><td class="value">{{result.type}}</td>
-          </tr>
-          <tr>
-            <td class="key">Status of owning entities</td><td class="value">{{status.ok}} OK, {{status.warning}} Warning, {{status.issue}} Issue
+            <td class="key">Status</td><td class="value">{{status.ok}} OK, {{status.warning}} Warning, {{status.issue}} Issue
             <StatusBar :ok="status.ok" :warning="status.warning" :issue="status.issue"></StatusBar></td>
           </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section-row row-spacing-top-medium">
+      <div class="header-small">
+        Detected lists
+        <a class="expand-collapse expand" v-show="!detectedListsOpen" aria-hidden="true" title="Expand" v-on:click.stop="detectedListsOpen = !detectedListsOpen"><i class="el-icon-arrow-down"></i></a>
+        <a class="expand-collapse collapse" v-show="detectedListsOpen" aria-hidden="true" title="Collapse" v-on:click.stop="detectedListsOpen = !detectedListsOpen"><i class="el-icon-arrow-up"></i></a>
+      </div>
+      <table class="padding-all-small full-width" v-show="detectedListsOpen">
+        <tbody>
+          <DetectedListItem :status="item.status" :type="item.type" :updated="item.updated" :source="item.source" v-for="item in result.detectedLists" v-bind:key="item.source"></DetectedListItem>
         </tbody>
       </table>
     </div>
@@ -47,6 +50,7 @@
   //import Vue from "vue";
   import api from "../utils/mockapi";
   import CompanyRelationListItem from "../components/CompanyRelationListItem.vue";
+  import DetectedListItem from "../components/DetectedListItem.vue";
   import StatusIcon from "../components/StatusIcon.vue";
   import StatusBar from "../components/StatusBar.vue";
   import store from "../store";
@@ -54,6 +58,7 @@
   export default {
     components: {
       CompanyRelationListItem,
+      DetectedListItem,
       StatusIcon,
       StatusBar
     },
@@ -80,9 +85,9 @@
       this.result = await api.getPerson(personId);
       console.log(this.result);
       
-      this.status.ok = this.result.owns.filter(entity => entity.status == 'ok').length;
-      this.status.warning = this.result.owns.filter(entity => entity.status == 'warning').length;
-      this.status.issue = this.result.owns.filter(entity => entity.status == 'issue').length;
+      this.status.ok = this.result.owns.filter(entity => entity.checkStatus == 'OK').length;
+      this.status.warning = this.result.owns.filter(entity => entity.checkStatus == 'WARNING').length;
+      this.status.issue = this.result.owns.filter(entity => entity.checkStatus == 'ISSUE').length;
 
       this.loading = false;
     },
