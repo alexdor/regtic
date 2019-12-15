@@ -5,7 +5,7 @@
       <div class="header">{{result.info.name}}</div>
       <el-button type="primary" round class="button-small"><i class="el-icon-plus"></i> Watchlist</el-button>
     </div>
-    <div>
+    <div class="section-row row-spacing-top-small">
       <div class="header-small">Info</div>
       <table class="padding-all-small">
         <tbody>
@@ -21,10 +21,13 @@
           <tr>
             <td class="key">Type</td><td class="value">{{result.info.type}}</td>
           </tr>
+          <tr>
+            <td class="key">Beneficiaries</td><td class="value">{{result.people.length}} people, {{result.companies.length}} companies</td>
+          </tr>
         </tbody>
       </table>
     </div>
-    <div>
+    <div class="section-row row-spacing-top-medium">
       <div class="header-small">Beneficiaries</div>
       <table class="padding-all-small full-width">
         <tbody>
@@ -95,25 +98,14 @@
     overflow: auto;
   }
 
-  .canvas {
-    padding-right: 4.25rem;
-  }
-
-  .view-mode {
-    margin-left: 3rem;
-  }
-
-  .view-mode .el-radio {
-    display: block;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-  }
-
   .flex-row {
     display: flex;
     flex-direction: row;
     align-items: center;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .section-row {
     font-family: 'Poppins', sans-serif;
   }
 
@@ -127,6 +119,10 @@
 
   .row-spacing-top-small {
     margin-top: 1rem;
+  }
+
+  .row-spacing-top-medium {
+    margin-top: 3rem;
   }
 
   .company-icon {
@@ -149,7 +145,9 @@
   .header-small {
     font-size: 1.375rem;
     margin-bottom: 0.75rem;
+    font-weight: bold;
     color: $black;
+    font-family: 'Poppins', sans-serif;
   }
 
   .button-small {

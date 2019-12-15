@@ -6,7 +6,15 @@ package models
 import "testing"
 
 func TestUpsert(t *testing.T) {
+	t.Run("BadCompanies", testBadCompaniesUpsert)
+
+	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesUpsert)
+
+	t.Run("BadCompaniesAliases", testBadCompaniesAliasesUpsert)
+
 	t.Run("BadPersons", testBadPersonsUpsert)
+
+	t.Run("BadPersonsAddresses", testBadPersonsAddressesUpsert)
 
 	t.Run("BadPersonsAliases", testBadPersonsAliasesUpsert)
 

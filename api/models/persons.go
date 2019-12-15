@@ -27,7 +27,7 @@ type Person struct {
 	ID          string      `boil:"id" json:"id" toml:"id" yaml:"id"`
 	FirstName   null.String `boil:"first_name" json:"first_name,omitempty" toml:"first_name" yaml:"first_name,omitempty"`
 	LastName    null.String `boil:"last_name" json:"last_name,omitempty" toml:"last_name" yaml:"last_name,omitempty"`
-	CountryCode null.String `boil:"country_code" json:"country_code,omitempty" toml:"country_code" yaml:"country_code,omitempty"`
+	CountryCode string      `boil:"country_code" json:"country_code" toml:"country_code" yaml:"country_code"`
 	UpdatedAt   time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	CreatedAt   time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	NameVector  null.String `boil:"name_vector" json:"name_vector,omitempty" toml:"name_vector" yaml:"name_vector,omitempty"`
@@ -63,7 +63,7 @@ var PersonWhere = struct {
 	ID          whereHelperstring
 	FirstName   whereHelpernull_String
 	LastName    whereHelpernull_String
-	CountryCode whereHelpernull_String
+	CountryCode whereHelperstring
 	UpdatedAt   whereHelpertime_Time
 	CreatedAt   whereHelpertime_Time
 	NameVector  whereHelpernull_String
@@ -72,7 +72,7 @@ var PersonWhere = struct {
 	ID:          whereHelperstring{field: "\"persons\".\"id\""},
 	FirstName:   whereHelpernull_String{field: "\"persons\".\"first_name\""},
 	LastName:    whereHelpernull_String{field: "\"persons\".\"last_name\""},
-	CountryCode: whereHelpernull_String{field: "\"persons\".\"country_code\""},
+	CountryCode: whereHelperstring{field: "\"persons\".\"country_code\""},
 	UpdatedAt:   whereHelpertime_Time{field: "\"persons\".\"updated_at\""},
 	CreatedAt:   whereHelpertime_Time{field: "\"persons\".\"created_at\""},
 	NameVector:  whereHelpernull_String{field: "\"persons\".\"name_vector\""},
@@ -101,8 +101,8 @@ type personL struct{}
 
 var (
 	personAllColumns            = []string{"id", "first_name", "last_name", "country_code", "updated_at", "created_at", "name_vector", "full_name"}
-	personColumnsWithoutDefault = []string{"first_name", "last_name", "country_code", "name_vector", "full_name"}
-	personColumnsWithDefault    = []string{"id", "updated_at", "created_at"}
+	personColumnsWithoutDefault = []string{"first_name", "last_name", "name_vector", "full_name"}
+	personColumnsWithDefault    = []string{"id", "country_code", "updated_at", "created_at"}
 	personPrimaryKeyColumns     = []string{"id"}
 )
 
@@ -280,7 +280,7 @@ func (personL) LoadCompanies(ctx context.Context, e boil.ContextExecutor, singul
 		one := new(Company)
 		var localJoinCol string
 
-		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &localJoinCol)
+		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &one.Type, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for companies")
 		}

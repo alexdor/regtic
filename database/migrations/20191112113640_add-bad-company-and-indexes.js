@@ -82,7 +82,7 @@ exports.up = function(knex) {
     )}
     ${uniqueRel("bad_persons_aliases", "bad_person_id, full_name")}
 
-    ${uniqueRel("bad_companies", "name_vector, address, type")}
+    ${uniqueRel("bad_companies", "name_vector, type")}
     ${uniqueRel("bad_companies_aliases", "bad_company_id, name")}
     ${uniqueRel(
       "bad_companies_addresses",

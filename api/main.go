@@ -17,11 +17,11 @@ var origin = os.Getenv("ORIGIN")
 
 func Router(ctx context.Context, request events.APIGatewayProxyRequest) (interfaces.Response, error) {
 	var headers = map[string]string{
-		"Content-Type": "application/json",
+		"Content-Type":                "application/json",
+		"Access-Control-Allow-Origin": origin,
 	}
 
 	if request.Headers["Origin"] == origin {
-		headers["Access-Control-Allow-Origin"] = origin
 		headers["Access-Control-Allow-Credentials"] = "true"
 	}
 	// TODO: Improve this
