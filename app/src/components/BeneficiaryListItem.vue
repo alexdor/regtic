@@ -1,6 +1,6 @@
 <template>
   <tr :class="'beneficiary-list-item ' + entity.entityType">
-    <td class="value"><div class="entity-type" :title="entity.entityType" :aria-label="entity.entityType"></div> {{entity.name}}</td>
+    <td class="value"><div class="entity-type" :title="entity.entityType" :aria-label="entity.entityType"></div> <router-link :to="'/' + entity.entityType + '/' + entity.id + '/info'">{{entity.name}}</router-link></td>
     <td><span class="key">Ownership:</span> <span class="value">{{percent(relation.ownership)}}</span></td>
     <td><span class="key">Voting rights:</span> <span class="value">{{percent(relation.votingRight)}}</span></td>
     <td><StatusIcon :status="entity.status" :statusType="entity.statusType" :source="entity.source" :statusNotes="entity.statusNotes"></StatusIcon></td>
@@ -37,6 +37,8 @@
   $orange: #E6A23C;
   $red: #F56C6C;
 
+  $link-hover: #1871F8;
+
   .beneficiary-list-item {
     font-family: 'Poppins', sans-serif;
     width: 100%;
@@ -44,6 +46,15 @@
 
   td {
     padding: 0.5rem 0;
+  }
+
+  a {
+    color: $black;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: $link-hover;
   }
 
   .entity-type {

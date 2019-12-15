@@ -3,7 +3,8 @@
     <div class="flex-row row-spacing-bottom-large row-spacing-top-small">
       <div class="company-icon"></div>
       <div class="header">{{result.info.name}}</div>
-      <el-button type="primary" round class="button-small"><i class="el-icon-plus"></i> Watchlist</el-button>
+      <StatusIcon :status="result.info.status" :statusType="result.info.statusType" :source="result.info.source" :statusNotes="result.info.statusNotes" class="row-spacing-left-small"></StatusIcon>
+      <el-button type="primary" round class="button-small pull-right"><i class="el-icon-plus"></i> Watchlist</el-button>
     </div>
     <div class="section-row row-spacing-top-small">
       <div class="header-small">Info</div>
@@ -22,13 +23,19 @@
             <td class="key">Type</td><td class="value">{{result.info.type}}</td>
           </tr>
           <tr>
-            <td class="key">Beneficiaries</td><td class="value">{{result.people.length}} people, {{result.companies.length}} companies</td>
+            <td class="key">Entities</td><td class="value">{{result.people.length}} people, {{result.companies.length}} companies</td>
+          </tr>
+          <tr>
+            <td class="key">Beneficiaries</td><td class="value">{{status.ok}} OK, {{status.warning}} Warning, {{status.issue}} Issue
+            <StatusBar :ok="status.ok" :warning="status.warning" :issue="status.issue"></StatusBar></td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="section-row row-spacing-top-medium">
-      <div class="header-small">Beneficiaries</div>
+      <div class="header-small">Beneficiaries
+      
+      </div>
       <table class="padding-all-small full-width">
         <tbody>
           <BeneficiaryListItem :entity="entityById(item.id)" :relation="item" v-for="item in result.info.ownedBy" v-bind:key="item.id"></BeneficiaryListItem>
@@ -42,11 +49,15 @@
   //import Vue from "vue";
   import api from "../utils/mockapi";
   import BeneficiaryListItem from "../components/BeneficiaryListItem.vue";
+  import StatusIcon from "../components/StatusIcon.vue";
+  import StatusBar from "../components/StatusBar.vue";
   import store from "../store";
 
   export default {
     components: {
-      BeneficiaryListItem
+      BeneficiaryListItem,
+      StatusIcon,
+      StatusBar
     },
     data() {
       return {
@@ -57,6 +68,11 @@
           people: []
         },
         entities: [],
+        status: {
+          ok: 0,
+          warning: 0,
+          issue: 0
+        },
         loading: true
       };
     },
@@ -66,6 +82,10 @@
 
       this.entities.push(...this.result.people);
       this.entities.push(...this.result.companies);
+
+      this.status.ok = this.entities.filter(entity => entity.status == 'ok').length;
+      this.status.warning = this.entities.filter(entity => entity.status == 'warning').length;
+      this.status.issue = this.entities.filter(entity => entity.status == 'issue').length;
 
       this.loading = false;
     },
@@ -111,6 +131,15 @@
 
   .flex-start {
     align-items: flex-start;
+  }
+
+  .pull-right {
+    position: absolute;
+    right: 0;
+  }
+
+  .row-spacing-left-small {
+    margin-left: 1rem;
   }
 
   .row-spacing-bottom-large {
