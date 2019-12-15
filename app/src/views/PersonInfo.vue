@@ -2,27 +2,24 @@
   <div class="container-center container-width-medium">
     <div class="flex-row row-spacing-bottom-large row-spacing-top-small">
       <div class="person-icon"></div>
-      <div class="header">{{result.info.name}}</div>
-      <StatusIcon :status="result.info.status" :statusType="result.info.statusType" :source="result.info.source" :statusNotes="result.info.statusNotes" class="row-spacing-left-small"></StatusIcon>
+      <div class="header">{{result.name}}</div>
+      <StatusIcon :status="result.checkStatus" :statusType="result.statusType" :source="result.source" :statusNotes="result.statusNotes" class="row-spacing-left-small"></StatusIcon>
     </div>
     <div class="section-row row-spacing-top-small">
       <div class="header-small">Info</div>
       <table class="padding-all-small">
         <tbody>
           <tr>
-            <td class="key">VAT</td><td class="value">{{result.info.vat}}</td>
+            <td class="key">VAT</td><td class="value">{{result.vat}}</td>
           </tr>
           <tr>
-            <td class="key">Country</td><td class="value">{{getCountry(result.info.countryCode)}}</td>
+            <td class="key">Country</td><td class="value">{{getCountry(result.countryCode)}}</td>
           </tr>
           <tr>
-            <td class="key">Address</td><td class="value">{{result.info.address}}</td>
+            <td class="key">Address</td><td class="value">{{result.address}}</td>
           </tr>
           <tr>
-            <td class="key">Type</td><td class="value">{{result.info.type}}</td>
-          </tr>
-          <tr>
-            <td class="key">Amount of entities owning this company</td><td class="value">{{result.people.length}} people, {{result.companies.length}} companies</td>
+            <td class="key">Type</td><td class="value">{{result.type}}</td>
           </tr>
           <tr>
             <td class="key">Status of owning entities</td><td class="value">{{status.ok}} OK, {{status.warning}} Warning, {{status.issue}} Issue
@@ -33,13 +30,13 @@
     </div>
     <div class="section-row row-spacing-top-medium">
       <div class="header-small">
-        Direct beneficiaries
-        <a class="expand-collapse expand" v-show="!beneficiariesOpen" aria-hidden="true" title="Expand" v-on:click.stop="beneficiariesOpen = !beneficiariesOpen"><i class="el-icon-arrow-down"></i></a>
-        <a class="expand-collapse collapse" v-show="beneficiariesOpen" aria-hidden="true" title="Collapse" v-on:click.stop="beneficiariesOpen = !beneficiariesOpen"><i class="el-icon-arrow-up"></i></a>
+        Related companies
+        <a class="expand-collapse expand" v-show="!companiesOpen" aria-hidden="true" title="Expand" v-on:click.stop="companiesOpen = !companiesOpen"><i class="el-icon-arrow-down"></i></a>
+        <a class="expand-collapse collapse" v-show="companiesOpen" aria-hidden="true" title="Collapse" v-on:click.stop="companiesOpen = !companiesOpen"><i class="el-icon-arrow-up"></i></a>
       </div>
-      <table class="padding-all-small full-width" v-show="beneficiariesOpen">
+      <table class="padding-all-small full-width" v-show="companiesOpen">
         <tbody>
-          <BeneficiaryListItem :entity="entityById(item.id)" :relation="item" v-for="item in result.info.ownedBy" v-bind:key="item.id"></BeneficiaryListItem>
+          <CompanyRelationListItem :company="item" v-for="item in result.owns" v-bind:key="item.id"></CompanyRelationListItem>
         </tbody>
       </table>
     </div>
@@ -49,20 +46,20 @@
 <script>
   //import Vue from "vue";
   import api from "../utils/mockapi";
-  import BeneficiaryListItem from "../components/BeneficiaryListItem.vue";
+  import CompanyRelationListItem from "../components/CompanyRelationListItem.vue";
   import StatusIcon from "../components/StatusIcon.vue";
   import StatusBar from "../components/StatusBar.vue";
   import store from "../store";
 
   export default {
     components: {
-      BeneficiaryListItem,
+      CompanyRelationListItem,
       StatusIcon,
       StatusBar
     },
     data() {
       return {
-        beneficiariesOpen: true,
+        companiesOpen: true,
         detectedListsOpen: true,
         result: {
           info: {},
@@ -81,6 +78,7 @@
     async mounted() {
       const personId = this.$route.params.id;
       this.result = await api.getPerson(personId);
+      console.log(this.result);
       
       this.status.ok = this.result.owns.filter(entity => entity.status == 'ok').length;
       this.status.warning = this.result.owns.filter(entity => entity.status == 'warning').length;

@@ -792,7 +792,7 @@ export default {
     } as ValidationResponse;
   },
   async getPerson(id: string) {
-    await sleep(3000);
+    await sleep(300);
 
     return {
       id: "1234-67890-12345-6789",
@@ -802,6 +802,7 @@ export default {
       address: "Anker Engelundsvej 1, 2800 Kgs. Lyngby",
       checkStatus: "ISSUE",
       statusType: "SANCTION",
+      source: "https://www.example.org/lists/sanction-list.pdf",
       owns: [
         {
           id: "3456-56789-01234-5678",
@@ -813,7 +814,7 @@ export default {
           type: "IVS",
           checkStatus: "ISSUE",
           statusType: "SANCTION",
-          source: "Inherited from beneficiaries",
+          statusNotes: "Inherited from beneficiaries",
           countryCode: "ZZ",
           entityType: "COMPANY"
         },
@@ -827,7 +828,7 @@ export default {
           type: "IVS",
           checkStatus: "ISSUE",
           statusType: "SANCTION",
-          source: "Inherited from beneficiaries",
+          statusNotes: "Inherited from beneficiaries",
           countryCode: "ZZ",
           entityType: "COMPANY"
         }
@@ -904,6 +905,7 @@ export interface OwnedCompany extends CommonFields {
   votingRight: number;
   vat: string;
   type: string;
+  statusNotes?: string;
 }
 
 export interface ApiResponsePersonInfo extends Person {
