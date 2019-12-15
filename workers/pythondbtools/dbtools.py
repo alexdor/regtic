@@ -166,7 +166,6 @@ def push_person_in_session(session, bad_person, list_type):
             session.add(bad_company_obj)
             returned_id = bad_company_obj.id
             returned_id_type = "E"
-            print("test")
             for alias in bad_person["alias"]:
                 if (
                     session.query(BadCompanyAllNames).filter_by(name=alias).first()
@@ -280,7 +279,6 @@ def upsert_df(df, list_type):
                 )
                 row_type_switch = "E"
             else:
-                test = "true"
                 query_row = (
                     session.query(BadPerson)
                     .filter(BadPerson.type == list_type)
