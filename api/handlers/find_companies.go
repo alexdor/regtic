@@ -9,25 +9,22 @@ import (
 
 	"github.com/alexdor/regtic/api/db"
 	"github.com/alexdor/regtic/api/interfaces"
-
-	"github.com/aws/aws-lambda-go/events"
 )
 
 const unprocessableFindError = "{\"error\": \"Please provide a company name \"}"
 const noCompanyFound = "{\"error\": \"Company name provided doesn't exist in the database \"}"
 
-func FindCompanies(ctx context.Context, request events.APIGatewayProxyRequest, headers map[string]string) (interfaces.Response, error) {
+func FindCompanies(ctx context.Context, companyName string, headers map[string]string) (interfaces.Response, error) {
 	headers["X-Regtic-Func-Reply"] = "find_companies_handler"
 
-	companyName := request.QueryStringParameters["name"]
 	if len(companyName) == 0 {
-		return interfaces.Response{StatusCode: 400, Body: unprocessableFindError}, nil
+		return interfaces.Response{StatusCode: 400, Body: unprocessableFindError, Headers: headers}, nil
 	}
 
 	companies, err := db.FindCompany(ctx, companyName)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return interfaces.Response{StatusCode: 404, Body: noCompanyFound}, nil
+			return interfaces.Response{StatusCode: 404, Body: noCompanyFound, Headers: headers}, nil
 		}
 		// TODO: Replace with sentry
 		fmt.Println(err)
@@ -38,7 +35,7 @@ func FindCompanies(ctx context.Context, request events.APIGatewayProxyRequest, h
 		"companies": companies,
 	})
 	if err != nil {
-		return interfaces.Response{StatusCode: 500}, err
+		return interfaces.Response{StatusCode: 500, Headers: headers}, err
 	}
 
 	resp := interfaces.Response{
