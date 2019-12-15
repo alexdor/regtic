@@ -4,12 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"strings"
 	"sync"
 
 	"github.com/alexdor/regtic/api/interfaces"
 	"github.com/alexdor/regtic/api/models"
-	"github.com/volatiletech/null"
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
@@ -43,8 +41,8 @@ func ValidateCompany(ctx context.Context, id string) (*interfaces.ValidationResp
 	locks.companyMap[company.ID] = struct{}{}
 
 	wg := &sync.WaitGroup{}
-	traverseThroughTheCompany(ctx, &models.CompanySlice{company}, response, locks, wg)
-	response.Info = interfaces.DBCompanyToCompanyJson(company)
+	traverseThroughCompanies(ctx, &models.CompanySlice{company}, response, locks, wg)
+	response.Info = DBCompanyToCompanyJson(company)
 	jsonCompany, err := convertCompany(ctx, company)
 	if err != nil {
 		writeError(err, response, locks)
@@ -58,12 +56,14 @@ func ValidateCompany(ctx context.Context, id string) (*interfaces.ValidationResp
 	return response, nil
 }
 
-func traverseThroughTheCompany(ctx context.Context, companies *models.CompanySlice, response *interfaces.ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
+// Go through the company structure
+func traverseThroughCompanies(ctx context.Context, companies *models.CompanySlice, response *interfaces.ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
 	wg.Add(2)
 	go getMotherCompanies(ctx, companies, response, locks, wg)
 	go getOwners(ctx, companies, response, locks, wg)
 }
 
+// Add mother companies to the list of companies
 func getMotherCompanies(ctx context.Context, companies *models.CompanySlice, response *interfaces.ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
 	defer wg.Done()
 
@@ -103,11 +103,11 @@ func getMotherCompanies(ctx context.Context, companies *models.CompanySlice, res
 		}
 	}
 
-	traverseThroughTheCompany(ctx, &aggregatedMotherCompanies, response, locks, wg)
+	traverseThroughCompanies(ctx, &aggregatedMotherCompanies, response, locks, wg)
 	var err error
 	companiesToAdd := make(interfaces.Companies, len(aggregatedMotherCompanies))
 	for i := range aggregatedMotherCompanies {
-		companiesToAdd[i], err = convertCompany(ctx, aggregatedMotherCompanies[i]) //TODO
+		companiesToAdd[i], err = convertCompany(ctx, aggregatedMotherCompanies[i])
 		if err != nil {
 			writeError(err, response, locks)
 		}
@@ -118,6 +118,7 @@ func getMotherCompanies(ctx context.Context, companies *models.CompanySlice, res
 	locks.companiesMutex.Unlock()
 }
 
+// Get the owners of the company
 func getOwners(ctx context.Context, companies *models.CompanySlice, response *interfaces.ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
 	defer wg.Done()
 	if companies == nil || len(*companies) == 0 {
@@ -134,6 +135,7 @@ func getOwners(ctx context.Context, companies *models.CompanySlice, response *in
 	}
 }
 
+// Search for badpersons and add persons to the response
 func searchForBadPersons(ctx context.Context, companyToPeople models.CompanyToPersonSlice, response *interfaces.ValidationResponse, locks *validationLocks) {
 	if len(companyToPeople) == 0 {
 		return
@@ -171,96 +173,4 @@ func writeError(err error, response *interfaces.ValidationResponse, locks *valid
 		response.Errors = append(response.Errors, err)
 		locks.errorsMutex.Unlock()
 	}
-}
-
-func convertPerson(ctx context.Context, person *models.Person) (interfaces.Person, error) {
-	jsonPerson := interfaces.Person{
-		ID:          person.ID,
-		CountryCode: person.CountryCode,
-		Name:        person.FullName,
-		EntityType:  interfaces.PERSON,
-		CheckStatus: interfaces.OK,
-	}
-	badPerson, err := models.BadPersons(
-		qm.Select(badPersonSelect),
-		qm.Where(badPersonWhereClause, person.FullName),
-		qm.OrderBy(badPersonOrderBy),
-	).One(ctx, DB)
-
-	noResults := errors.Is(err, sql.ErrNoRows)
-	if err != nil && !noResults {
-		return jsonPerson, err
-	}
-
-	if !noResults {
-		jsonPerson.CheckStatus = interfaces.BadTypeToStatusMapping[strings.ToLower(badPerson.Type)]
-		jsonPerson.Source = badPerson.Source
-		jsonPerson.BadType = null.String{String: badPerson.Type, Valid: true}
-	}
-
-	return jsonPerson, nil
-}
-
-func convertCompany(ctx context.Context, company *models.Company) (interfaces.Company, error) {
-	jsonCompany := interfaces.Company{
-		ID:           company.ID,
-		Address:      company.Address,
-		CountryCode:  company.CountryCode,
-		Name:         company.Name,
-		Vat:          company.Vat,
-		StartingDate: company.StartingDate,
-		Status:       company.Status,
-		StatusNotes:  company.StatusNotes,
-		Type:         company.Type,
-		EntityType:   interfaces.COMPANY,
-		CheckStatus:  interfaces.OK,
-	}
-	companyOwners, err := company.MotherCompanyCompanyToCompanies().All(ctx, DB)
-	noResults := errors.Is(err, sql.ErrNoRows)
-	if err != nil && !noResults {
-		return jsonCompany, err
-	}
-	peopleOwners, err := company.CompanyToPeople().All(ctx, DB)
-	noResults = errors.Is(err, sql.ErrNoRows)
-	if err != nil && !noResults {
-		return jsonCompany, err
-	}
-	peopleOwnersLength := len(peopleOwners)
-	ownedBy := make([]interfaces.Relationship, peopleOwnersLength+len(companyOwners))
-	for i := range peopleOwners {
-		ownedBy[i] = interfaces.Relationship{
-			EntityID:     peopleOwners[i].PersonID,
-			Relation:     peopleOwners[i].Relations,
-			Ownership:    peopleOwners[i].Ownership,
-			VotingRights: peopleOwners[i].VotingRights,
-			EntityType:   interfaces.PERSON,
-		}
-	}
-	for i := range companyOwners {
-		ownedBy[peopleOwnersLength-1+i] = interfaces.Relationship{
-			EntityID:     companyOwners[i].MotherCompanyID,
-			Relation:     companyOwners[i].Relations,
-			Ownership:    companyOwners[i].Ownership,
-			VotingRights: companyOwners[i].VotingRights,
-			EntityType:   interfaces.COMPANY,
-		}
-	}
-	jsonCompany.OwnedBy = ownedBy
-
-	badCompany, err := company.BadCompanies(
-		qm.OrderBy(badCompanyOrderBy),
-	).One(ctx, DB)
-
-	noResults = errors.Is(err, sql.ErrNoRows)
-	if err != nil && !noResults {
-		return jsonCompany, err
-	}
-
-	if !noResults {
-		jsonCompany.Source = null.String{String: badCompany.Source, Valid: true}
-		jsonCompany.BadType = null.String{String: badCompany.Type, Valid: true}
-		jsonCompany.CheckStatus = interfaces.BadTypeToStatusMapping[strings.ToLower(badCompany.Type)]
-	}
-
-	return jsonCompany, nil
 }

@@ -8,9 +8,6 @@ import (
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
-var whereClause = models.CompanyColumns.NameVector + " @@ plainto_tsquery('simple', ?)"
-var orClause = models.CompanyColumns.ID + " = ?"
-
 func FindCompany(ctx context.Context, name string) (res []interfaces.CompanyJson, err error) {
 	err = models.Companies(
 		qm.Select(
@@ -25,7 +22,7 @@ func FindCompany(ctx context.Context, name string) (res []interfaces.CompanyJson
 			"ts_rank("+models.CompanyColumns.NameVector+", plainto_tsquery('simple', $1)) as rank",
 		),
 		qm.Where(
-			whereClause, name,
+			findCompanyWhereClause, name,
 		),
 		qm.OrderBy("rank desc"),
 		qm.Limit(10),
