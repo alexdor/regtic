@@ -60,7 +60,6 @@ class BadCompanyAllNames(base):
     __tablename__ = "bad_companies_all_names"
     id = Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid.uuid4)
     name = Column(String)
-    type = Column(Enum(BAD_PERSON_TYPE))
     bad_company_id = Column(UUID(as_uuid=True), ForeignKey("bad_companies.id"))
 
 
@@ -174,9 +173,7 @@ def push_person_in_session(session, bad_person, list_type):
                     is None
                 ):
                     alias_obj = BadCompanyAllNames(
-                        name=alias,
-                        type=bad_company_obj.type,
-                        bad_company_id=bad_company_obj.id,
+                        name=alias, bad_company_id=bad_company_obj.id
                     )
                     session.add(alias_obj)
 
