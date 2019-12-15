@@ -1,4 +1,4 @@
-//go:generate sqlboiler psql --no-hooks
+//go:generate sqlboiler psql --no-hooks --struct-tag-casing camel
 package main
 
 import (
@@ -9,7 +9,6 @@ import (
 	"github.com/alexdor/regtic/api/handlers"
 	"github.com/alexdor/regtic/api/interfaces"
 	"github.com/aws/aws-lambda-go/events"
-
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
@@ -27,9 +26,9 @@ func Router(ctx context.Context, request events.APIGatewayProxyRequest) (interfa
 	// TODO: Improve this
 	switch {
 	case strings.Contains(request.Path, "find_companies"):
-		return handlers.FindCompanies(ctx, request, headers)
+		return handlers.FindCompanies(ctx, request.QueryStringParameters["name"], headers)
 	case strings.Contains(request.Path, "validate_company"):
-		return handlers.ValidateCompanyHandler(ctx, request, headers)
+		return handlers.ValidateCompanyHandler(ctx, request.QueryStringParameters["id"], headers)
 	}
 
 	return interfaces.Response{
