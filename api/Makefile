@@ -16,6 +16,9 @@ help:
 dev:
 	reflex -d fancy -r '\.go$$' -s -- sh -c 'echo "\n\nRestarting server\n\n"; make build';
 
+api:
+	go run -tags api --race .
+
 build: ## Build golang binaries
 	export GO111MODULE=on
 	go mod tidy
