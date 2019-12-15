@@ -41,9 +41,6 @@ func convertPerson(ctx context.Context, person *models.Person) (interfaces.Perso
 	).One(ctx, DB)
 
 	noResults := errors.Is(err, sql.ErrNoRows)
-	if err != nil && !noResults {
-		return jsonPerson, err
-	}
 
 	if !noResults {
 		jsonPerson.CheckStatus = interfaces.BadTypeToStatusMapping[strings.ToLower(badPerson.Type)]
@@ -51,7 +48,7 @@ func convertPerson(ctx context.Context, person *models.Person) (interfaces.Perso
 		jsonPerson.BadType = null.String{String: badPerson.Type, Valid: true}
 	}
 
-	return jsonPerson, nil
+	return jsonPerson, err
 }
 
 func convertCompany(ctx context.Context, company *models.Company) (interfaces.Company, error) {
