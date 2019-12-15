@@ -1,5 +1,5 @@
 <template>
-  <div class="company-list-item">
+  <router-link class="company-list-item" tag="div" :to="'/company/' + data.id">
     <span class="title">{{ data.name }}</span>
     <table class="info">
       <tr>
@@ -26,22 +26,12 @@
         <td class="key">
           Type
         </td>
-        <td class="type">
+        <td class="value">
           {{ data.type }}
         </td>
       </tr>
     </table>
-
-    <router-link class="check-button" :to="'/company/' + data.id">
-      <el-button
-        class="check-button"
-        type="primary"
-        icon="el-icon-search"
-        aria-label="Check"
-        title="Check"
-      />
-    </router-link>
-  </div>
+  </router-link>
 </template>
 
 <script>
@@ -57,11 +47,17 @@ export default {
 
 <style lang="scss" scoped>
 $black: #303133;
+$link-hover: #109cf1;
 
 .company-list-item {
+  cursor: pointer;
   padding: 1rem 0;
   margin: 1rem 0;
   font-family: "Poppins", sans-serif;
+  &:hover *,
+  &:focus * {
+    color: $link-hover;
+  }
 }
 
 .title {
@@ -84,15 +80,5 @@ table {
 .value {
   color: $black;
   padding-right: 1.5rem;
-}
-
-.check-button {
-  width: 2rem;
-  height: 2rem;
-  font-size: 1rem;
-  padding: 0;
-  position: absolute;
-  right: 0;
-  margin-top: -2rem;
 }
 </style>
