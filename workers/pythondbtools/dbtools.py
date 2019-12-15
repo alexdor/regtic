@@ -166,7 +166,7 @@ def push_person_in_session(session, bad_person, list_type):
             session.add(bad_company_obj)
             returned_id = bad_company_obj.id
             returned_id_type = "E"
-
+            print("test")
             for alias in bad_person["alias"]:
                 if (
                     session.query(BadCompanyAllNames).filter_by(name=alias).first()
@@ -271,25 +271,20 @@ def upsert_df(df, list_type):
         for _, row in df.iterrows():
             row_type_switch = "P"
             query_row = None
-            if list_type == BAD_PERSON_TYPE.SANCTION:
-                if row["entity"] == "E":
-                    query_row = (
-                        session.query(BadCompany)
-                        .filter(BadCompany.type == list_type)
-                        .filter(BadCompany.name == row["full_name"])
-                        .one_or_none()
-                    )
-                    row_type_switch = "E"
+            if list_type == BAD_PERSON_TYPE.SANCTION and row["entity"] == "E":
+                query_row = (
+                    session.query(BadCompany)
+                    .filter(BadCompany.type == list_type)
+                    .filter(BadCompany.name == row["full_name"])
+                    .one_or_none()
+                )
+                row_type_switch = "E"
             else:
+                test = "true"
                 query_row = (
                     session.query(BadPerson)
                     .filter(BadPerson.type == list_type)
                     .filter(BadPerson.full_name == row["full_name"])
-                    .filter(
-                        BadPerson.citizenship_country_code.contains(
-                            cast(row["country_code"], ARRAY(VARCHAR(2)))
-                        )
-                    )
                     .one_or_none()
                 )
 
@@ -330,7 +325,7 @@ def upsert_df(df, list_type):
 
         return (
             f"PERSONS: inserted: {len(inserted_ids['P'])} updated: {len(updated_ids['P'])} deleted: {len(deleted_ids['P'])}\n"
-            f"COMPANIES: inserted: {len(inserted_ids['E'])} updated: {len(updated_ids['E'])} deleted: {len(deleted_ids['E'])}"
+            f"COMPANIES: inserted: {len(inserted_ids['E'])} updated: {len(updated_ids['E'])} deleted: {len(deleted_ids['E'])}\n"
         )
     except Exception as err:
         session.rollback()
