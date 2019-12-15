@@ -21,24 +21,24 @@ var (
 	_ = queries.Equal
 )
 
-func testBadCompaniesAliases(t *testing.T) {
+func testBadCompaniesAllNames(t *testing.T) {
 	t.Parallel()
 
-	query := BadCompaniesAliases()
+	query := BadCompaniesAllNames()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testBadCompaniesAliasesDelete(t *testing.T) {
+func testBadCompaniesAllNamesDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -54,7 +54,7 @@ func testBadCompaniesAliasesDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := BadCompaniesAliases().Count(ctx, tx)
+	count, err := BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,14 +64,14 @@ func testBadCompaniesAliasesDelete(t *testing.T) {
 	}
 }
 
-func testBadCompaniesAliasesQueryDeleteAll(t *testing.T) {
+func testBadCompaniesAllNamesQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -81,13 +81,13 @@ func testBadCompaniesAliasesQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := BadCompaniesAliases().DeleteAll(ctx, tx); err != nil {
+	if rowsAff, err := BadCompaniesAllNames().DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := BadCompaniesAliases().Count(ctx, tx)
+	count, err := BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,14 +97,14 @@ func testBadCompaniesAliasesQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testBadCompaniesAliasesSliceDeleteAll(t *testing.T) {
+func testBadCompaniesAllNamesSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -114,7 +114,7 @@ func testBadCompaniesAliasesSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := BadCompaniesAliasSlice{o}
+	slice := BadCompaniesAllNameSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
@@ -122,7 +122,7 @@ func testBadCompaniesAliasesSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := BadCompaniesAliases().Count(ctx, tx)
+	count, err := BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,14 +132,14 @@ func testBadCompaniesAliasesSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testBadCompaniesAliasesExists(t *testing.T) {
+func testBadCompaniesAllNamesExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -149,23 +149,23 @@ func testBadCompaniesAliasesExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := BadCompaniesAliasExists(ctx, tx, o.ID)
+	e, err := BadCompaniesAllNameExists(ctx, tx, o.ID)
 	if err != nil {
-		t.Errorf("Unable to check if BadCompaniesAlias exists: %s", err)
+		t.Errorf("Unable to check if BadCompaniesAllName exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected BadCompaniesAliasExists to return true, but got false.")
+		t.Errorf("Expected BadCompaniesAllNameExists to return true, but got false.")
 	}
 }
 
-func testBadCompaniesAliasesFind(t *testing.T) {
+func testBadCompaniesAllNamesFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -175,24 +175,24 @@ func testBadCompaniesAliasesFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	badCompaniesAliasFound, err := FindBadCompaniesAlias(ctx, tx, o.ID)
+	badCompaniesAllNameFound, err := FindBadCompaniesAllName(ctx, tx, o.ID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if badCompaniesAliasFound == nil {
+	if badCompaniesAllNameFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testBadCompaniesAliasesBind(t *testing.T) {
+func testBadCompaniesAllNamesBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -202,19 +202,19 @@ func testBadCompaniesAliasesBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = BadCompaniesAliases().Bind(ctx, tx, o); err != nil {
+	if err = BadCompaniesAllNames().Bind(ctx, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testBadCompaniesAliasesOne(t *testing.T) {
+func testBadCompaniesAllNamesOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -224,38 +224,38 @@ func testBadCompaniesAliasesOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := BadCompaniesAliases().One(ctx, tx); err != nil {
+	if x, err := BadCompaniesAllNames().One(ctx, tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testBadCompaniesAliasesAll(t *testing.T) {
+func testBadCompaniesAllNamesAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	badCompaniesAliasOne := &BadCompaniesAlias{}
-	badCompaniesAliasTwo := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, badCompaniesAliasOne, badCompaniesAliasDBTypes, false, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	badCompaniesAllNameOne := &BadCompaniesAllName{}
+	badCompaniesAllNameTwo := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, badCompaniesAllNameOne, badCompaniesAllNameDBTypes, false, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
-	if err = randomize.Struct(seed, badCompaniesAliasTwo, badCompaniesAliasDBTypes, false, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	if err = randomize.Struct(seed, badCompaniesAllNameTwo, badCompaniesAllNameDBTypes, false, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = badCompaniesAliasOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = badCompaniesAllNameOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = badCompaniesAliasTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = badCompaniesAllNameTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := BadCompaniesAliases().All(ctx, tx)
+	slice, err := BadCompaniesAllNames().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -265,31 +265,31 @@ func testBadCompaniesAliasesAll(t *testing.T) {
 	}
 }
 
-func testBadCompaniesAliasesCount(t *testing.T) {
+func testBadCompaniesAllNamesCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	badCompaniesAliasOne := &BadCompaniesAlias{}
-	badCompaniesAliasTwo := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, badCompaniesAliasOne, badCompaniesAliasDBTypes, false, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	badCompaniesAllNameOne := &BadCompaniesAllName{}
+	badCompaniesAllNameTwo := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, badCompaniesAllNameOne, badCompaniesAllNameDBTypes, false, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
-	if err = randomize.Struct(seed, badCompaniesAliasTwo, badCompaniesAliasDBTypes, false, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	if err = randomize.Struct(seed, badCompaniesAllNameTwo, badCompaniesAllNameDBTypes, false, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = badCompaniesAliasOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = badCompaniesAllNameOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = badCompaniesAliasTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = badCompaniesAllNameTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := BadCompaniesAliases().Count(ctx, tx)
+	count, err := BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -299,14 +299,14 @@ func testBadCompaniesAliasesCount(t *testing.T) {
 	}
 }
 
-func testBadCompaniesAliasesInsert(t *testing.T) {
+func testBadCompaniesAllNamesInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -316,7 +316,7 @@ func testBadCompaniesAliasesInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := BadCompaniesAliases().Count(ctx, tx)
+	count, err := BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -326,24 +326,24 @@ func testBadCompaniesAliasesInsert(t *testing.T) {
 	}
 }
 
-func testBadCompaniesAliasesInsertWhitelist(t *testing.T) {
+func testBadCompaniesAllNamesInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(ctx, tx, boil.Whitelist(badCompaniesAliasColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(ctx, tx, boil.Whitelist(badCompaniesAllNameColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := BadCompaniesAliases().Count(ctx, tx)
+	count, err := BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -353,17 +353,17 @@ func testBadCompaniesAliasesInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testBadCompaniesAliasToOneBadCompanyUsingBadCompany(t *testing.T) {
+func testBadCompaniesAllNameToOneBadCompanyUsingBadCompany(t *testing.T) {
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var local BadCompaniesAlias
+	var local BadCompaniesAllName
 	var foreign BadCompany
 
 	seed := randomize.NewSeed()
-	if err := randomize.Struct(seed, &local, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	if err := randomize.Struct(seed, &local, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 	if err := randomize.Struct(seed, &foreign, badCompanyDBTypes, false, badCompanyColumnsWithDefault...); err != nil {
 		t.Errorf("Unable to randomize BadCompany struct: %s", err)
@@ -387,8 +387,8 @@ func testBadCompaniesAliasToOneBadCompanyUsingBadCompany(t *testing.T) {
 		t.Errorf("want: %v, got %v", foreign.ID, check.ID)
 	}
 
-	slice := BadCompaniesAliasSlice{&local}
-	if err = local.L.LoadBadCompany(ctx, tx, false, (*[]*BadCompaniesAlias)(&slice), nil); err != nil {
+	slice := BadCompaniesAllNameSlice{&local}
+	if err = local.L.LoadBadCompany(ctx, tx, false, (*[]*BadCompaniesAllName)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
 	if local.R.BadCompany == nil {
@@ -404,18 +404,18 @@ func testBadCompaniesAliasToOneBadCompanyUsingBadCompany(t *testing.T) {
 	}
 }
 
-func testBadCompaniesAliasToOneSetOpBadCompanyUsingBadCompany(t *testing.T) {
+func testBadCompaniesAllNameToOneSetOpBadCompanyUsingBadCompany(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a BadCompaniesAlias
+	var a BadCompaniesAllName
 	var b, c BadCompany
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, badCompaniesAliasDBTypes, false, strmangle.SetComplement(badCompaniesAliasPrimaryKeyColumns, badCompaniesAliasColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, badCompaniesAllNameDBTypes, false, strmangle.SetComplement(badCompaniesAllNamePrimaryKeyColumns, badCompaniesAllNameColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
 	if err = randomize.Struct(seed, &b, badCompanyDBTypes, false, strmangle.SetComplement(badCompanyPrimaryKeyColumns, badCompanyColumnsWithoutDefault)...); err != nil {
@@ -442,7 +442,7 @@ func testBadCompaniesAliasToOneSetOpBadCompanyUsingBadCompany(t *testing.T) {
 			t.Error("relationship struct not set to correct value")
 		}
 
-		if x.R.BadCompaniesAliases[0] != &a {
+		if x.R.BadCompaniesAllNames[0] != &a {
 			t.Error("failed to append to foreign relationship struct")
 		}
 		if !queries.Equal(a.BadCompanyID, x.ID) {
@@ -462,18 +462,18 @@ func testBadCompaniesAliasToOneSetOpBadCompanyUsingBadCompany(t *testing.T) {
 	}
 }
 
-func testBadCompaniesAliasToOneRemoveOpBadCompanyUsingBadCompany(t *testing.T) {
+func testBadCompaniesAllNameToOneRemoveOpBadCompanyUsingBadCompany(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a BadCompaniesAlias
+	var a BadCompaniesAllName
 	var b BadCompany
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, badCompaniesAliasDBTypes, false, strmangle.SetComplement(badCompaniesAliasPrimaryKeyColumns, badCompaniesAliasColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, badCompaniesAllNameDBTypes, false, strmangle.SetComplement(badCompaniesAllNamePrimaryKeyColumns, badCompaniesAllNameColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
 	if err = randomize.Struct(seed, &b, badCompanyDBTypes, false, strmangle.SetComplement(badCompanyPrimaryKeyColumns, badCompanyColumnsWithoutDefault)...); err != nil {
@@ -508,19 +508,19 @@ func testBadCompaniesAliasToOneRemoveOpBadCompanyUsingBadCompany(t *testing.T) {
 		t.Error("foreign key value should be nil")
 	}
 
-	if len(b.R.BadCompaniesAliases) != 0 {
+	if len(b.R.BadCompaniesAllNames) != 0 {
 		t.Error("failed to remove a from b's relationships")
 	}
 }
 
-func testBadCompaniesAliasesReload(t *testing.T) {
+func testBadCompaniesAllNamesReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -535,14 +535,14 @@ func testBadCompaniesAliasesReload(t *testing.T) {
 	}
 }
 
-func testBadCompaniesAliasesReloadAll(t *testing.T) {
+func testBadCompaniesAllNamesReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -552,21 +552,21 @@ func testBadCompaniesAliasesReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := BadCompaniesAliasSlice{o}
+	slice := BadCompaniesAllNameSlice{o}
 
 	if err = slice.ReloadAll(ctx, tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testBadCompaniesAliasesSelect(t *testing.T) {
+func testBadCompaniesAllNamesSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -576,7 +576,7 @@ func testBadCompaniesAliasesSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := BadCompaniesAliases().All(ctx, tx)
+	slice, err := BadCompaniesAllNames().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -587,25 +587,25 @@ func testBadCompaniesAliasesSelect(t *testing.T) {
 }
 
 var (
-	badCompaniesAliasDBTypes = map[string]string{`ID`: `uuid`, `UpdatedAt`: `timestamp without time zone`, `CreatedAt`: `timestamp without time zone`, `BadCompanyID`: `uuid`, `Name`: `text`, `NameVector`: `tsvector`, `Type`: `enum.bad_person_type('PEP','SANCTION')`}
-	_                        = bytes.MinRead
+	badCompaniesAllNameDBTypes = map[string]string{`ID`: `uuid`, `UpdatedAt`: `timestamp without time zone`, `CreatedAt`: `timestamp without time zone`, `BadCompanyID`: `uuid`, `Name`: `text`, `NameVector`: `tsvector`}
+	_                          = bytes.MinRead
 )
 
-func testBadCompaniesAliasesUpdate(t *testing.T) {
+func testBadCompaniesAllNamesUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(badCompaniesAliasPrimaryKeyColumns) {
+	if 0 == len(badCompaniesAllNamePrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(badCompaniesAliasAllColumns) == len(badCompaniesAliasPrimaryKeyColumns) {
+	if len(badCompaniesAllNameAllColumns) == len(badCompaniesAllNamePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -615,7 +615,7 @@ func testBadCompaniesAliasesUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := BadCompaniesAliases().Count(ctx, tx)
+	count, err := BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -624,8 +624,8 @@ func testBadCompaniesAliasesUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNamePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(ctx, tx, boil.Infer()); err != nil {
@@ -635,18 +635,18 @@ func testBadCompaniesAliasesUpdate(t *testing.T) {
 	}
 }
 
-func testBadCompaniesAliasesSliceUpdateAll(t *testing.T) {
+func testBadCompaniesAllNamesSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(badCompaniesAliasAllColumns) == len(badCompaniesAliasPrimaryKeyColumns) {
+	if len(badCompaniesAllNameAllColumns) == len(badCompaniesAllNamePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &BadCompaniesAlias{}
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := &BadCompaniesAllName{}
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNameColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -656,7 +656,7 @@ func testBadCompaniesAliasesSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := BadCompaniesAliases().Count(ctx, tx)
+	count, err := BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -665,18 +665,18 @@ func testBadCompaniesAliasesSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, badCompaniesAliasDBTypes, true, badCompaniesAliasPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	if err = randomize.Struct(seed, o, badCompaniesAllNameDBTypes, true, badCompaniesAllNamePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(badCompaniesAliasAllColumns, badCompaniesAliasPrimaryKeyColumns) {
-		fields = badCompaniesAliasAllColumns
+	if strmangle.StringSliceMatch(badCompaniesAllNameAllColumns, badCompaniesAllNamePrimaryKeyColumns) {
+		fields = badCompaniesAllNameAllColumns
 	} else {
 		fields = strmangle.SetComplement(
-			badCompaniesAliasAllColumns,
-			badCompaniesAliasPrimaryKeyColumns,
+			badCompaniesAllNameAllColumns,
+			badCompaniesAllNamePrimaryKeyColumns,
 		)
 	}
 
@@ -694,7 +694,7 @@ func testBadCompaniesAliasesSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := BadCompaniesAliasSlice{o}
+	slice := BadCompaniesAllNameSlice{o}
 	if rowsAff, err := slice.UpdateAll(ctx, tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -702,29 +702,29 @@ func testBadCompaniesAliasesSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testBadCompaniesAliasesUpsert(t *testing.T) {
+func testBadCompaniesAllNamesUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(badCompaniesAliasAllColumns) == len(badCompaniesAliasPrimaryKeyColumns) {
+	if len(badCompaniesAllNameAllColumns) == len(badCompaniesAllNamePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := BadCompaniesAlias{}
-	if err = randomize.Struct(seed, &o, badCompaniesAliasDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	o := BadCompaniesAllName{}
+	if err = randomize.Struct(seed, &o, badCompaniesAllNameDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(ctx, tx, false, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert BadCompaniesAlias: %s", err)
+		t.Errorf("Unable to upsert BadCompaniesAllName: %s", err)
 	}
 
-	count, err := BadCompaniesAliases().Count(ctx, tx)
+	count, err := BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -733,15 +733,15 @@ func testBadCompaniesAliasesUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, badCompaniesAliasDBTypes, false, badCompaniesAliasPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize BadCompaniesAlias struct: %s", err)
+	if err = randomize.Struct(seed, &o, badCompaniesAllNameDBTypes, false, badCompaniesAllNamePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize BadCompaniesAllName struct: %s", err)
 	}
 
 	if err = o.Upsert(ctx, tx, true, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert BadCompaniesAlias: %s", err)
+		t.Errorf("Unable to upsert BadCompaniesAllName: %s", err)
 	}
 
-	count, err = BadCompaniesAliases().Count(ctx, tx)
+	count, err = BadCompaniesAllNames().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}

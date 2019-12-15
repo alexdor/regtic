@@ -14,110 +14,130 @@ import "testing"
 func TestParent(t *testing.T) {
 	t.Run("BadCompanies", testBadCompanies)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddresses)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliases)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNames)
 	t.Run("BadPersons", testBadPersons)
 	t.Run("BadPersonsAddresses", testBadPersonsAddresses)
-	t.Run("BadPersonsAliases", testBadPersonsAliases)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNames)
 	t.Run("Companies", testCompanies)
+	t.Run("CompanyToCompanies", testCompanyToCompanies)
+	t.Run("CompanyToPeople", testCompanyToPeople)
 	t.Run("Persons", testPersons)
 }
 
 func TestDelete(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesDelete)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesDelete)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesDelete)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesDelete)
 	t.Run("BadPersons", testBadPersonsDelete)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesDelete)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesDelete)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesDelete)
 	t.Run("Companies", testCompaniesDelete)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesDelete)
+	t.Run("CompanyToPeople", testCompanyToPeopleDelete)
 	t.Run("Persons", testPersonsDelete)
 }
 
 func TestQueryDeleteAll(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesQueryDeleteAll)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesQueryDeleteAll)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesQueryDeleteAll)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesQueryDeleteAll)
 	t.Run("BadPersons", testBadPersonsQueryDeleteAll)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesQueryDeleteAll)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesQueryDeleteAll)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesQueryDeleteAll)
 	t.Run("Companies", testCompaniesQueryDeleteAll)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesQueryDeleteAll)
+	t.Run("CompanyToPeople", testCompanyToPeopleQueryDeleteAll)
 	t.Run("Persons", testPersonsQueryDeleteAll)
 }
 
 func TestSliceDeleteAll(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesSliceDeleteAll)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesSliceDeleteAll)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesSliceDeleteAll)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesSliceDeleteAll)
 	t.Run("BadPersons", testBadPersonsSliceDeleteAll)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesSliceDeleteAll)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesSliceDeleteAll)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesSliceDeleteAll)
 	t.Run("Companies", testCompaniesSliceDeleteAll)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesSliceDeleteAll)
+	t.Run("CompanyToPeople", testCompanyToPeopleSliceDeleteAll)
 	t.Run("Persons", testPersonsSliceDeleteAll)
 }
 
 func TestExists(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesExists)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesExists)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesExists)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesExists)
 	t.Run("BadPersons", testBadPersonsExists)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesExists)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesExists)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesExists)
 	t.Run("Companies", testCompaniesExists)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesExists)
+	t.Run("CompanyToPeople", testCompanyToPeopleExists)
 	t.Run("Persons", testPersonsExists)
 }
 
 func TestFind(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesFind)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesFind)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesFind)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesFind)
 	t.Run("BadPersons", testBadPersonsFind)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesFind)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesFind)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesFind)
 	t.Run("Companies", testCompaniesFind)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesFind)
+	t.Run("CompanyToPeople", testCompanyToPeopleFind)
 	t.Run("Persons", testPersonsFind)
 }
 
 func TestBind(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesBind)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesBind)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesBind)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesBind)
 	t.Run("BadPersons", testBadPersonsBind)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesBind)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesBind)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesBind)
 	t.Run("Companies", testCompaniesBind)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesBind)
+	t.Run("CompanyToPeople", testCompanyToPeopleBind)
 	t.Run("Persons", testPersonsBind)
 }
 
 func TestOne(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesOne)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesOne)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesOne)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesOne)
 	t.Run("BadPersons", testBadPersonsOne)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesOne)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesOne)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesOne)
 	t.Run("Companies", testCompaniesOne)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesOne)
+	t.Run("CompanyToPeople", testCompanyToPeopleOne)
 	t.Run("Persons", testPersonsOne)
 }
 
 func TestAll(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesAll)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesAll)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesAll)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesAll)
 	t.Run("BadPersons", testBadPersonsAll)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesAll)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesAll)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesAll)
 	t.Run("Companies", testCompaniesAll)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesAll)
+	t.Run("CompanyToPeople", testCompanyToPeopleAll)
 	t.Run("Persons", testPersonsAll)
 }
 
 func TestCount(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesCount)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesCount)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesCount)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesCount)
 	t.Run("BadPersons", testBadPersonsCount)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesCount)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesCount)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesCount)
 	t.Run("Companies", testCompaniesCount)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesCount)
+	t.Run("CompanyToPeople", testCompanyToPeopleCount)
 	t.Run("Persons", testPersonsCount)
 }
 
@@ -126,16 +146,20 @@ func TestInsert(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesInsertWhitelist)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesInsert)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesInsertWhitelist)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesInsert)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesInsertWhitelist)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesInsert)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesInsertWhitelist)
 	t.Run("BadPersons", testBadPersonsInsert)
 	t.Run("BadPersons", testBadPersonsInsertWhitelist)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesInsert)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesInsertWhitelist)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesInsert)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesInsertWhitelist)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesInsert)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesInsertWhitelist)
 	t.Run("Companies", testCompaniesInsert)
 	t.Run("Companies", testCompaniesInsertWhitelist)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesInsert)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesInsertWhitelist)
+	t.Run("CompanyToPeople", testCompanyToPeopleInsert)
+	t.Run("CompanyToPeople", testCompanyToPeopleInsertWhitelist)
 	t.Run("Persons", testPersonsInsert)
 	t.Run("Persons", testPersonsInsertWhitelist)
 }
@@ -144,9 +168,13 @@ func TestInsert(t *testing.T) {
 // or deadlocks can occur.
 func TestToOne(t *testing.T) {
 	t.Run("BadCompaniesAddressToBadCompanyUsingBadCompany", testBadCompaniesAddressToOneBadCompanyUsingBadCompany)
-	t.Run("BadCompaniesAliasToBadCompanyUsingBadCompany", testBadCompaniesAliasToOneBadCompanyUsingBadCompany)
+	t.Run("BadCompaniesAllNameToBadCompanyUsingBadCompany", testBadCompaniesAllNameToOneBadCompanyUsingBadCompany)
 	t.Run("BadPersonsAddressToBadPersonUsingBadPerson", testBadPersonsAddressToOneBadPersonUsingBadPerson)
-	t.Run("BadPersonsAliasToBadPersonUsingBadPerson", testBadPersonsAliasToOneBadPersonUsingBadPerson)
+	t.Run("BadPersonsAllNameToBadPersonUsingBadPerson", testBadPersonsAllNameToOneBadPersonUsingBadPerson)
+	t.Run("CompanyToCompanyToCompanyUsingDaughterCompany", testCompanyToCompanyToOneCompanyUsingDaughterCompany)
+	t.Run("CompanyToCompanyToCompanyUsingMotherCompany", testCompanyToCompanyToOneCompanyUsingMotherCompany)
+	t.Run("CompanyToPersonToCompanyUsingCompany", testCompanyToPersonToOneCompanyUsingCompany)
+	t.Run("CompanyToPersonToPersonUsingPerson", testCompanyToPersonToOnePersonUsingPerson)
 }
 
 // TestOneToOne tests cannot be run in parallel
@@ -157,29 +185,37 @@ func TestOneToOne(t *testing.T) {}
 // or deadlocks can occur.
 func TestToMany(t *testing.T) {
 	t.Run("BadCompanyToBadCompaniesAddresses", testBadCompanyToManyBadCompaniesAddresses)
-	t.Run("BadCompanyToBadCompaniesAliases", testBadCompanyToManyBadCompaniesAliases)
+	t.Run("BadCompanyToBadCompaniesAllNames", testBadCompanyToManyBadCompaniesAllNames)
+	t.Run("BadCompanyToCompanies", testBadCompanyToManyCompanies)
+	t.Run("BadPersonToPersons", testBadPersonToManyPersons)
 	t.Run("BadPersonToBadPersonsAddresses", testBadPersonToManyBadPersonsAddresses)
-	t.Run("BadPersonToBadPersonsAliases", testBadPersonToManyBadPersonsAliases)
-	t.Run("CompanyToMotherCompanyCompanies", testCompanyToManyMotherCompanyCompanies)
-	t.Run("CompanyToDaughterCompanyCompanies", testCompanyToManyDaughterCompanyCompanies)
-	t.Run("CompanyToPersons", testCompanyToManyPersons)
-	t.Run("PersonToCompanies", testPersonToManyCompanies)
+	t.Run("BadPersonToBadPersonsAllNames", testBadPersonToManyBadPersonsAllNames)
+	t.Run("CompanyToBadCompanies", testCompanyToManyBadCompanies)
+	t.Run("CompanyToDaughterCompanyCompanyToCompanies", testCompanyToManyDaughterCompanyCompanyToCompanies)
+	t.Run("CompanyToMotherCompanyCompanyToCompanies", testCompanyToManyMotherCompanyCompanyToCompanies)
+	t.Run("CompanyToCompanyToPeople", testCompanyToManyCompanyToPeople)
+	t.Run("PersonToBadPersons", testPersonToManyBadPersons)
+	t.Run("PersonToCompanyToPeople", testPersonToManyCompanyToPeople)
 }
 
 // TestToOneSet tests cannot be run in parallel
 // or deadlocks can occur.
 func TestToOneSet(t *testing.T) {
 	t.Run("BadCompaniesAddressToBadCompanyUsingBadCompaniesAddresses", testBadCompaniesAddressToOneSetOpBadCompanyUsingBadCompany)
-	t.Run("BadCompaniesAliasToBadCompanyUsingBadCompaniesAliases", testBadCompaniesAliasToOneSetOpBadCompanyUsingBadCompany)
+	t.Run("BadCompaniesAllNameToBadCompanyUsingBadCompaniesAllNames", testBadCompaniesAllNameToOneSetOpBadCompanyUsingBadCompany)
 	t.Run("BadPersonsAddressToBadPersonUsingBadPersonsAddresses", testBadPersonsAddressToOneSetOpBadPersonUsingBadPerson)
-	t.Run("BadPersonsAliasToBadPersonUsingBadPersonsAliases", testBadPersonsAliasToOneSetOpBadPersonUsingBadPerson)
+	t.Run("BadPersonsAllNameToBadPersonUsingBadPersonsAllNames", testBadPersonsAllNameToOneSetOpBadPersonUsingBadPerson)
+	t.Run("CompanyToCompanyToCompanyUsingDaughterCompanyCompanyToCompanies", testCompanyToCompanyToOneSetOpCompanyUsingDaughterCompany)
+	t.Run("CompanyToCompanyToCompanyUsingMotherCompanyCompanyToCompanies", testCompanyToCompanyToOneSetOpCompanyUsingMotherCompany)
+	t.Run("CompanyToPersonToCompanyUsingCompanyToPeople", testCompanyToPersonToOneSetOpCompanyUsingCompany)
+	t.Run("CompanyToPersonToPersonUsingCompanyToPeople", testCompanyToPersonToOneSetOpPersonUsingPerson)
 }
 
 // TestToOneRemove tests cannot be run in parallel
 // or deadlocks can occur.
 func TestToOneRemove(t *testing.T) {
 	t.Run("BadCompaniesAddressToBadCompanyUsingBadCompaniesAddresses", testBadCompaniesAddressToOneRemoveOpBadCompanyUsingBadCompany)
-	t.Run("BadCompaniesAliasToBadCompanyUsingBadCompaniesAliases", testBadCompaniesAliasToOneRemoveOpBadCompanyUsingBadCompany)
+	t.Run("BadCompaniesAllNameToBadCompanyUsingBadCompaniesAllNames", testBadCompaniesAllNameToOneRemoveOpBadCompanyUsingBadCompany)
 	t.Run("BadPersonsAddressToBadPersonUsingBadPersonsAddresses", testBadPersonsAddressToOneRemoveOpBadPersonUsingBadPerson)
 }
 
@@ -195,90 +231,104 @@ func TestOneToOneRemove(t *testing.T) {}
 // or deadlocks can occur.
 func TestToManyAdd(t *testing.T) {
 	t.Run("BadCompanyToBadCompaniesAddresses", testBadCompanyToManyAddOpBadCompaniesAddresses)
-	t.Run("BadCompanyToBadCompaniesAliases", testBadCompanyToManyAddOpBadCompaniesAliases)
+	t.Run("BadCompanyToBadCompaniesAllNames", testBadCompanyToManyAddOpBadCompaniesAllNames)
+	t.Run("BadCompanyToCompanies", testBadCompanyToManyAddOpCompanies)
+	t.Run("BadPersonToPersons", testBadPersonToManyAddOpPersons)
 	t.Run("BadPersonToBadPersonsAddresses", testBadPersonToManyAddOpBadPersonsAddresses)
-	t.Run("BadPersonToBadPersonsAliases", testBadPersonToManyAddOpBadPersonsAliases)
-	t.Run("CompanyToMotherCompanyCompanies", testCompanyToManyAddOpMotherCompanyCompanies)
-	t.Run("CompanyToDaughterCompanyCompanies", testCompanyToManyAddOpDaughterCompanyCompanies)
-	t.Run("CompanyToPersons", testCompanyToManyAddOpPersons)
-	t.Run("PersonToCompanies", testPersonToManyAddOpCompanies)
+	t.Run("BadPersonToBadPersonsAllNames", testBadPersonToManyAddOpBadPersonsAllNames)
+	t.Run("CompanyToBadCompanies", testCompanyToManyAddOpBadCompanies)
+	t.Run("CompanyToDaughterCompanyCompanyToCompanies", testCompanyToManyAddOpDaughterCompanyCompanyToCompanies)
+	t.Run("CompanyToMotherCompanyCompanyToCompanies", testCompanyToManyAddOpMotherCompanyCompanyToCompanies)
+	t.Run("CompanyToCompanyToPeople", testCompanyToManyAddOpCompanyToPeople)
+	t.Run("PersonToBadPersons", testPersonToManyAddOpBadPersons)
+	t.Run("PersonToCompanyToPeople", testPersonToManyAddOpCompanyToPeople)
 }
 
 // TestToManySet tests cannot be run in parallel
 // or deadlocks can occur.
 func TestToManySet(t *testing.T) {
 	t.Run("BadCompanyToBadCompaniesAddresses", testBadCompanyToManySetOpBadCompaniesAddresses)
-	t.Run("BadCompanyToBadCompaniesAliases", testBadCompanyToManySetOpBadCompaniesAliases)
+	t.Run("BadCompanyToBadCompaniesAllNames", testBadCompanyToManySetOpBadCompaniesAllNames)
+	t.Run("BadCompanyToCompanies", testBadCompanyToManySetOpCompanies)
+	t.Run("BadPersonToPersons", testBadPersonToManySetOpPersons)
 	t.Run("BadPersonToBadPersonsAddresses", testBadPersonToManySetOpBadPersonsAddresses)
-	t.Run("CompanyToMotherCompanyCompanies", testCompanyToManySetOpMotherCompanyCompanies)
-	t.Run("CompanyToDaughterCompanyCompanies", testCompanyToManySetOpDaughterCompanyCompanies)
-	t.Run("CompanyToPersons", testCompanyToManySetOpPersons)
-	t.Run("PersonToCompanies", testPersonToManySetOpCompanies)
+	t.Run("CompanyToBadCompanies", testCompanyToManySetOpBadCompanies)
+	t.Run("PersonToBadPersons", testPersonToManySetOpBadPersons)
 }
 
 // TestToManyRemove tests cannot be run in parallel
 // or deadlocks can occur.
 func TestToManyRemove(t *testing.T) {
 	t.Run("BadCompanyToBadCompaniesAddresses", testBadCompanyToManyRemoveOpBadCompaniesAddresses)
-	t.Run("BadCompanyToBadCompaniesAliases", testBadCompanyToManyRemoveOpBadCompaniesAliases)
+	t.Run("BadCompanyToBadCompaniesAllNames", testBadCompanyToManyRemoveOpBadCompaniesAllNames)
+	t.Run("BadCompanyToCompanies", testBadCompanyToManyRemoveOpCompanies)
+	t.Run("BadPersonToPersons", testBadPersonToManyRemoveOpPersons)
 	t.Run("BadPersonToBadPersonsAddresses", testBadPersonToManyRemoveOpBadPersonsAddresses)
-	t.Run("CompanyToMotherCompanyCompanies", testCompanyToManyRemoveOpMotherCompanyCompanies)
-	t.Run("CompanyToDaughterCompanyCompanies", testCompanyToManyRemoveOpDaughterCompanyCompanies)
-	t.Run("CompanyToPersons", testCompanyToManyRemoveOpPersons)
-	t.Run("PersonToCompanies", testPersonToManyRemoveOpCompanies)
+	t.Run("CompanyToBadCompanies", testCompanyToManyRemoveOpBadCompanies)
+	t.Run("PersonToBadPersons", testPersonToManyRemoveOpBadPersons)
 }
 
 func TestReload(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesReload)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesReload)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesReload)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesReload)
 	t.Run("BadPersons", testBadPersonsReload)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesReload)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesReload)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesReload)
 	t.Run("Companies", testCompaniesReload)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesReload)
+	t.Run("CompanyToPeople", testCompanyToPeopleReload)
 	t.Run("Persons", testPersonsReload)
 }
 
 func TestReloadAll(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesReloadAll)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesReloadAll)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesReloadAll)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesReloadAll)
 	t.Run("BadPersons", testBadPersonsReloadAll)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesReloadAll)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesReloadAll)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesReloadAll)
 	t.Run("Companies", testCompaniesReloadAll)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesReloadAll)
+	t.Run("CompanyToPeople", testCompanyToPeopleReloadAll)
 	t.Run("Persons", testPersonsReloadAll)
 }
 
 func TestSelect(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesSelect)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesSelect)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesSelect)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesSelect)
 	t.Run("BadPersons", testBadPersonsSelect)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesSelect)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesSelect)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesSelect)
 	t.Run("Companies", testCompaniesSelect)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesSelect)
+	t.Run("CompanyToPeople", testCompanyToPeopleSelect)
 	t.Run("Persons", testPersonsSelect)
 }
 
 func TestUpdate(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesUpdate)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesUpdate)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesUpdate)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesUpdate)
 	t.Run("BadPersons", testBadPersonsUpdate)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesUpdate)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesUpdate)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesUpdate)
 	t.Run("Companies", testCompaniesUpdate)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesUpdate)
+	t.Run("CompanyToPeople", testCompanyToPeopleUpdate)
 	t.Run("Persons", testPersonsUpdate)
 }
 
 func TestSliceUpdateAll(t *testing.T) {
 	t.Run("BadCompanies", testBadCompaniesSliceUpdateAll)
 	t.Run("BadCompaniesAddresses", testBadCompaniesAddressesSliceUpdateAll)
-	t.Run("BadCompaniesAliases", testBadCompaniesAliasesSliceUpdateAll)
+	t.Run("BadCompaniesAllNames", testBadCompaniesAllNamesSliceUpdateAll)
 	t.Run("BadPersons", testBadPersonsSliceUpdateAll)
 	t.Run("BadPersonsAddresses", testBadPersonsAddressesSliceUpdateAll)
-	t.Run("BadPersonsAliases", testBadPersonsAliasesSliceUpdateAll)
+	t.Run("BadPersonsAllNames", testBadPersonsAllNamesSliceUpdateAll)
 	t.Run("Companies", testCompaniesSliceUpdateAll)
+	t.Run("CompanyToCompanies", testCompanyToCompaniesSliceUpdateAll)
+	t.Run("CompanyToPeople", testCompanyToPeopleSliceUpdateAll)
 	t.Run("Persons", testPersonsSliceUpdateAll)
 }
