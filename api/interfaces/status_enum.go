@@ -14,7 +14,7 @@ const (
 	//Entity is on pep list
 	WARNING
 	// Entity is on sanction list
-	ERROR
+	ISSUE
 )
 
 func (s CheckStatusEnum) String() string {
@@ -24,18 +24,18 @@ func (s CheckStatusEnum) String() string {
 var statusEnumToString = map[CheckStatusEnum]string{
 	OK:      "OK",
 	WARNING: "WARNING",
-	ERROR:   "ERROR",
+	ISSUE:   "ISSUE",
 }
 
 var statusEnumToID = map[string]CheckStatusEnum{
 	"OK":      OK,
 	"WARNING": WARNING,
-	"ERROR":   ERROR,
+	"ISSUE":   ISSUE,
 }
 
 var BadTypeToStatusMapping = map[string]CheckStatusEnum{
 	"pep":      WARNING,
-	"sanction": ERROR,
+	"sanction": ISSUE,
 }
 
 // MarshalJSON marshals the enum as a quoted json string
