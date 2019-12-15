@@ -3,7 +3,7 @@
     <td class="value"><div class="entity-type" :title="entity.entityType" :aria-label="entity.entityType"></div> <router-link :to="'/' + entity.entityType + '/' + entity.id + '/info'">{{entity.name}}</router-link></td>
     <td><span class="key">Ownership:</span> <span class="value">{{percent(relation.ownership)}}</span></td>
     <td><span class="key">Voting rights:</span> <span class="value">{{percent(relation.votingRight)}}</span></td>
-    <td><StatusIcon :status="entity.status" :statusType="entity.statusType" :source="entity.source" :statusNotes="entity.statusNotes"></StatusIcon></td>
+    <td><StatusIcon :status="entity.status" :statusType="entity.statusType" :source="entity.source" :statusNotes="entity.statusNotes" class="pull-right"></StatusIcon></td>
   </tr>
 </template>
 
@@ -55,6 +55,10 @@
 
   a:hover {
     color: $link-hover;
+  }
+
+  .pull-right {
+    float: right;
   }
 
   .entity-type {

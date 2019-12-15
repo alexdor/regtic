@@ -161,11 +161,7 @@
   }
 
     .expand-collapse.expand i {
-      top: -0.125rem;
-    }
-
-    .expand-collapse.collapse i {
-      top: -0.25rem;
+      top: 0.125rem;
     }
 
   table {

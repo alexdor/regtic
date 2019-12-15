@@ -23,20 +23,22 @@
             <td class="key">Type</td><td class="value">{{result.info.type}}</td>
           </tr>
           <tr>
-            <td class="key">Entities</td><td class="value">{{result.people.length}} people, {{result.companies.length}} companies</td>
+            <td class="key">Amount of entities owning this company</td><td class="value">{{result.people.length}} people, {{result.companies.length}} companies</td>
           </tr>
           <tr>
-            <td class="key">Beneficiaries</td><td class="value">{{status.ok}} OK, {{status.warning}} Warning, {{status.issue}} Issue
+            <td class="key">Status of owning entities</td><td class="value">{{status.ok}} OK, {{status.warning}} Warning, {{status.issue}} Issue
             <StatusBar :ok="status.ok" :warning="status.warning" :issue="status.issue"></StatusBar></td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="section-row row-spacing-top-medium">
-      <div class="header-small">Beneficiaries
-      
+      <div class="header-small">
+        Direct beneficiaries
+        <a class="expand-collapse expand" v-show="!beneficiariesOpen" aria-hidden="true" title="Expand" v-on:click.stop="beneficiariesOpen = !beneficiariesOpen"><i class="el-icon-arrow-down"></i></a>
+        <a class="expand-collapse collapse" v-show="beneficiariesOpen" aria-hidden="true" title="Collapse" v-on:click.stop="beneficiariesOpen = !beneficiariesOpen"><i class="el-icon-arrow-up"></i></a>
       </div>
-      <table class="padding-all-small full-width">
+      <table class="padding-all-small full-width" v-show="beneficiariesOpen">
         <tbody>
           <BeneficiaryListItem :entity="entityById(item.id)" :relation="item" v-for="item in result.info.ownedBy" v-bind:key="item.id"></BeneficiaryListItem>
         </tbody>
@@ -61,7 +63,7 @@
     },
     data() {
       return {
-        expanded: "collapsed",
+        beneficiariesOpen: true,
         result: {
           info: {},
           companies: [],
@@ -104,6 +106,7 @@
 
 <style scoped lang="scss">
   $black: #303133;
+  $blue: #1989FA;
 
   .flex-vertical {
     display: flex;
@@ -154,6 +157,25 @@
     margin-top: 3rem;
   }
 
+  .expand-collapse {
+    color: $blue;
+    float: right;
+    margin-right: 0.5rem;
+  }
+
+  .expand-collapse i {
+    display: inline-block;
+    position: relative;
+  }
+
+  .expand-collapse.expand i {
+    top: -0.125rem;
+  }
+
+  .expand-collapse.collapse i {
+    top: -0.25rem;
+  }
+
   .company-icon {
     background-image: url('../assets/icon-company.svg');
     background-size: contain;
@@ -173,7 +195,6 @@
 
   .header-small {
     font-size: 1.375rem;
-    margin-bottom: 0.75rem;
     font-weight: bold;
     color: $black;
     font-family: 'Poppins', sans-serif;
@@ -213,97 +234,8 @@
     color: $black;
   }
 
-  /* Default content styling, for semi-small screens (tablets) */
-  @media screen and (max-width: 1400px) {
-    .col-width-30 {
-      width: 50%;
-    }
-
-    .col-width-70 {
-      width: 50%;
-    }
-  }
-
-  /* Default content styling, for small screens (phones) */
-  @media screen and (max-width: 1000px) {
-    .col-width-30, .col-width-70 {
-      width: 100%;
-      margin-right: 0;
-      display: block;
-    }
-
-    .responsive-flex {
-      display: inline;
-    }
-  }
-
-.title-col {
-  height: 40px;
-  display: flex;
-}
-
-.title {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.text-large {
-  display: inline-block;
-  font-size: 18px;
-  margin-bottom: 6px;
-}
-
-.el-card p {
-  margin: 0;
-  color: #777779;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
-}
-
-.col-center {
-  max-width: 420px;
-  margin: auto;
-  margin-top: 100px;
-}
-
 .full-width {
   width: 100%;
-}
-
-.people-card {
-  margin: 20px 10px 10px 0px;
-}
-
-.companies-card {
-  margin: 20px 0px 10px 10px;
-}
-
-.right-button {
-  float: right;
-}
-
-.item {
-  margin: 10px 0;
-}
-
-.item:first-child {
-  margin-top: 0;
-}
-
-.item:last-child {
-  margin-bottom: 0;
 }
 
 .title-loading {
