@@ -1,11 +1,7 @@
 <template>
   <div class="full-height">
     <div class="col-center">
-      <img
-        src="../assets/undraw_people_search.svg"
-        alt
-        class="fit-to-width"
-      />
+      <img class="fit-to-width" src="../assets/undraw_people_search.svg" alt />
       <div class="vertical-spacing">
         <SearchInput :include-button="true" />
       </div>
