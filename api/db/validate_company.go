@@ -74,7 +74,10 @@ func getMotherCompanies(ctx context.Context, companies *models.CompanySlice, res
 
 	for _, company := range *companies {
 
-		motherCompanies, err := company.DaughterCompanyCompanyToCompanies(qm.Load(models.CompanyToCompanyRels.MotherCompany)).All(ctx, DB)
+		motherCompanies, err := company.DaughterCompanyCompanyToCompanies(
+			qm.Load(models.CompanyToCompanyRels.MotherCompany),
+			companyToCompanyFilter,
+		).All(ctx, DB)
 		if err != nil {
 			writeError(err, response, locks)
 			continue
@@ -126,7 +129,7 @@ func getOwners(ctx context.Context, companies *models.CompanySlice, response *in
 	}
 
 	for _, company := range *companies {
-		persons, err := company.CompanyToPeople(qm.Load(models.CompanyToPersonRels.Person)).All(ctx, DB)
+		persons, err := company.CompanyToPeople(qm.Load(models.CompanyToPersonRels.Person), companyToPeopleFilter).All(ctx, DB)
 		if err != nil {
 			writeError(err, response, locks)
 			continue

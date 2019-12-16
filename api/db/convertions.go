@@ -65,12 +65,14 @@ func convertCompany(ctx context.Context, company *models.Company) (interfaces.Co
 		EntityType:   interfaces.COMPANY,
 		CheckStatus:  interfaces.OK,
 	}
-	companyOwners, err := company.DaughterCompanyCompanyToCompanies().All(ctx, DB)
+	companyOwners, err := company.DaughterCompanyCompanyToCompanies(companyToCompanyFilter).All(ctx, DB)
 	noResults := errors.Is(err, sql.ErrNoRows)
 	if err != nil && !noResults {
 		return jsonCompany, err
 	}
-	peopleOwners, err := company.CompanyToPeople().All(ctx, DB)
+
+	peopleOwners, err := company.CompanyToPeople(companyToPeopleFilter).All(ctx, DB)
+
 	noResults = errors.Is(err, sql.ErrNoRows)
 	if err != nil && !noResults {
 		return jsonCompany, err

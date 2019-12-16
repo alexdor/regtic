@@ -12,9 +12,11 @@ import (
 	"github.com/alexdor/regtic/api/handlers"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
+	"github.com/volatiletech/sqlboiler/boil"
 )
 
 func init() {
+	boil.DebugMode = true
 	go Start()
 }
 
