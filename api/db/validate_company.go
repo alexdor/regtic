@@ -74,7 +74,7 @@ func getMotherCompanies(ctx context.Context, companies *models.CompanySlice, res
 
 	for _, company := range *companies {
 
-		motherCompanies, err := company.MotherCompanyCompanyToCompanies(qm.Load(models.CompanyToCompanyRels.MotherCompany)).All(ctx, DB)
+		motherCompanies, err := company.DaughterCompanyCompanyToCompanies(qm.Load(models.CompanyToCompanyRels.MotherCompany)).All(ctx, DB)
 		if err != nil {
 			writeError(err, response, locks)
 			continue
