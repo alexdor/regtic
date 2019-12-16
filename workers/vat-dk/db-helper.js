@@ -26,7 +26,8 @@ function insertPerson(client, person) {
   return client.query(insertPersonQuery, [
     person.firstName,
     person.lastName,
-    person.countryCode
+    person.countryCode,
+    person.address
   ]);
 }
 
