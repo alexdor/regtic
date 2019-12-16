@@ -19,7 +19,7 @@ export default {
         id: "1234-56789-01234-5678",
         address: "Demo Street 1",
         vat: "DK-12345678",
-        country: "Denmark / DK",
+        countryCode: "DK",
         type: "IVS"
       },
       {
@@ -27,7 +27,7 @@ export default {
         id: "2345-56789-01234-5678",
         address: "Demo Street 1",
         vat: "DK-23456789",
-        country: "Denmark / DK",
+        countryCode: "DK",
         type: "IVS"
       },
       {
@@ -35,7 +35,7 @@ export default {
         id: "3456-56789-01234-5678",
         address: "Demo Street 2",
         vat: "DK-34567890",
-        country: "Denmark / DK",
+        countryCode: "DK",
         type: "IVS"
       },
       {
@@ -43,7 +43,7 @@ export default {
         id: "4567-56789-01234-5678",
         address: "Test Street 100",
         vat: "DK-45678901",
-        country: "Denmark / DK",
+        countryCode: "DK",
         type: "IVS"
       },
       {
@@ -51,7 +51,7 @@ export default {
         id: "5678-56789-01234-5678",
         address: "Test Street 100",
         vat: "DK-56789012",
-        country: "Denmark / DK",
+        countryCode: "DK",
         type: "IVS"
       },
       {
@@ -59,7 +59,7 @@ export default {
         id: "6789-56789-01234-5678",
         address: "Demo Blv. 5",
         vat: "DK-67890123",
-        country: "Denmark / DK",
+        countryCode: "DK",
         type: "IVS"
       },
       {
@@ -67,7 +67,7 @@ export default {
         id: "7890-56789-01234-5678",
         address: "DTU Lyngby 101 A",
         vat: "DK-78901234",
-        country: "Denmark / DK",
+        countryCode: "DK",
         type: "IVS"
       }
     ] as Company[];
