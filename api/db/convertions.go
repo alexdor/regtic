@@ -86,8 +86,13 @@ func convertCompany(ctx context.Context, company *models.Company) (interfaces.Co
 			EntityType:   interfaces.PERSON,
 		}
 	}
+	peopleOwnersLength -= 1
+
+	if peopleOwnersLength < 0 {
+		peopleOwnersLength = 0
+	}
 	for i := range companyOwners {
-		ownedBy[peopleOwnersLength-1+i] = interfaces.Relationship{
+		ownedBy[peopleOwnersLength+i] = interfaces.Relationship{
 			EntityID:     companyOwners[i].MotherCompanyID,
 			Relation:     companyOwners[i].Relations,
 			Ownership:    companyOwners[i].Ownership,
