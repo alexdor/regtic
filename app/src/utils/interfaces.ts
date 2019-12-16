@@ -12,8 +12,8 @@ export interface Company extends CommonFields {
   address?: string;
   vat: string;
   startingDate?: string;
-  status?: string;
-  statusNotes?: string;
+  status?: string | null;
+  statusNotes?: string | null;
   type?: string;
 }
 export interface CommonFields {
@@ -21,12 +21,15 @@ export interface CommonFields {
   countryCode: string;
   name: string;
   checkStatus: CheckStatusType;
-  statusType?: BadType;
-  source?: string;
-  ownedBy?: Relationship[];
+  statusType?: BadType | null;
+  source?: string | null;
+  ownedBy?: Relationship[] | null;
   entityType: EntityType;
 }
-export type CompanyJson = Omit<Company, "ownedBy">;
+export type CompanyJson = Omit<
+  Company,
+  "ownedBy" | "checkStatus" | "entityType"
+>;
 export type Person = CommonFields;
 export interface ValidationResponse {
   info: CompanyJson;
