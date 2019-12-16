@@ -4,7 +4,7 @@ import { FindCompaniesData, ValidationResponse } from "./interfaces";
 import mockapi from "./mockapi";
 const UseMockApi = process.env.VUE_APP_USE_MOCK_API;
 const api = axios.create({
-  baseURL: process.env.VUE_APP_API_URL || "http://localhost:3030/",
+  baseURL: process.env.VUE_APP_API_URL || "http://localhost:8090/",
   timeout: 200000,
   headers: {
     "Content-Type": "application/json"

@@ -11,7 +11,9 @@
           :aria-label="data.entityType"
           :title="data.entityType"
         ></div>
-        <span class="title">{{ data.full_name || data.name || "Name not found" }}</span>
+        <span class="title">{{
+          data.full_name || data.name || "Name not found"
+        }}</span>
       </div>
       <StatusIcon
         :status="data.checkStatus"
@@ -153,6 +155,7 @@ $card-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.15);
   font-weight: bold;
   display: inline;
   color: $black;
+  margin: auto;
 }
 
 .flex-row {
@@ -224,7 +227,11 @@ tr td {
   width: 1.5rem;
   height: 1.5rem;
   background-size: contain;
-  margin-right: 1rem;
+  padding-right: 1rem;
+  margin-right: 0.4rem;
+  margin-top: auto;
+  margin-bottom: auto;
+  background-repeat: no-repeat;
 }
 
 .entity-card.COMPANY .entity-type {

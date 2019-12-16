@@ -90,7 +90,11 @@ a:hover {
   width: 1.25rem;
   height: 1.25rem;
   background-size: contain;
-  margin-right: 1rem;
+  padding-right: 1rem;
+  margin-right: 0.4rem;
+  margin-top: auto;
+  margin-bottom: auto;
+  background-repeat: no-repeat;
 }
 
 .beneficiary-list-item.COMPANY .entity-type {
