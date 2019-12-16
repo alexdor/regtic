@@ -22,18 +22,18 @@ export default {
 </script>
 
 <style lang="scss">
-  $footer-height: 76px;
+$footer-height: 76px;
 
-  @import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Poppins&display=swap");
 
-  #app,
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: "Avenir", Helvetica, Arial, sans-serif;
-  }
+#app,
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+}
 
 .el-notification__group {
   width: 230px;
@@ -50,18 +50,19 @@ export default {
 
 /*Override elem.io color on buttons*/
 .el-button--primary {
-  background-color: #1989FA !important;
-  border-color: #1989FA !important;
+  background-color: #1989fa !important;
+  border-color: #1989fa !important;
 }
 
-.el-button--primary:hover, .el-button--primary:focus {
-  background-color: #167BE0 !important;
-  border-color: #167BE0 !important;
+.el-button--primary:hover,
+.el-button--primary:focus {
+  background-color: #167be0 !important;
+  border-color: #167be0 !important;
 }
 
 .el-button--primary[disabled] {
-  background-color: #4FA4F9 !important;
-  border-color: #4FA4F9 !important;
+  background-color: #4fa4f9 !important;
+  border-color: #4fa4f9 !important;
 }
 
 #app,

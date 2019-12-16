@@ -55,7 +55,7 @@
 
 <script lang="ts">
 import { Notification } from "element-ui";
-import api from "@/utils/mockapi";
+import api from "@/utils/api";
 import Footer from "@/components/Footer.vue";
 import Vue from "vue";
 
