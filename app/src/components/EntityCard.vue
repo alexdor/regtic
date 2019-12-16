@@ -11,7 +11,7 @@
           :aria-label="data.entityType"
           :title="data.entityType"
         ></div>
-        <span class="title">{{ data.full_name || data.name }}</span>
+        <span class="title">{{ data.full_name || data.name || "Name not found" }}</span>
       </div>
       <StatusIcon
         :status="data.checkStatus"

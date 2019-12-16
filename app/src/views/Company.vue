@@ -11,7 +11,7 @@
     <div v-if="selectedCompany != null" class="company-info">
       <div class="flex-row row-spacing-bottom-large row-spacing-top-small">
         <div class="company-icon"></div>
-        <div class="header">{{ selectedCompany.data.name }}</div>
+        <div class="header">{{ selectedCompany.data.name || "Name not found" }}</div>
         <el-button type="primary" round class="button-small"
           ><i class="el-icon-plus"></i> Watchlist</el-button
         >

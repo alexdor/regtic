@@ -1,6 +1,6 @@
 <template>
   <router-link class="company-list-item" tag="div" :to="'/company/' + data.id">
-    <span class="title">{{ data.name }}</span>
+    <span class="title">{{ data.name || "Name not found" }}</span>
     <table class="info">
       <tr>
         <td class="key">
