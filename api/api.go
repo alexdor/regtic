@@ -11,6 +11,7 @@ import (
 
 	"github.com/alexdor/regtic/api/handlers"
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 )
 
 func init() {
@@ -60,6 +61,6 @@ func Start() {
 	router := httprouter.New()
 	router.GET("/v2/find_companies", find)
 	router.GET("/v2/validate_company", validate)
-
-	log.Fatal(http.ListenAndServe(":8090", router))
+	handler := cors.Default().Handler(router)
+	log.Fatal(http.ListenAndServe(":8090", handler))
 }
