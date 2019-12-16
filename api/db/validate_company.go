@@ -24,8 +24,8 @@ type validationLocks struct {
 func ValidateCompany(ctx context.Context, id string) (*interfaces.ValidationResponse, error) {
 	company, err := models.Companies(
 		models.CompanyWhere.ID.EQ(id),
-		qm.Load(models.CompanyRels.MotherCompanyCompanyToCompanies),
-		qm.Load(models.CompanyRels.CompanyToPeople),
+		qm.Load(models.CompanyRels.MotherCompanyCompanyToCompanies, companyToCompanyFilter),
+		qm.Load(models.CompanyRels.CompanyToPeople, companyToPeopleFilter),
 		qm.Load(models.CompanyRels.BadCompanies),
 	).One(ctx, DB)
 
@@ -94,8 +94,8 @@ func getMotherCompanies(ctx context.Context, companies *models.CompanySlice, res
 			locks.companyMap[motherCompanies[i].MotherCompanyID] = struct{}{}
 			locks.companiesMapMutex.Unlock()
 			motherCompanies, err := motherCompanies[i].MotherCompany(
-				qm.Load(models.CompanyRels.MotherCompanyCompanyToCompanies),
-				qm.Load(models.CompanyRels.CompanyToPeople),
+				qm.Load(models.CompanyRels.MotherCompanyCompanyToCompanies, companyToCompanyFilter),
+				qm.Load(models.CompanyRels.CompanyToPeople, companyToPeopleFilter),
 				qm.Load(models.CompanyRels.BadCompanies),
 			).All(ctx, DB)
 			if err != nil {
