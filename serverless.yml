@@ -40,6 +40,8 @@ custom:
   ORIGIN:
     development: "http://localhost:8080"
     production: "https://demo.regtic.com"
+    beta: "https://dev--affectionate-swartz-baae10.netlify.com"
+
   pythonRequirements:
     dockerizePip: true
     slim: true
@@ -143,7 +145,7 @@ functions:
     environment:
       ENVIONMENT: ${self:custom.ENVIRONMENT}
       REGTIC_DATABASE_URL: ${self:custom.REGTIC_DATABASE_URL}
-      ORIGIN: ${self:custom.ORIGIN.${self:custom.ENVIRONMENT}}
+      ORIGIN: ${self:custom.ORIGIN.${self:provider.stage}}
 
   signup:
     runtime: nodejs12.x
@@ -160,4 +162,4 @@ functions:
       ENVIONMENT: ${self:custom.ENVIRONMENT}
       NODE_ENV: ${self:custom.ENVIRONMENT}
       SLACK_WEBHOOK_URL: ${env:SLACK_WEBHOOK_URL}
-      ORIGIN: ${self:custom.ORIGIN.${self:custom.ENVIRONMENT}}
+      ORIGIN: ${self:custom.ORIGIN.${self:provider.stage}}
