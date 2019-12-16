@@ -13,6 +13,8 @@ provider:
   endpointType: regional
   stage: beta
   minimumCompressionSize: 1024
+  apiGateway:
+    minimumCompressionSize: 1024
   timeout: 30
 
 package:
