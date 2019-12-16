@@ -1,7 +1,14 @@
+const { get } = require("lodash");
+
 function addressToString(address) {
-  return `${address.postnummer} ${address.postdistrikt} ${
-    address.vejnavn
-  } ${address.husnummerFra || ""} ${address.bogstavFra || ""}`.trim();
+  const aggregatedAddress = [
+    `${get(address, "postnummer") || ""}`,
+    `${get(address, "postdistrikt" || "")}`,
+    `${get(address, "vejnavn") || ""}`,
+    `${get(address, "husnummerFra") || ""}`,
+    `${get(address, "bogstavFra") || ""}`
+  ];
+  return aggregatedAddress.join(" ").trim();
 }
 
 function getName(entity) {
@@ -34,7 +41,8 @@ function parsePerson(person) {
       .split(" ")
       .slice(-1)
       .join(" "),
-    countryCode: getCountryCode(person)
+    countryCode: getCountryCode(person),
+    address: addressToString(person.beliggenhedsadresse[0])
   };
 }
 
