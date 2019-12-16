@@ -1,5 +1,5 @@
 <template>
-  <div class="full-height flex-vertical">
+  <div v-loading="loading" class="full-height flex-vertical">
     <div class="canvas-scroll">
       <div class="canvas">
         <div class="view-mode">
@@ -98,6 +98,7 @@ export default {
     const PERSON = "PERSON";
 
     const companyId = this.$route.params.id;
+    this.loading = true;
     this.result = await api.validateCompany(companyId);
 
     const companyGrid = [];
@@ -113,7 +114,7 @@ export default {
     const companyCardClosedHeightCenter = 31;
 
     const people = this.result.people || [];
-    this.entities.push(this.result.info);
+    // this.entities.push(this.result.info);
     this.entities.push(...(this.result.companies || []));
     this.entities.push(...people);
 
@@ -133,7 +134,7 @@ export default {
       this.result.companies,
       companyGrid,
       visitedCompanies,
-      this.result.info,
+      this.result.companies.find(company => company.id === this.result.info.id),
       0
     );
     let maxHeight = 0;
@@ -268,6 +269,7 @@ export default {
 
     canvas.style.width = canvasWidth + "px";
     //canvas.style.height = canvasHeight + "px";
+    this.loading = false;
   },
   methods: {
     entityById(id) {
