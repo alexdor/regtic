@@ -16,6 +16,7 @@
 
 <script lang="ts">
 import api from "@/utils/api";
+import { Company } from "@/utils/interfaces";
 import { Component, Vue } from "vue-property-decorator";
 import SearchInput from "@/components/SearchInput.vue";
 import CompanyListItem from "@/components/CompanyListItem.vue";
@@ -31,7 +32,7 @@ import { VclTable } from "vue-content-loading";
 export default class SelectCompany extends Vue {
   loading = true;
   initialSearchStr = "";
-  results: { name: string; id: string; address: string; vat: string }[] = [];
+  results: Company[] = [];
 
   created() {
     this.initialSearchStr = this.$route.params.name;
@@ -40,7 +41,7 @@ export default class SelectCompany extends Vue {
 
   async search(searchStr: string) {
     this.loading = true;
-    this.results = await api.findCompanies(searchStr);
+    this.results = (await api.findCompanies(searchStr)) || [];
     this.loading = false;
   }
 }

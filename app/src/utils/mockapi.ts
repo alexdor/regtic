@@ -1,6 +1,10 @@
 /* eslint-disable */
 
-import { ApiResponsePersonInfo, ValidationResponse } from "./interfaces";
+import {
+  ApiResponsePersonInfo,
+  Company,
+  ValidationResponse
+} from "./interfaces";
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -66,7 +70,7 @@ export default {
         country: "Denmark / DK",
         type: "IVS"
       }
-    ];
+    ] as Company[];
   },
   async validateCompany(id: string) {
     await sleep(300);
