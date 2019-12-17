@@ -25,7 +25,6 @@ import (
 // Company is an object representing the database table.
 type Company struct {
 	ID           string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Address      null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
 	Vat          string      `boil:"vat" json:"vat" toml:"vat" yaml:"vat"`
 	StartingDate null.String `boil:"starting_date" json:"startingDate,omitempty" toml:"startingDate" yaml:"startingDate,omitempty"`
 	CountryCode  string      `boil:"country_code" json:"countryCode" toml:"countryCode" yaml:"countryCode"`
@@ -36,6 +35,11 @@ type Company struct {
 	StatusNotes  null.String `boil:"status_notes" json:"statusNotes,omitempty" toml:"statusNotes" yaml:"statusNotes,omitempty"`
 	NameVector   null.String `boil:"name_vector" json:"nameVector,omitempty" toml:"nameVector" yaml:"nameVector,omitempty"`
 	Type         null.String `boil:"type" json:"type,omitempty" toml:"type" yaml:"type,omitempty"`
+	Street       null.String `boil:"street" json:"street,omitempty" toml:"street" yaml:"street,omitempty"`
+	Region       null.String `boil:"region" json:"region,omitempty" toml:"region" yaml:"region,omitempty"`
+	ZipCode      null.String `boil:"zip_code" json:"zipCode,omitempty" toml:"zipCode" yaml:"zipCode,omitempty"`
+	City         null.String `boil:"city" json:"city,omitempty" toml:"city" yaml:"city,omitempty"`
+	Address      null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
 
 	R *companyR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L companyL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -43,7 +47,6 @@ type Company struct {
 
 var CompanyColumns = struct {
 	ID           string
-	Address      string
 	Vat          string
 	StartingDate string
 	CountryCode  string
@@ -54,9 +57,13 @@ var CompanyColumns = struct {
 	StatusNotes  string
 	NameVector   string
 	Type         string
+	Street       string
+	Region       string
+	ZipCode      string
+	City         string
+	Address      string
 }{
 	ID:           "id",
-	Address:      "address",
 	Vat:          "vat",
 	StartingDate: "starting_date",
 	CountryCode:  "country_code",
@@ -67,13 +74,17 @@ var CompanyColumns = struct {
 	StatusNotes:  "status_notes",
 	NameVector:   "name_vector",
 	Type:         "type",
+	Street:       "street",
+	Region:       "region",
+	ZipCode:      "zip_code",
+	City:         "city",
+	Address:      "address",
 }
 
 // Generated where
 
 var CompanyWhere = struct {
 	ID           whereHelperstring
-	Address      whereHelpernull_String
 	Vat          whereHelperstring
 	StartingDate whereHelpernull_String
 	CountryCode  whereHelperstring
@@ -84,9 +95,13 @@ var CompanyWhere = struct {
 	StatusNotes  whereHelpernull_String
 	NameVector   whereHelpernull_String
 	Type         whereHelpernull_String
+	Street       whereHelpernull_String
+	Region       whereHelpernull_String
+	ZipCode      whereHelpernull_String
+	City         whereHelpernull_String
+	Address      whereHelpernull_String
 }{
 	ID:           whereHelperstring{field: "\"companies\".\"id\""},
-	Address:      whereHelpernull_String{field: "\"companies\".\"address\""},
 	Vat:          whereHelperstring{field: "\"companies\".\"vat\""},
 	StartingDate: whereHelpernull_String{field: "\"companies\".\"starting_date\""},
 	CountryCode:  whereHelperstring{field: "\"companies\".\"country_code\""},
@@ -97,6 +112,11 @@ var CompanyWhere = struct {
 	StatusNotes:  whereHelpernull_String{field: "\"companies\".\"status_notes\""},
 	NameVector:   whereHelpernull_String{field: "\"companies\".\"name_vector\""},
 	Type:         whereHelpernull_String{field: "\"companies\".\"type\""},
+	Street:       whereHelpernull_String{field: "\"companies\".\"street\""},
+	Region:       whereHelpernull_String{field: "\"companies\".\"region\""},
+	ZipCode:      whereHelpernull_String{field: "\"companies\".\"zip_code\""},
+	City:         whereHelpernull_String{field: "\"companies\".\"city\""},
+	Address:      whereHelpernull_String{field: "\"companies\".\"address\""},
 }
 
 // CompanyRels is where relationship names are stored.
@@ -129,8 +149,8 @@ func (*companyR) NewStruct() *companyR {
 type companyL struct{}
 
 var (
-	companyAllColumns            = []string{"id", "address", "vat", "starting_date", "country_code", "updated_at", "created_at", "name", "status", "status_notes", "name_vector", "type"}
-	companyColumnsWithoutDefault = []string{"address", "vat", "starting_date", "name", "status", "status_notes", "name_vector", "type"}
+	companyAllColumns            = []string{"id", "vat", "starting_date", "country_code", "updated_at", "created_at", "name", "status", "status_notes", "name_vector", "type", "street", "region", "zip_code", "city", "address"}
+	companyColumnsWithoutDefault = []string{"vat", "starting_date", "name", "status", "status_notes", "name_vector", "type", "street", "region", "zip_code", "city", "address"}
 	companyColumnsWithDefault    = []string{"id", "country_code", "updated_at", "created_at"}
 	companyPrimaryKeyColumns     = []string{"id"}
 )

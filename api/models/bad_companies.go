@@ -596,7 +596,7 @@ func (badCompanyL) LoadCompanies(ctx context.Context, e boil.ContextExecutor, si
 		one := new(Company)
 		var localJoinCol string
 
-		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &one.Type, &localJoinCol)
+		err = results.Scan(&one.ID, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &one.Type, &one.Street, &one.Region, &one.ZipCode, &one.City, &one.Address, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for companies")
 		}

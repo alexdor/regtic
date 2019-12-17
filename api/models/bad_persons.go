@@ -329,7 +329,7 @@ func (badPersonL) LoadPersons(ctx context.Context, e boil.ContextExecutor, singu
 		one := new(Person)
 		var localJoinCol string
 
-		err = results.Scan(&one.ID, &one.FirstName, &one.LastName, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.NameVector, &one.FullName, &localJoinCol)
+		err = results.Scan(&one.ID, &one.FirstName, &one.LastName, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.NameVector, &one.FullName, &one.Street, &one.Region, &one.ZipCode, &one.City, &one.Address, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for persons")
 		}
