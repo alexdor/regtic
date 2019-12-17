@@ -5,7 +5,7 @@ const fs = require("fs");
 
 const GREEN = "\x1b[32m";
 const RED = "\x1b[31m";
-
+const ADD_DELAY = process.env.ADD_DELAY;
 const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
 
 const file = fs.readFileSync("../serverless.yml", "utf8");
@@ -15,6 +15,12 @@ const localApi = axios.create({
   timeout: 200000
 });
 
+function sleep(ms) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
+}
+let breakCounter = 0;
 async function cvrWorker() {
   let counter = 0;
   let scrollId;
@@ -25,7 +31,7 @@ async function cvrWorker() {
       console.log(
         GREEN,
         "cvr worker:",
-        "page:",
+        "parsing page:",
         ++counter,
         "more pages:",
         keepGoing
@@ -33,9 +39,13 @@ async function cvrWorker() {
       const { data } = await localApi.post("cvr-parse", { scrollId });
       scrollId = data.scrollId;
       keepGoing = data.hitListLength === 200;
+      if (ADD_DELAY) sleep(1000);
     } catch (error) {
       console.error(RED, error);
-      break;
+      if (breakCounter > 4) break;
+      breakCounter++;
+      counter--;
+      sleep(10000);
     }
   }
 }
@@ -54,5 +64,4 @@ async function seed() {
     worker("pepworker")
   ]);
 }
-
 seed();
