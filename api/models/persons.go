@@ -32,6 +32,11 @@ type Person struct {
 	CreatedAt   time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	NameVector  null.String `boil:"name_vector" json:"nameVector,omitempty" toml:"nameVector" yaml:"nameVector,omitempty"`
 	FullName    null.String `boil:"full_name" json:"fullName,omitempty" toml:"fullName" yaml:"fullName,omitempty"`
+	Street      null.String `boil:"street" json:"street,omitempty" toml:"street" yaml:"street,omitempty"`
+	Region      null.String `boil:"region" json:"region,omitempty" toml:"region" yaml:"region,omitempty"`
+	ZipCode     null.String `boil:"zip_code" json:"zipCode,omitempty" toml:"zipCode" yaml:"zipCode,omitempty"`
+	City        null.String `boil:"city" json:"city,omitempty" toml:"city" yaml:"city,omitempty"`
+	Address     null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
 
 	R *personR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L personL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -46,6 +51,11 @@ var PersonColumns = struct {
 	CreatedAt   string
 	NameVector  string
 	FullName    string
+	Street      string
+	Region      string
+	ZipCode     string
+	City        string
+	Address     string
 }{
 	ID:          "id",
 	FirstName:   "first_name",
@@ -55,6 +65,11 @@ var PersonColumns = struct {
 	CreatedAt:   "created_at",
 	NameVector:  "name_vector",
 	FullName:    "full_name",
+	Street:      "street",
+	Region:      "region",
+	ZipCode:     "zip_code",
+	City:        "city",
+	Address:     "address",
 }
 
 // Generated where
@@ -68,6 +83,11 @@ var PersonWhere = struct {
 	CreatedAt   whereHelpertime_Time
 	NameVector  whereHelpernull_String
 	FullName    whereHelpernull_String
+	Street      whereHelpernull_String
+	Region      whereHelpernull_String
+	ZipCode     whereHelpernull_String
+	City        whereHelpernull_String
+	Address     whereHelpernull_String
 }{
 	ID:          whereHelperstring{field: "\"persons\".\"id\""},
 	FirstName:   whereHelpernull_String{field: "\"persons\".\"first_name\""},
@@ -77,6 +97,11 @@ var PersonWhere = struct {
 	CreatedAt:   whereHelpertime_Time{field: "\"persons\".\"created_at\""},
 	NameVector:  whereHelpernull_String{field: "\"persons\".\"name_vector\""},
 	FullName:    whereHelpernull_String{field: "\"persons\".\"full_name\""},
+	Street:      whereHelpernull_String{field: "\"persons\".\"street\""},
+	Region:      whereHelpernull_String{field: "\"persons\".\"region\""},
+	ZipCode:     whereHelpernull_String{field: "\"persons\".\"zip_code\""},
+	City:        whereHelpernull_String{field: "\"persons\".\"city\""},
+	Address:     whereHelpernull_String{field: "\"persons\".\"address\""},
 }
 
 // PersonRels is where relationship names are stored.
@@ -103,8 +128,8 @@ func (*personR) NewStruct() *personR {
 type personL struct{}
 
 var (
-	personAllColumns            = []string{"id", "first_name", "last_name", "country_code", "updated_at", "created_at", "name_vector", "full_name"}
-	personColumnsWithoutDefault = []string{"first_name", "last_name", "name_vector", "full_name"}
+	personAllColumns            = []string{"id", "first_name", "last_name", "country_code", "updated_at", "created_at", "name_vector", "full_name", "street", "region", "zip_code", "city", "address"}
+	personColumnsWithoutDefault = []string{"first_name", "last_name", "name_vector", "full_name", "street", "region", "zip_code", "city", "address"}
 	personColumnsWithDefault    = []string{"id", "country_code", "updated_at", "created_at"}
 	personPrimaryKeyColumns     = []string{"id"}
 )
