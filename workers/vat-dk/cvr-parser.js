@@ -1,14 +1,19 @@
 const { get } = require("lodash");
 
-function addressToString(address) {
-  const aggregatedAddress = [
-    `${get(address, "postnummer") || ""}`,
-    `${get(address, "postdistrikt" || "")}`,
-    `${get(address, "vejnavn") || ""}`,
-    `${get(address, "husnummerFra") || ""}`,
-    `${get(address, "bogstavFra") || ""}`
-  ];
-  return aggregatedAddress.join(" ").trim();
+function addressToString(address, countryCode) {
+  return {
+    zipCode: get(address, "postnummer"),
+    region: null,
+    street: [
+      get(address, "vejnavn") || "",
+      get(address, "husnummerFra") || "",
+      get(address, "bogstavFra") || ""
+    ]
+      .join(" ")
+      .trim(),
+    city: get(address, "postdistrikt"),
+    countryCode: countryCode || get(address, "landekode", "ZZ")
+  };
 }
 
 function getName(entity) {
@@ -28,7 +33,7 @@ function getCountryCode(entity) {
   const entityLocationObj = entity.beliggenhedsadresse.find(
     ba => !ba.periode.gyldigTil
   );
-  return entityLocationObj ? entityLocationObj.landekode : "ZZ";
+  return (entityLocationObj || {}).landekode;
 }
 
 function parsePerson(person) {
@@ -41,31 +46,39 @@ function parsePerson(person) {
       .split(" ")
       .slice(-1)
       .join(" "),
-    countryCode: getCountryCode(person),
-    address: addressToString(person.beliggenhedsadresse[0])
+    ...addressToString(person.beliggenhedsadresse[0], getCountryCode(person))
   };
 }
 
 function parseMotherCompany(motherCompany) {
   return {
     name: getName(motherCompany),
-    address: addressToString(motherCompany.beliggenhedsadresse[0]),
-    countryCode: getCountryCode(motherCompany),
+    ...addressToString(
+      motherCompany.beliggenhedsadresse[0],
+      getCountryCode(motherCompany)
+    ),
     vat: "DK-" + motherCompany.forretningsnoegle,
     startingDate: motherCompany.sidstOpdateret
   };
 }
 
 function parseCompany(company) {
+  const countryCode = get(
+    company,
+    "virksomhedMetadata.nyesteBeliggenhedsadresse.landekode"
+  );
   return {
     name: getCompanyName(company),
-    address: addressToString(
-      company.virksomhedMetadata.nyesteBeliggenhedsadresse
+    ...addressToString(
+      company.virksomhedMetadata.nyesteBeliggenhedsadresse,
+      countryCode
     ),
-    countryCode: company.virksomhedMetadata.nyesteBeliggenhedsadresse.landekode,
     vat: "DK-" + company.cvrNummer.toString().padStart(8, "0"),
-    startingDate: company.virksomhedMetadata.stiftelsesDato,
-    type: company.virksomhedMetadata.nyesteVirksomhedsform.kortBeskrivelse
+    startingDate: get(company, "virksomhedMetadata.stiftelsesDato"),
+    type: get(
+      company,
+      "virksomhedMetadata.nyesteVirksomhedsform.kortBeskrivelse"
+    )
   };
 }
 
