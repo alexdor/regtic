@@ -33,6 +33,7 @@ func convertPerson(ctx context.Context, person *models.Person) (interfaces.Perso
 		Name:        person.FullName,
 		EntityType:  interfaces.PERSON,
 		CheckStatus: interfaces.OK,
+		Address:     person.Address,
 	}
 	badPerson, err := models.BadPersons(
 		qm.Select(badPersonSelect),
