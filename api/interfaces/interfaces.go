@@ -10,7 +10,7 @@ type Response events.APIGatewayProxyResponse
 
 type CompanyJson struct {
 	ID           string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Address      null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
+	Address      null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address"`
 	Vat          string      `boil:"vat" json:"vat" toml:"vat" yaml:"vat"`
 	StartingDate null.String `boil:"startingDate" json:"startingDate,omitempty" toml:"startingDate" yaml:"startingDate,omitempty"`
 	CountryCode  string      `boil:"countryCode" json:"countryCode,omitempty" toml:"countryCode" yaml:"countryCode,omitempty"`
@@ -31,6 +31,7 @@ type Person struct {
 	Source      null.String     `json:"source" toml:"source" yaml:"source"`
 	OwnedBy     []Relationship  `json:"ownedBy" toml:"ownedBy" yaml:"ownedBy"`
 	EntityType  EntityTypeEnum  `json:"entityType" toml:"entityType" yaml:"entityType"`
+	Address     null.String     `boil:"address" json:"address,omitempty" toml:"address" yaml:"address"`
 }
 type People []Person
 type Company struct {
