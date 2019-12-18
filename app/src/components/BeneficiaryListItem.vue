@@ -1,13 +1,13 @@
 <template>
-  <tr :class="'beneficiary-list-item ' + entity.entityType">
+  <tr :class="'beneficiary-list-item ' + entityType">
     <td class="value">
       <div
         class="entity-type"
-        :title="entity.entityType"
-        :aria-label="entity.entityType"
+        :title="entityType"
+        :aria-label="entityType"
       ></div>
       <router-link
-        :to="'/' + entity.entityType.toLowerCase() + '/' + entity.id + '/info'"
+        :to="'/' + entityType.toLowerCase() + '/' + entity.id + '/info'"
         >{{ entity.name }}</router-link
       >
     </td>
@@ -31,27 +31,35 @@
   </tr>
 </template>
 
-<script>
+<script lang="ts">
 import StatusIcon from "@/components/StatusIcon.vue";
+import Vue from "vue";
 
-export default {
+export default Vue.extend({
   components: {
     StatusIcon
   },
   props: {
     entity: {
-      type: Object
+      type: Object,
+      required: true
     },
     relation: {
-      type: Object
+      type: Object,
+      required: true
+    }
+  },
+  computed: {
+    entityType() {
+      return (this.entity || {}).entityType || "";
     }
   },
   methods: {
-    percent(value) {
+    percent(value: number) {
       return Math.round(value * 100) + "%";
     }
   }
-};
+});
 </script>
 
 <style lang="scss" scoped>
