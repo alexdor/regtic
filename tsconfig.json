@@ -13,6 +13,8 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
     "noImplicitThis": true,
     "lib": ["esnext", "scripthost"]
   },

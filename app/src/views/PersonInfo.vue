@@ -101,15 +101,16 @@
 </template>
 
 <script>
-//import Vue from "vue";
+import Vue from "vue";
 import api from "@/utils/api";
 import CompanyRelationListItem from "@/components/CompanyRelationListItem.vue";
 import DetectedListItem from "@/components/DetectedListItem.vue";
 import StatusIcon from "@/components/StatusIcon.vue";
 import StatusBar from "@/components/StatusBar.vue";
-import store from "@/store";
+import { getCountry } from "@/utils/countries";
+import { ENTITY_STATUS } from "@/enums/enums";
 
-export default {
+export default Vue.extend({
   components: {
     CompanyRelationListItem,
     DetectedListItem,
@@ -137,16 +138,15 @@ export default {
   async mounted() {
     const personId = this.$route.params.id;
     this.result = await api.getPerson(personId);
-    console.log(this.result);
 
     this.status.ok = this.result.owns.filter(
-      entity => entity.checkStatus == "OK"
+      entity => entity.checkStatus == ENTITY_STATUS.OK
     ).length;
     this.status.warning = this.result.owns.filter(
-      entity => entity.checkStatus == "WARNING"
+      entity => entity.checkStatus == ENTITY_STATUS.WARNING
     ).length;
     this.status.issue = this.result.owns.filter(
-      entity => entity.checkStatus == "ISSUE"
+      entity => entity.checkStatus == ENTITY_STATUS.ISSUE
     ).length;
 
     this.loading = false;
@@ -155,15 +155,9 @@ export default {
     entityById(id) {
       return this.entities.find(entity => entity.id == id);
     },
-    getCountry(code) {
-      const found = store.state.countries.filter(
-        entry => entry.alpha2Code == code
-      );
-      if (found.length > 0) return found[0].name + " / " + code;
-      else return "Unknown / ZZ";
-    }
+    getCountry
   }
-};
+});
 </script>
 
 <style scoped lang="scss">
