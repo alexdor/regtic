@@ -96,7 +96,7 @@ import api from "@/utils/api";
 import BeneficiaryListItem from "@/components/BeneficiaryListItem.vue";
 import StatusIcon from "@/components/StatusIcon.vue";
 import StatusBar from "@/components/StatusBar.vue";
-import store from "@/store";
+import { getCountry } from "@/utils/countries";
 
 export default {
   components: {
@@ -154,13 +154,7 @@ export default {
     entityById(id) {
       return this.entities.find(entity => entity.id == id);
     },
-    getCountry(code) {
-      const found = store.state.countries.filter(
-        entry => entry.alpha2Code == code
-      );
-      if (found.length > 0) return found[0].name + " / " + code;
-      else return "Unknown / ZZ";
-    }
+    getCountry
   }
 };
 </script>

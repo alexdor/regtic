@@ -11,7 +11,9 @@
     <div v-if="selectedCompany != null" class="company-info">
       <div class="flex-row row-spacing-bottom-large row-spacing-top-small">
         <div class="company-icon"></div>
-        <div class="header">{{ selectedCompany.data.name || "Name not found" }}</div>
+        <div class="header">
+          {{ selectedCompany.data.name || "Name not found" }}
+        </div>
         <el-button type="primary" round class="button-small"
           ><i class="el-icon-plus"></i> Watchlist</el-button
         >
@@ -66,9 +68,9 @@ import api from "@/utils/api";
 import EntityCard from "@/components/EntityCard.vue";
 import LineCurve from "@/components/LineCurve.vue";
 import BeneficiaryListItem from "@/components/BeneficiaryListItem.vue";
-import store from "@/store";
-
-export default {
+import { ENTITY_TYPE, ENTITY_STATUS, CARD_STATUS } from "@/enums/enums";
+import { getCountry } from "@/utils/countries";
+export default Vue.extend({
   components: {
     BeneficiaryListItem
   },
@@ -76,9 +78,9 @@ export default {
     return {
       expanded: "collapsed",
       result: {},
-      companyCards: [],
       cards: [],
       entities: [],
+      idToIndex: {},
       selectedCompany: null,
       loading: false
     };
@@ -86,16 +88,12 @@ export default {
   watch: {
     expanded: {
       handler(val) {
-        if (val.length > 0) this.setAllExpanded(val == "expanded");
+        if (val.length > 0) this.setAllExpanded(val === CARD_STATUS.EXPANDED);
       }
     }
   },
   async mounted() {
-    console.log(this, this.$el);
     const canvas = this.$el.querySelector(".canvas");
-
-    const COMPANY = "COMPANY";
-    const PERSON = "PERSON";
 
     const companyId = this.$route.params.id;
     this.loading = true;
@@ -114,126 +112,73 @@ export default {
     const companyCardClosedHeightCenter = 31;
 
     const people = this.result.people || [];
-    // this.entities.push(this.result.info);
     this.entities.push(...(this.result.companies || []));
     this.entities.push(...people);
 
-    this.entities.forEach(
-      entity => (entity.checkStatus = entity.checkStatus || "OK")
-    );
-    this.entities.forEach(entity => {
-      if (entity.checkStatus != "OK" && entity.source == undefined) {
+    this.entities.forEach((entity, i) => {
+      this.idToIndex[entity.id] = i;
+      entity.checkStatus = entity.checkStatus || ENTITY_STATUS.OK;
+      if (entity.checkStatus !== ENTITY_STATUS.OK && !entity.source) {
         entity.statusNotes =
           entity.statusNotes || "Inherited from beneficiaries";
       }
     });
 
-    console.log(this.entities, people);
-
     this.mapCompaniesToGrid(
       this.result.companies,
       companyGrid,
       visitedCompanies,
-      this.result.companies.find(company => company.id === this.result.info.id),
+      this.entityById(this.result.info.id),
       0
     );
     let maxHeight = 0;
     for (let depth = 0; depth < companyGrid.length; depth++)
       maxHeight = Math.max(maxHeight, companyGrid[depth].length);
 
-    for (let depth = 0; depth < companyGrid.length; depth++) {
-      for (let i = 0; i < companyGrid[depth].length; i++)
-        companyGrid[depth][i].y =
-          maxHeight * 0.5 * companyCardHeightBase +
-          (i - (companyGrid[depth].length - 1) * 0.5) * companyCardHeightBase;
-    }
-
-    for (let i = 0; i < people.length; i++) {
-      people[i].x = 220 + companyGrid.length * 450;
-      people[i].y = 10 + i * personCardHeightBase;
-    }
+    people.forEach((person, i) => {
+      person.x = 220 + companyGrid.length * 450;
+      person.y = 10 + i * personCardHeightBase;
+    });
 
     const EntityCardClass = Vue.extend(EntityCard);
     const LineCurveClass = Vue.extend(LineCurve);
 
     for (let depth = 0; depth < companyGrid.length; depth++) {
       for (let i = 0; i < companyGrid[depth].length; i++) {
-        const company = companyGrid[depth][i];
-        if (!company || !company.ownedBy) continue;
-        for (let ei = 0; ei < company.ownedBy.length; ei++) {
-          const otherCompany = this.entityById(company.ownedBy[ei].id);
-          if (otherCompany != undefined && otherCompany.entityType == COMPANY) {
-            const line = new LineCurveClass({
-              propsData: {
-                x1: company.x + companyCardWidth - 10,
-                y1: company.y + companyCardClosedHeightCenter,
-                x2: otherCompany.x + 10,
-                y2: otherCompany.y + companyCardClosedHeightCenter,
-                xWeight1: 0.5,
-                xWeight2: 0.5
-              }
-            });
-            line.$mount();
-            canvas.append(line.$el);
-          }
-          const person = this.entityById(company.ownedBy[ei].id);
-          if (person != undefined && person.entityType == PERSON) {
-            const line = new LineCurveClass({
-              propsData: {
-                x1: company.x + companyCardWidth - 10,
-                y1: company.y + companyCardClosedHeightCenter,
-                x2: person.x + 10,
-                y2: person.y + companyCardClosedHeightCenter,
-                xWeight1: 0.95,
-                xWeight2: 0.75
-              }
-            });
-            line.$mount();
-            canvas.append(line.$el);
-          }
-        }
+        companyGrid[depth][i].y =
+          maxHeight * 0.5 * companyCardHeightBase +
+          (i - (companyGrid[depth].length - 1) * 0.5) * companyCardHeightBase;
       }
     }
-
-    // Makes sure the radio toggles matches the current view mode.
-    const updateViewMode = () => {
-      if (this.cards.every(card => card.openState)) this.expanded = "expanded";
-      else if (this.cards.every(card => !card.openState))
-        this.expanded = "collapsed";
-      else this.expanded = "";
-    };
 
     for (let depth = 0; depth < companyGrid.length; depth++) {
       for (let i = 0; i < companyGrid[depth].length; i++) {
-        const card = new EntityCardClass({
-          propsData: {
-            data: companyGrid[depth][i],
-            open: companyGrid[depth][i].open,
-            x: companyGrid[depth][i].x,
-            y: companyGrid[depth][i].y
-          }
-        });
-        card.$parent = this;
-        card.$mount();
-        canvas.append(card.$el);
-        this.cards.push(card);
-        this.companyCards.push(card);
+        const company = companyGrid[depth][i];
 
-        this.$watch(
-          "cards." + (this.cards.length - 1) + ".openState",
-          updateViewMode
-        );
+        if (!company || !company.ownedBy) continue;
+        for (let ei = 0; ei < company.ownedBy.length; ei++) {
+          const entity = this.entityById(company.ownedBy[ei].id);
+          if (!entity) continue;
+          const isCompany = entity.entityType === ENTITY_TYPE.COMPANY;
+          const line = new LineCurveClass({
+            propsData: {
+              x1: company.x + companyCardWidth - 10,
+              y1: company.y + companyCardClosedHeightCenter,
+              x2: entity.x + 10,
+              y2: entity.y + companyCardClosedHeightCenter,
+              xWeight1: isCompany ? 0.5 : 0.95,
+              xWeight2: isCompany ? 0.5 : 0.75
+            }
+          });
+          line.$mount();
+          canvas.append(line.$el);
+        }
       }
     }
 
-    for (let i = 0; i < people.length; i++) {
+    const generateEntityCard = propsData => {
       const card = new EntityCardClass({
-        propsData: {
-          data: people[i],
-          open: people[i].open,
-          x: people[i].x,
-          y: people[i].y
-        }
+        propsData
       });
       card.$parent = this;
       card.$mount();
@@ -241,9 +186,29 @@ export default {
       this.cards.push(card);
 
       this.$watch(
-        "cards." + (this.cards.length - 1) + ".openState",
-        updateViewMode
+        `cards.${this.cards.length - 1}.openState`,
+        this.updateViewMode
       );
+    };
+
+    for (let depth = 0; depth < companyGrid.length; depth++) {
+      for (let i = 0; i < companyGrid[depth].length; i++) {
+        generateEntityCard({
+          data: companyGrid[depth][i],
+          open: companyGrid[depth][i].open,
+          x: companyGrid[depth][i].x,
+          y: companyGrid[depth][i].y
+        });
+      }
+    }
+
+    for (let i = 0; i < people.length; i++) {
+      generateEntityCard({
+        data: people[i],
+        open: people[i].open,
+        x: people[i].x,
+        y: people[i].y
+      });
     }
 
     let canvasWidth = 300;
@@ -252,7 +217,7 @@ export default {
       canvasWidth = Math.max(
         canvasWidth,
         this.cards[i].x +
-          (this.cards[i].entityType == PERSON
+          (this.cards[i].entityType === ENTITY_TYPE.PERSON
             ? personCardWidthBase
             : companyCardWidthBase) +
           32
@@ -260,25 +225,30 @@ export default {
       canvasHeight = Math.max(
         canvasHeight,
         this.cards[i].y +
-          (this.cards[i].entityType == PERSON
+          (this.cards[i].entityType === ENTITY_TYPE.PERSON
             ? personCardHeightBase
             : companyCardHeightBase) +
           32
       );
     }
 
-    canvas.style.width = canvasWidth + "px";
-    //canvas.style.height = canvasHeight + "px";
+    canvas.style.width = `${canvasWidth}px`;
     this.loading = false;
   },
   methods: {
     entityById(id) {
-      return this.entities.find(entity => entity.id == id);
+      return this.entities[this.idToIndex[id]];
+    },
+    // Makes sure the radio toggles matches the current view mode.
+    updateViewMode() {
+      if (this.cards.every(card => card.openState))
+        this.expanded = CARD_STATUS.EXPANDED;
+      else if (this.cards.every(card => !card.openState))
+        this.expanded = CARD_STATUS.COLLAPSED;
+      else this.expanded = "";
     },
     // Recursively scans and maps companies into a 2D array, and avoids recursive loops.
     mapCompaniesToGrid(companies, grid, visited, company, depth) {
-      const COMPANY = "COMPANY";
-
       if (company.id in visited) return;
       grid[depth] = grid[depth] || [];
       grid[depth].push(company);
@@ -287,7 +257,7 @@ export default {
       if (!company || !company.ownedBy) return;
       for (let i = 0; i < company.ownedBy.length; i++) {
         const otherCompany = this.entityById(company.ownedBy[i].id);
-        if (otherCompany != undefined && otherCompany.entityType == COMPANY)
+        if ((otherCompany || {}).entityType === ENTITY_TYPE.COMPANY)
           this.mapCompaniesToGrid(
             companies,
             grid,
@@ -297,28 +267,20 @@ export default {
           );
       }
     },
-    getCountry(code) {
-      const found = store.state.countries.filter(
-        entry => entry.alpha2Code == code
-      );
-      if (found.length > 0) return found[0].name + " / " + code;
-      else return "Unknown / ZZ";
-    },
+    getCountry,
     // Callback for when 'expanded' is either expanded/collapsed, to toggle all cards.
     setAllExpanded(expanded) {
-      for (let i = 0; i < this.cards.length; i++) this.cards[i].open = expanded;
+      this.cards.forEach(card => (card.open = expanded));
     },
     entityCardSelected(card) {
-      const COMPANY = "COMPANY";
-
-      if (card.data.entityType == COMPANY) {
+      if (card.data.entityType === ENTITY_TYPE.COMPANY) {
         if (this.selectedCompany != null) this.selectedCompany.active = false;
         if (this.selectedCompany != card) card.active = !card.active;
         this.selectedCompany = card.active ? card : null;
       }
     }
   }
-};
+});
 </script>
 
 <style scoped lang="scss">

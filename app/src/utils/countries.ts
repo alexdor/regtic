@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-export const countries = [
+const countries = [
   {
     name: "Afghanistan",
     topLevelDomain: [".af"],
@@ -13998,3 +13998,8 @@ export const countries = [
     cioc: "ZIM"
   }
 ];
+
+export const getCountry = (code: string) => {
+  const found = countries.find(entry => entry.alpha2Code == code);
+  return found ? found.name + " / " + code : "Unknown / ZZ";
+};

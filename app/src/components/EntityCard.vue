@@ -58,7 +58,7 @@
 
 <script>
 import StatusIcon from "@/components/StatusIcon.vue";
-import store from "@/store";
+import { getCountry } from "@/utils/countries";
 
 export default {
   components: {
@@ -99,13 +99,7 @@ export default {
     setActive() {
       this.$parent.entityCardSelected(this);
     },
-    getCountry(code) {
-      const found = store.state.countries.filter(
-        entry => entry.alpha2Code == code
-      );
-      if (found.length > 0) return found[0].name + " / " + code;
-      else return "Unknown / ZZ";
-    }
+    getCountry
   }
 };
 </script>
