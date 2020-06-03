@@ -1,14 +1,7 @@
 <template>
   <div class="full-height">
     <div class="col-center">
-      <img
-        src="../assets/undraw_detailed_analysis.svg"
-        alt
-        class="fit-to-width"
-      />
-      <p class="justify-center">
-        Check your company relations with a click of a button. Simple, easy.
-      </p>
+      <img class="fit-to-width" src="../assets/undraw_people_search.svg" alt />
       <div class="vertical-spacing">
         <SearchInput :include-button="true" />
       </div>
@@ -64,6 +57,7 @@ a {
 }
 
 .vertical-spacing {
-  margin: 20px 0;
+  margin-top: 4rem;
+  margin-bottom: 2rem;
 }
 </style>

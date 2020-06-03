@@ -6,176 +6,174 @@ import (
 	"errors"
 	"sync"
 
+	"github.com/alexdor/regtic/api/interfaces"
 	"github.com/alexdor/regtic/api/models"
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
 type validationLocks struct {
-	companies  sync.Mutex
-	people     sync.Mutex
-	errors     sync.Mutex
-	companyMap map[string]struct{}
-}
-type People struct {
-	Bad     models.BadPersonSlice `json:"bad"`
-	Warning models.BadPersonSlice `json:"warning"`
-	Good    models.PersonSlice    `json:"good"`
-}
-type ValidationResponse struct {
-	Info      models.Company      `json:"info"`
-	Companies models.CompanySlice `json:"companies"`
-	People    People              `json:"people"`
-	Errors    []error             `json:"errors"`
+	companiesMutex    sync.Mutex
+	companiesMapMutex sync.RWMutex
+	peopleMapMutex    sync.RWMutex
+	peopleMutex       sync.Mutex
+	errorsMutex       sync.Mutex
+	companyMap        map[string]struct{}
+	personMap         map[string]struct{}
 }
 
-func ValidateCompany(ctx context.Context, id string) (*ValidationResponse, error) {
+func ValidateCompany(ctx context.Context, id string) (*interfaces.ValidationResponse, error) {
 	company, err := models.Companies(
 		models.CompanyWhere.ID.EQ(id),
-		qm.Load(models.CompanyRels.MotherCompanyCompanies),
-		qm.Load(models.CompanyRels.Persons),
-		qm.Limit(1),
+		qm.Load(models.CompanyRels.MotherCompanyCompanyToCompanies, companyToCompanyFilter),
+		qm.Load(models.CompanyRels.CompanyToPeople, companyToPeopleFilter),
+		qm.Load(models.CompanyRels.BadCompanies),
 	).One(ctx, DB)
 
-	var response ValidationResponse
+	response := &interfaces.ValidationResponse{}
 	if err != nil {
-		return &response, err
+		return response, err
 	}
 
 	locks := &validationLocks{
 		companyMap: make(map[string]struct{}),
+		personMap:  make(map[string]struct{}),
 	}
+	locks.companyMap[company.ID] = struct{}{}
 
 	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	traverseThroughTheCompany(ctx, &models.CompanySlice{company}, &response, locks, wg)
-
-	response.Info = *company
-
+	traverseThroughCompanies(ctx, &models.CompanySlice{company}, response, locks, wg)
+	response.Info = DBCompanyToCompanyJson(company)
+	jsonCompany, err := convertCompany(ctx, company)
+	if err != nil {
+		writeError(err, response, locks)
+	} else {
+		locks.companiesMutex.Lock()
+		response.Companies = append(response.Companies, jsonCompany)
+		locks.companiesMutex.Unlock()
+	}
 	wg.Wait()
 
-	unique(response)
-	return &response, nil
+	return response, nil
 }
 
-func unique(response ValidationResponse) {
-	//TODO
-	return
-}
-
-func traverseThroughTheCompany(ctx context.Context, companies *models.CompanySlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
+// Go through the company structure
+func traverseThroughCompanies(ctx context.Context, companies *models.CompanySlice, response *interfaces.ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
 	wg.Add(2)
 	go getMotherCompanies(ctx, companies, response, locks, wg)
 	go getOwners(ctx, companies, response, locks, wg)
-	wg.Done()
 }
 
-func getMotherCompanies(ctx context.Context, companies *models.CompanySlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
+// Add mother companies to the list of companies
+func getMotherCompanies(ctx context.Context, companies *models.CompanySlice, response *interfaces.ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	if companies == nil || len(*companies) == 0 {
 		return
 	}
 	aggregatedMotherCompanies := models.CompanySlice{}
+
 	for _, company := range *companies {
-		motherCompanies, err := company.MotherCompanyCompanies(qm.Load(models.CompanyRels.Persons), qm.Load(models.CompanyRels.MotherCompanyCompanies)).All(ctx, DB)
+
+		motherCompanies, err := company.DaughterCompanyCompanyToCompanies(
+			qm.Load(models.CompanyToCompanyRels.MotherCompany),
+			companyToCompanyFilter,
+		).All(ctx, DB)
 		if err != nil {
 			writeError(err, response, locks)
 			continue
 		}
 		//Search for companies that have already been traversed and drop them from the list
-		locks.companies.Lock()
-		companiesFound := 0
-		for i := 0; i+companiesFound < len(motherCompanies); i++ {
-			_, parsedAlready := locks.companyMap[motherCompanies[i].ID]
-			if !parsedAlready {
-				locks.companyMap[motherCompanies[i].ID] = struct{}{}
+		for i := range motherCompanies {
+			locks.companiesMapMutex.RLock()
+			_, parsedAlready := locks.companyMap[motherCompanies[i].MotherCompanyID]
+			locks.companiesMapMutex.RUnlock()
+			if parsedAlready {
 				continue
 			}
-			companiesFound++
-			motherCompanies[i] = motherCompanies[len(motherCompanies)-companiesFound]
-			i--
+			locks.companiesMapMutex.Lock()
+			locks.companyMap[motherCompanies[i].MotherCompanyID] = struct{}{}
+			locks.companiesMapMutex.Unlock()
+			motherCompanies, err := motherCompanies[i].MotherCompany(
+				qm.Load(models.CompanyRels.MotherCompanyCompanyToCompanies, companyToCompanyFilter),
+				qm.Load(models.CompanyRels.CompanyToPeople, companyToPeopleFilter),
+				qm.Load(models.CompanyRels.BadCompanies),
+			).All(ctx, DB)
+			if err != nil {
+				writeError(err, response, locks)
+				continue
+			}
+			aggregatedMotherCompanies = append(aggregatedMotherCompanies, motherCompanies...)
 		}
-		if companiesFound > 0 {
-			motherCompanies = motherCompanies[:len(motherCompanies)-companiesFound]
-		}
-		locks.companies.Unlock()
-		aggregatedMotherCompanies = append(aggregatedMotherCompanies, motherCompanies...)
 	}
-	wg.Add(1)
-	traverseThroughTheCompany(ctx, &aggregatedMotherCompanies, response, locks, wg)
 
-	locks.companies.Lock()
-	response.Companies = append(response.Companies, aggregatedMotherCompanies...)
-	locks.companies.Unlock()
+	traverseThroughCompanies(ctx, &aggregatedMotherCompanies, response, locks, wg)
+	var err error
+	companiesToAdd := make(interfaces.Companies, len(aggregatedMotherCompanies))
+	for i := range aggregatedMotherCompanies {
+		companiesToAdd[i], err = convertCompany(ctx, aggregatedMotherCompanies[i])
+		if err != nil {
+			writeError(err, response, locks)
+		}
+	}
+
+	locks.companiesMutex.Lock()
+	response.Companies = append(response.Companies, companiesToAdd...)
+	locks.companiesMutex.Unlock()
 }
 
-func getOwners(ctx context.Context, companies *models.CompanySlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
+// Get the owners of the company
+func getOwners(ctx context.Context, companies *models.CompanySlice, response *interfaces.ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
 	defer wg.Done()
 	if companies == nil || len(*companies) == 0 {
 		return
 	}
 
 	for _, company := range *companies {
-		persons, err := company.Persons().All(ctx, DB)
+		persons, err := company.CompanyToPeople(qm.Load(models.CompanyToPersonRels.Person), companyToPeopleFilter).All(ctx, DB)
 		if err != nil {
 			writeError(err, response, locks)
 			continue
 		}
-		wg.Add(1)
-		go searchForBadPersons(ctx, persons, response, locks, wg)
+		searchForBadPersons(ctx, persons, response, locks)
 	}
 }
 
-var badPersonWhereClause = models.BadPersonColumns.NameVector + " @@ plainto_tsquery('simple', ? )"
-var badPersonSelect = "*, ts_rank(" + models.BadPersonColumns.NameVector + ", plainto_tsquery('simple', $1)) as rank"
-var badPersonOrderBy = "rank desc, " + models.BadPersonColumns.Type + " desc"
-
-func searchForBadPersons(ctx context.Context, persons models.PersonSlice, response *ValidationResponse, locks *validationLocks, wg *sync.WaitGroup) {
-	defer wg.Done()
-	if len(persons) == 0 {
+// Search for badpersons and add persons to the response
+func searchForBadPersons(ctx context.Context, companyToPeople models.CompanyToPersonSlice, response *interfaces.ValidationResponse, locks *validationLocks) {
+	if len(companyToPeople) == 0 {
 		return
 	}
-	peopleResponse := People{}
-	for _, person := range persons {
-		//TODO: add aliases, score and sorting
-		badPersons, err := models.BadPersons(
-			qm.Select(badPersonSelect),
-			qm.Where(badPersonWhereClause, person.FullName),
-			qm.Limit(1),
-			qm.OrderBy(badPersonOrderBy),
-		).All(ctx, DB)
+	peopleResponse := make(interfaces.People, len(companyToPeople))
+	for i := range companyToPeople {
 
-		noRows := errors.Is(err, sql.ErrNoRows)
-		if !noRows && err != nil {
+		locks.peopleMapMutex.RLock()
+		_, parsedAlready := locks.personMap[companyToPeople[i].PersonID]
+		locks.peopleMapMutex.RUnlock()
+		if parsedAlready {
+			continue
+		}
+		locks.peopleMapMutex.Lock()
+		locks.personMap[companyToPeople[i].PersonID] = struct{}{}
+		locks.peopleMapMutex.Unlock()
+		person, err := companyToPeople[i].Person().One(ctx, DB)
+		if err != nil {
 			writeError(err, response, locks)
-			continue
 		}
-
-		if noRows || len(badPersons) == 0 {
-			peopleResponse.Good = append(peopleResponse.Good, person)
-			continue
-		}
-
-		//TODO: Get all the matches and not just the first one
-		switch badPersons[0].Type {
-		case models.BadPersonTypePEP:
-			peopleResponse.Warning = append(peopleResponse.Warning, badPersons[0])
-		case models.BadPersonTypeSANCTION:
-			peopleResponse.Bad = append(peopleResponse.Bad, badPersons[0])
+		peopleResponse[i], err = convertPerson(ctx, person)
+		if err != nil {
+			writeError(err, response, locks)
 		}
 	}
 
-	locks.people.Lock()
-	response.People.Good = append(response.People.Good, peopleResponse.Good...)
-	response.People.Warning = append(response.People.Warning, peopleResponse.Warning...)
-	response.People.Bad = append(response.People.Bad, peopleResponse.Bad...)
-	locks.people.Unlock()
+	locks.peopleMutex.Lock()
+	response.People = append(response.People, peopleResponse...)
+	locks.peopleMutex.Unlock()
 }
 
-func writeError(err error, response *ValidationResponse, locks *validationLocks) {
+func writeError(err error, response *interfaces.ValidationResponse, locks *validationLocks) {
 	if !errors.Is(err, sql.ErrNoRows) {
-		locks.errors.Lock()
+		locks.errorsMutex.Lock()
 		response.Errors = append(response.Errors, err)
-		locks.errors.Unlock()
+		locks.errorsMutex.Unlock()
 	}
 }

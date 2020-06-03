@@ -11,3 +11,6 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[context.dev.environment]
+  VUE_APP_API_URL = "https://78pnkdbz8f.execute-api.eu-west-1.amazonaws.com/beta/"

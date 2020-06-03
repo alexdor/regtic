@@ -25,13 +25,18 @@ import (
 // Person is an object representing the database table.
 type Person struct {
 	ID          string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	FirstName   null.String `boil:"first_name" json:"first_name,omitempty" toml:"first_name" yaml:"first_name,omitempty"`
-	LastName    null.String `boil:"last_name" json:"last_name,omitempty" toml:"last_name" yaml:"last_name,omitempty"`
-	CountryCode string      `boil:"country_code" json:"country_code" toml:"country_code" yaml:"country_code"`
-	UpdatedAt   time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	CreatedAt   time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	NameVector  null.String `boil:"name_vector" json:"name_vector,omitempty" toml:"name_vector" yaml:"name_vector,omitempty"`
-	FullName    null.String `boil:"full_name" json:"full_name,omitempty" toml:"full_name" yaml:"full_name,omitempty"`
+	FirstName   null.String `boil:"first_name" json:"firstName,omitempty" toml:"firstName" yaml:"firstName,omitempty"`
+	LastName    null.String `boil:"last_name" json:"lastName,omitempty" toml:"lastName" yaml:"lastName,omitempty"`
+	CountryCode string      `boil:"country_code" json:"countryCode" toml:"countryCode" yaml:"countryCode"`
+	UpdatedAt   time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	CreatedAt   time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	NameVector  null.String `boil:"name_vector" json:"nameVector,omitempty" toml:"nameVector" yaml:"nameVector,omitempty"`
+	FullName    null.String `boil:"full_name" json:"fullName,omitempty" toml:"fullName" yaml:"fullName,omitempty"`
+	Street      null.String `boil:"street" json:"street,omitempty" toml:"street" yaml:"street,omitempty"`
+	Region      null.String `boil:"region" json:"region,omitempty" toml:"region" yaml:"region,omitempty"`
+	ZipCode     null.String `boil:"zip_code" json:"zipCode,omitempty" toml:"zipCode" yaml:"zipCode,omitempty"`
+	City        null.String `boil:"city" json:"city,omitempty" toml:"city" yaml:"city,omitempty"`
+	Address     null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
 
 	R *personR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L personL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -46,6 +51,11 @@ var PersonColumns = struct {
 	CreatedAt   string
 	NameVector  string
 	FullName    string
+	Street      string
+	Region      string
+	ZipCode     string
+	City        string
+	Address     string
 }{
 	ID:          "id",
 	FirstName:   "first_name",
@@ -55,6 +65,11 @@ var PersonColumns = struct {
 	CreatedAt:   "created_at",
 	NameVector:  "name_vector",
 	FullName:    "full_name",
+	Street:      "street",
+	Region:      "region",
+	ZipCode:     "zip_code",
+	City:        "city",
+	Address:     "address",
 }
 
 // Generated where
@@ -68,6 +83,11 @@ var PersonWhere = struct {
 	CreatedAt   whereHelpertime_Time
 	NameVector  whereHelpernull_String
 	FullName    whereHelpernull_String
+	Street      whereHelpernull_String
+	Region      whereHelpernull_String
+	ZipCode     whereHelpernull_String
+	City        whereHelpernull_String
+	Address     whereHelpernull_String
 }{
 	ID:          whereHelperstring{field: "\"persons\".\"id\""},
 	FirstName:   whereHelpernull_String{field: "\"persons\".\"first_name\""},
@@ -77,18 +97,26 @@ var PersonWhere = struct {
 	CreatedAt:   whereHelpertime_Time{field: "\"persons\".\"created_at\""},
 	NameVector:  whereHelpernull_String{field: "\"persons\".\"name_vector\""},
 	FullName:    whereHelpernull_String{field: "\"persons\".\"full_name\""},
+	Street:      whereHelpernull_String{field: "\"persons\".\"street\""},
+	Region:      whereHelpernull_String{field: "\"persons\".\"region\""},
+	ZipCode:     whereHelpernull_String{field: "\"persons\".\"zip_code\""},
+	City:        whereHelpernull_String{field: "\"persons\".\"city\""},
+	Address:     whereHelpernull_String{field: "\"persons\".\"address\""},
 }
 
 // PersonRels is where relationship names are stored.
 var PersonRels = struct {
-	Companies string
+	BadPersons      string
+	CompanyToPeople string
 }{
-	Companies: "Companies",
+	BadPersons:      "BadPersons",
+	CompanyToPeople: "CompanyToPeople",
 }
 
 // personR is where relationships are stored.
 type personR struct {
-	Companies CompanySlice
+	BadPersons      BadPersonSlice
+	CompanyToPeople CompanyToPersonSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -100,8 +128,8 @@ func (*personR) NewStruct() *personR {
 type personL struct{}
 
 var (
-	personAllColumns            = []string{"id", "first_name", "last_name", "country_code", "updated_at", "created_at", "name_vector", "full_name"}
-	personColumnsWithoutDefault = []string{"first_name", "last_name", "name_vector", "full_name"}
+	personAllColumns            = []string{"id", "first_name", "last_name", "country_code", "updated_at", "created_at", "name_vector", "full_name", "street", "region", "zip_code", "city", "address"}
+	personColumnsWithoutDefault = []string{"first_name", "last_name", "name_vector", "full_name", "street", "region", "zip_code", "city", "address"}
 	personColumnsWithDefault    = []string{"id", "country_code", "updated_at", "created_at"}
 	personPrimaryKeyColumns     = []string{"id"}
 )
@@ -197,31 +225,52 @@ func (q personQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (boo
 	return count > 0, nil
 }
 
-// Companies retrieves all the company's Companies with an executor.
-func (o *Person) Companies(mods ...qm.QueryMod) companyQuery {
+// BadPersons retrieves all the bad_person's BadPersons with an executor.
+func (o *Person) BadPersons(mods ...qm.QueryMod) badPersonQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.InnerJoin("\"company_to_person\" on \"companies\".\"id\" = \"company_to_person\".\"company_id\""),
-		qm.Where("\"company_to_person\".\"person_id\"=?", o.ID),
+		qm.InnerJoin("\"bad_person_to_person\" on \"bad_persons\".\"id\" = \"bad_person_to_person\".\"bad_person_id\""),
+		qm.Where("\"bad_person_to_person\".\"person_id\"=?", o.ID),
 	)
 
-	query := Companies(queryMods...)
-	queries.SetFrom(query.Query, "\"companies\"")
+	query := BadPersons(queryMods...)
+	queries.SetFrom(query.Query, "\"bad_persons\"")
 
 	if len(queries.GetSelect(query.Query)) == 0 {
-		queries.SetSelect(query.Query, []string{"\"companies\".*"})
+		queries.SetSelect(query.Query, []string{"\"bad_persons\".*"})
 	}
 
 	return query
 }
 
-// LoadCompanies allows an eager lookup of values, cached into the
+// CompanyToPeople retrieves all the company_to_person's CompanyToPeople with an executor.
+func (o *Person) CompanyToPeople(mods ...qm.QueryMod) companyToPersonQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"company_to_person\".\"person_id\"=?", o.ID),
+	)
+
+	query := CompanyToPeople(queryMods...)
+	queries.SetFrom(query.Query, "\"company_to_person\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"company_to_person\".*"})
+	}
+
+	return query
+}
+
+// LoadBadPersons allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (personL) LoadCompanies(ctx context.Context, e boil.ContextExecutor, singular bool, maybePerson interface{}, mods queries.Applicator) error {
+func (personL) LoadBadPersons(ctx context.Context, e boil.ContextExecutor, singular bool, maybePerson interface{}, mods queries.Applicator) error {
 	var slice []*Person
 	var object *Person
 
@@ -259,9 +308,9 @@ func (personL) LoadCompanies(ctx context.Context, e boil.ContextExecutor, singul
 	}
 
 	query := NewQuery(
-		qm.Select("\"companies\".*, \"a\".\"person_id\""),
-		qm.From("\"companies\""),
-		qm.InnerJoin("\"company_to_person\" as \"a\" on \"companies\".\"id\" = \"a\".\"company_id\""),
+		qm.Select("\"bad_persons\".*, \"a\".\"person_id\""),
+		qm.From("\"bad_persons\""),
+		qm.InnerJoin("\"bad_person_to_person\" as \"a\" on \"bad_persons\".\"id\" = \"a\".\"bad_person_id\""),
 		qm.WhereIn("\"a\".\"person_id\" in ?", args...),
 	)
 	if mods != nil {
@@ -270,22 +319,22 @@ func (personL) LoadCompanies(ctx context.Context, e boil.ContextExecutor, singul
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load companies")
+		return errors.Wrap(err, "failed to eager load bad_persons")
 	}
 
-	var resultSlice []*Company
+	var resultSlice []*BadPerson
 
 	var localJoinCols []string
 	for results.Next() {
-		one := new(Company)
+		one := new(BadPerson)
 		var localJoinCol string
 
-		err = results.Scan(&one.ID, &one.Address, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &one.Type, &localJoinCol)
+		err = results.Scan(&one.ID, &one.FullName, &one.Type, &one.Source, &one.UpdatedAt, &one.CreatedAt, &one.NameVector, &one.CitizenshipCountryCode, &localJoinCol)
 		if err != nil {
-			return errors.Wrap(err, "failed to scan eager loaded results for companies")
+			return errors.Wrap(err, "failed to scan eager loaded results for bad_persons")
 		}
 		if err = results.Err(); err != nil {
-			return errors.Wrap(err, "failed to plebian-bind eager loaded slice companies")
+			return errors.Wrap(err, "failed to plebian-bind eager loaded slice bad_persons")
 		}
 
 		resultSlice = append(resultSlice, one)
@@ -293,17 +342,17 @@ func (personL) LoadCompanies(ctx context.Context, e boil.ContextExecutor, singul
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on companies")
+		return errors.Wrap(err, "failed to close results in eager load on bad_persons")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for companies")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for bad_persons")
 	}
 
 	if singular {
-		object.R.Companies = resultSlice
+		object.R.BadPersons = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
-				foreign.R = &companyR{}
+				foreign.R = &badPersonR{}
 			}
 			foreign.R.Persons = append(foreign.R.Persons, object)
 		}
@@ -314,9 +363,9 @@ func (personL) LoadCompanies(ctx context.Context, e boil.ContextExecutor, singul
 		localJoinCol := localJoinCols[i]
 		for _, local := range slice {
 			if local.ID == localJoinCol {
-				local.R.Companies = append(local.R.Companies, foreign)
+				local.R.BadPersons = append(local.R.BadPersons, foreign)
 				if foreign.R == nil {
-					foreign.R = &companyR{}
+					foreign.R = &badPersonR{}
 				}
 				foreign.R.Persons = append(foreign.R.Persons, local)
 				break
@@ -327,11 +376,99 @@ func (personL) LoadCompanies(ctx context.Context, e boil.ContextExecutor, singul
 	return nil
 }
 
-// AddCompanies adds the given related objects to the existing relationships
+// LoadCompanyToPeople allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (personL) LoadCompanyToPeople(ctx context.Context, e boil.ContextExecutor, singular bool, maybePerson interface{}, mods queries.Applicator) error {
+	var slice []*Person
+	var object *Person
+
+	if singular {
+		object = maybePerson.(*Person)
+	} else {
+		slice = *maybePerson.(*[]*Person)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &personR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &personR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`company_to_person`), qm.WhereIn(`company_to_person.person_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load company_to_person")
+	}
+
+	var resultSlice []*CompanyToPerson
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice company_to_person")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on company_to_person")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for company_to_person")
+	}
+
+	if singular {
+		object.R.CompanyToPeople = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &companyToPersonR{}
+			}
+			foreign.R.Person = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.PersonID {
+				local.R.CompanyToPeople = append(local.R.CompanyToPeople, foreign)
+				if foreign.R == nil {
+					foreign.R = &companyToPersonR{}
+				}
+				foreign.R.Person = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// AddBadPersons adds the given related objects to the existing relationships
 // of the person, optionally inserting them as new records.
-// Appends related to o.R.Companies.
+// Appends related to o.R.BadPersons.
 // Sets related.R.Persons appropriately.
-func (o *Person) AddCompanies(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Company) error {
+func (o *Person) AddBadPersons(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*BadPerson) error {
 	var err error
 	for _, rel := range related {
 		if insert {
@@ -342,7 +479,7 @@ func (o *Person) AddCompanies(ctx context.Context, exec boil.ContextExecutor, in
 	}
 
 	for _, rel := range related {
-		query := "insert into \"company_to_person\" (\"person_id\", \"company_id\") values ($1, $2)"
+		query := "insert into \"bad_person_to_person\" (\"person_id\", \"bad_person_id\") values ($1, $2)"
 		values := []interface{}{o.ID, rel.ID}
 
 		if boil.DebugMode {
@@ -357,15 +494,15 @@ func (o *Person) AddCompanies(ctx context.Context, exec boil.ContextExecutor, in
 	}
 	if o.R == nil {
 		o.R = &personR{
-			Companies: related,
+			BadPersons: related,
 		}
 	} else {
-		o.R.Companies = append(o.R.Companies, related...)
+		o.R.BadPersons = append(o.R.BadPersons, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
-			rel.R = &companyR{
+			rel.R = &badPersonR{
 				Persons: PersonSlice{o},
 			}
 		} else {
@@ -375,14 +512,14 @@ func (o *Person) AddCompanies(ctx context.Context, exec boil.ContextExecutor, in
 	return nil
 }
 
-// SetCompanies removes all previously related items of the
+// SetBadPersons removes all previously related items of the
 // person replacing them completely with the passed
 // in related items, optionally inserting them as new records.
-// Sets o.R.Persons's Companies accordingly.
-// Replaces o.R.Companies with related.
-// Sets related.R.Persons's Companies accordingly.
-func (o *Person) SetCompanies(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Company) error {
-	query := "delete from \"company_to_person\" where \"person_id\" = $1"
+// Sets o.R.Persons's BadPersons accordingly.
+// Replaces o.R.BadPersons with related.
+// Sets related.R.Persons's BadPersons accordingly.
+func (o *Person) SetBadPersons(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*BadPerson) error {
+	query := "delete from \"bad_person_to_person\" where \"person_id\" = $1"
 	values := []interface{}{o.ID}
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, query)
@@ -394,20 +531,20 @@ func (o *Person) SetCompanies(ctx context.Context, exec boil.ContextExecutor, in
 		return errors.Wrap(err, "failed to remove relationships before set")
 	}
 
-	removeCompaniesFromPersonsSlice(o, related)
+	removeBadPersonsFromPersonsSlice(o, related)
 	if o.R != nil {
-		o.R.Companies = nil
+		o.R.BadPersons = nil
 	}
-	return o.AddCompanies(ctx, exec, insert, related...)
+	return o.AddBadPersons(ctx, exec, insert, related...)
 }
 
-// RemoveCompanies relationships from objects passed in.
-// Removes related items from R.Companies (uses pointer comparison, removal does not keep order)
+// RemoveBadPersons relationships from objects passed in.
+// Removes related items from R.BadPersons (uses pointer comparison, removal does not keep order)
 // Sets related.R.Persons.
-func (o *Person) RemoveCompanies(ctx context.Context, exec boil.ContextExecutor, related ...*Company) error {
+func (o *Person) RemoveBadPersons(ctx context.Context, exec boil.ContextExecutor, related ...*BadPerson) error {
 	var err error
 	query := fmt.Sprintf(
-		"delete from \"company_to_person\" where \"person_id\" = $1 and \"company_id\" in (%s)",
+		"delete from \"bad_person_to_person\" where \"person_id\" = $1 and \"bad_person_id\" in (%s)",
 		strmangle.Placeholders(dialect.UseIndexPlaceholders, len(related), 2, 1),
 	)
 	values := []interface{}{o.ID}
@@ -424,22 +561,22 @@ func (o *Person) RemoveCompanies(ctx context.Context, exec boil.ContextExecutor,
 	if err != nil {
 		return errors.Wrap(err, "failed to remove relationships before set")
 	}
-	removeCompaniesFromPersonsSlice(o, related)
+	removeBadPersonsFromPersonsSlice(o, related)
 	if o.R == nil {
 		return nil
 	}
 
 	for _, rel := range related {
-		for i, ri := range o.R.Companies {
+		for i, ri := range o.R.BadPersons {
 			if rel != ri {
 				continue
 			}
 
-			ln := len(o.R.Companies)
+			ln := len(o.R.BadPersons)
 			if ln > 1 && i < ln-1 {
-				o.R.Companies[i] = o.R.Companies[ln-1]
+				o.R.BadPersons[i] = o.R.BadPersons[ln-1]
 			}
-			o.R.Companies = o.R.Companies[:ln-1]
+			o.R.BadPersons = o.R.BadPersons[:ln-1]
 			break
 		}
 	}
@@ -447,7 +584,7 @@ func (o *Person) RemoveCompanies(ctx context.Context, exec boil.ContextExecutor,
 	return nil
 }
 
-func removeCompaniesFromPersonsSlice(o *Person, related []*Company) {
+func removeBadPersonsFromPersonsSlice(o *Person, related []*BadPerson) {
 	for _, rel := range related {
 		if rel.R == nil {
 			continue
@@ -465,6 +602,59 @@ func removeCompaniesFromPersonsSlice(o *Person, related []*Company) {
 			break
 		}
 	}
+}
+
+// AddCompanyToPeople adds the given related objects to the existing relationships
+// of the person, optionally inserting them as new records.
+// Appends related to o.R.CompanyToPeople.
+// Sets related.R.Person appropriately.
+func (o *Person) AddCompanyToPeople(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*CompanyToPerson) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.PersonID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"company_to_person\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"person_id"}),
+				strmangle.WhereClause("\"", "\"", 2, companyToPersonPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.CompanyID, rel.PersonID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.PersonID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &personR{
+			CompanyToPeople: related,
+		}
+	} else {
+		o.R.CompanyToPeople = append(o.R.CompanyToPeople, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &companyToPersonR{
+				Person: o,
+			}
+		} else {
+			rel.R.Person = o
+		}
+	}
+	return nil
 }
 
 // Persons retrieves all the records using an executor.

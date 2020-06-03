@@ -47,6 +47,7 @@ async function parseAndSaveResponse(responseData) {
     try {
       const company = cvrParser.parse(hit);
       if (!company) return;
+      if (process.env.DEBUG) console.dir(company, { depth: null });
       await dbHelper.insertDataTransactionally(company);
     } catch (error) {
       // TODO: Maybe use sentry here...

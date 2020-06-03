@@ -23,7 +23,7 @@ Resources:
         Vote:
           Type: Api
           Properties:
-            Path: /v1/find_companies
+            Path: /v2/find_companies
             Method: get
   ValidateCompany:
     Type: AWS::Serverless::Function
@@ -38,5 +38,5 @@ Resources:
         Vote:
           Type: Api
           Properties:
-            Path: /v1/validate_company
+            Path: /v2/validate_company
             Method: get

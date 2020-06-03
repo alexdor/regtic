@@ -26,15 +26,15 @@ import (
 // BadCompany is an object representing the database table.
 type BadCompany struct {
 	ID                     string            `boil:"id" json:"id" toml:"id" yaml:"id"`
-	UpdatedAt              time.Time         `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	CreatedAt              time.Time         `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt              time.Time         `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	CreatedAt              time.Time         `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	Name                   string            `boil:"name" json:"name" toml:"name" yaml:"name"`
-	NameVector             null.String       `boil:"name_vector" json:"name_vector,omitempty" toml:"name_vector" yaml:"name_vector,omitempty"`
+	NameVector             null.String       `boil:"name_vector" json:"nameVector,omitempty" toml:"nameVector" yaml:"nameVector,omitempty"`
 	Address                null.String       `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
 	Source                 string            `boil:"source" json:"source" toml:"source" yaml:"source"`
-	CitizenshipRegion      null.String       `boil:"citizenship_region" json:"citizenship_region,omitempty" toml:"citizenship_region" yaml:"citizenship_region,omitempty"`
+	CitizenshipRegion      null.String       `boil:"citizenship_region" json:"citizenshipRegion,omitempty" toml:"citizenshipRegion" yaml:"citizenshipRegion,omitempty"`
 	Type                   string            `boil:"type" json:"type" toml:"type" yaml:"type"`
-	CitizenshipCountryCode types.StringArray `boil:"citizenship_country_code" json:"citizenship_country_code" toml:"citizenship_country_code" yaml:"citizenship_country_code"`
+	CitizenshipCountryCode types.StringArray `boil:"citizenship_country_code" json:"citizenshipCountryCode" toml:"citizenshipCountryCode" yaml:"citizenshipCountryCode"`
 
 	R *badCompanyR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L badCompanyL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -174,16 +174,19 @@ var BadCompanyWhere = struct {
 // BadCompanyRels is where relationship names are stored.
 var BadCompanyRels = struct {
 	BadCompaniesAddresses string
-	BadCompaniesAliases   string
+	BadCompaniesAllNames  string
+	Companies             string
 }{
 	BadCompaniesAddresses: "BadCompaniesAddresses",
-	BadCompaniesAliases:   "BadCompaniesAliases",
+	BadCompaniesAllNames:  "BadCompaniesAllNames",
+	Companies:             "Companies",
 }
 
 // badCompanyR is where relationships are stored.
 type badCompanyR struct {
 	BadCompaniesAddresses BadCompaniesAddressSlice
-	BadCompaniesAliases   BadCompaniesAliasSlice
+	BadCompaniesAllNames  BadCompaniesAllNameSlice
+	Companies             CompanySlice
 }
 
 // NewStruct creates a new relationship struct
@@ -313,22 +316,44 @@ func (o *BadCompany) BadCompaniesAddresses(mods ...qm.QueryMod) badCompaniesAddr
 	return query
 }
 
-// BadCompaniesAliases retrieves all the bad_companies_alias's BadCompaniesAliases with an executor.
-func (o *BadCompany) BadCompaniesAliases(mods ...qm.QueryMod) badCompaniesAliasQuery {
+// BadCompaniesAllNames retrieves all the bad_companies_all_name's BadCompaniesAllNames with an executor.
+func (o *BadCompany) BadCompaniesAllNames(mods ...qm.QueryMod) badCompaniesAllNameQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"bad_companies_aliases\".\"bad_company_id\"=?", o.ID),
+		qm.Where("\"bad_companies_all_names\".\"bad_company_id\"=?", o.ID),
 	)
 
-	query := BadCompaniesAliases(queryMods...)
-	queries.SetFrom(query.Query, "\"bad_companies_aliases\"")
+	query := BadCompaniesAllNames(queryMods...)
+	queries.SetFrom(query.Query, "\"bad_companies_all_names\"")
 
 	if len(queries.GetSelect(query.Query)) == 0 {
-		queries.SetSelect(query.Query, []string{"\"bad_companies_aliases\".*"})
+		queries.SetSelect(query.Query, []string{"\"bad_companies_all_names\".*"})
+	}
+
+	return query
+}
+
+// Companies retrieves all the company's Companies with an executor.
+func (o *BadCompany) Companies(mods ...qm.QueryMod) companyQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.InnerJoin("\"bad_company_to_company\" on \"companies\".\"id\" = \"bad_company_to_company\".\"company_id\""),
+		qm.Where("\"bad_company_to_company\".\"bad_company_id\"=?", o.ID),
+	)
+
+	query := Companies(queryMods...)
+	queries.SetFrom(query.Query, "\"companies\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"companies\".*"})
 	}
 
 	return query
@@ -422,9 +447,9 @@ func (badCompanyL) LoadBadCompaniesAddresses(ctx context.Context, e boil.Context
 	return nil
 }
 
-// LoadBadCompaniesAliases allows an eager lookup of values, cached into the
+// LoadBadCompaniesAllNames allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (badCompanyL) LoadBadCompaniesAliases(ctx context.Context, e boil.ContextExecutor, singular bool, maybeBadCompany interface{}, mods queries.Applicator) error {
+func (badCompanyL) LoadBadCompaniesAllNames(ctx context.Context, e boil.ContextExecutor, singular bool, maybeBadCompany interface{}, mods queries.Applicator) error {
 	var slice []*BadCompany
 	var object *BadCompany
 
@@ -461,33 +486,33 @@ func (badCompanyL) LoadBadCompaniesAliases(ctx context.Context, e boil.ContextEx
 		return nil
 	}
 
-	query := NewQuery(qm.From(`bad_companies_aliases`), qm.WhereIn(`bad_companies_aliases.bad_company_id in ?`, args...))
+	query := NewQuery(qm.From(`bad_companies_all_names`), qm.WhereIn(`bad_companies_all_names.bad_company_id in ?`, args...))
 	if mods != nil {
 		mods.Apply(query)
 	}
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load bad_companies_aliases")
+		return errors.Wrap(err, "failed to eager load bad_companies_all_names")
 	}
 
-	var resultSlice []*BadCompaniesAlias
+	var resultSlice []*BadCompaniesAllName
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice bad_companies_aliases")
+		return errors.Wrap(err, "failed to bind eager loaded slice bad_companies_all_names")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on bad_companies_aliases")
+		return errors.Wrap(err, "failed to close results in eager load on bad_companies_all_names")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for bad_companies_aliases")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for bad_companies_all_names")
 	}
 
 	if singular {
-		object.R.BadCompaniesAliases = resultSlice
+		object.R.BadCompaniesAllNames = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
-				foreign.R = &badCompaniesAliasR{}
+				foreign.R = &badCompaniesAllNameR{}
 			}
 			foreign.R.BadCompany = object
 		}
@@ -497,11 +522,119 @@ func (badCompanyL) LoadBadCompaniesAliases(ctx context.Context, e boil.ContextEx
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
 			if queries.Equal(local.ID, foreign.BadCompanyID) {
-				local.R.BadCompaniesAliases = append(local.R.BadCompaniesAliases, foreign)
+				local.R.BadCompaniesAllNames = append(local.R.BadCompaniesAllNames, foreign)
 				if foreign.R == nil {
-					foreign.R = &badCompaniesAliasR{}
+					foreign.R = &badCompaniesAllNameR{}
 				}
 				foreign.R.BadCompany = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadCompanies allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (badCompanyL) LoadCompanies(ctx context.Context, e boil.ContextExecutor, singular bool, maybeBadCompany interface{}, mods queries.Applicator) error {
+	var slice []*BadCompany
+	var object *BadCompany
+
+	if singular {
+		object = maybeBadCompany.(*BadCompany)
+	} else {
+		slice = *maybeBadCompany.(*[]*BadCompany)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &badCompanyR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &badCompanyR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.Select("\"companies\".*, \"a\".\"bad_company_id\""),
+		qm.From("\"companies\""),
+		qm.InnerJoin("\"bad_company_to_company\" as \"a\" on \"companies\".\"id\" = \"a\".\"company_id\""),
+		qm.WhereIn("\"a\".\"bad_company_id\" in ?", args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load companies")
+	}
+
+	var resultSlice []*Company
+
+	var localJoinCols []string
+	for results.Next() {
+		one := new(Company)
+		var localJoinCol string
+
+		err = results.Scan(&one.ID, &one.Vat, &one.StartingDate, &one.CountryCode, &one.UpdatedAt, &one.CreatedAt, &one.Name, &one.Status, &one.StatusNotes, &one.NameVector, &one.Type, &one.Street, &one.Region, &one.ZipCode, &one.City, &one.Address, &localJoinCol)
+		if err != nil {
+			return errors.Wrap(err, "failed to scan eager loaded results for companies")
+		}
+		if err = results.Err(); err != nil {
+			return errors.Wrap(err, "failed to plebian-bind eager loaded slice companies")
+		}
+
+		resultSlice = append(resultSlice, one)
+		localJoinCols = append(localJoinCols, localJoinCol)
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on companies")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for companies")
+	}
+
+	if singular {
+		object.R.Companies = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &companyR{}
+			}
+			foreign.R.BadCompanies = append(foreign.R.BadCompanies, object)
+		}
+		return nil
+	}
+
+	for i, foreign := range resultSlice {
+		localJoinCol := localJoinCols[i]
+		for _, local := range slice {
+			if local.ID == localJoinCol {
+				local.R.Companies = append(local.R.Companies, foreign)
+				if foreign.R == nil {
+					foreign.R = &companyR{}
+				}
+				foreign.R.BadCompanies = append(foreign.R.BadCompanies, local)
 				break
 			}
 		}
@@ -633,11 +766,11 @@ func (o *BadCompany) RemoveBadCompaniesAddresses(ctx context.Context, exec boil.
 	return nil
 }
 
-// AddBadCompaniesAliases adds the given related objects to the existing relationships
+// AddBadCompaniesAllNames adds the given related objects to the existing relationships
 // of the bad_company, optionally inserting them as new records.
-// Appends related to o.R.BadCompaniesAliases.
+// Appends related to o.R.BadCompaniesAllNames.
 // Sets related.R.BadCompany appropriately.
-func (o *BadCompany) AddBadCompaniesAliases(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*BadCompaniesAlias) error {
+func (o *BadCompany) AddBadCompaniesAllNames(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*BadCompaniesAllName) error {
 	var err error
 	for _, rel := range related {
 		if insert {
@@ -647,9 +780,9 @@ func (o *BadCompany) AddBadCompaniesAliases(ctx context.Context, exec boil.Conte
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
-				"UPDATE \"bad_companies_aliases\" SET %s WHERE %s",
+				"UPDATE \"bad_companies_all_names\" SET %s WHERE %s",
 				strmangle.SetParamNames("\"", "\"", 1, []string{"bad_company_id"}),
-				strmangle.WhereClause("\"", "\"", 2, badCompaniesAliasPrimaryKeyColumns),
+				strmangle.WhereClause("\"", "\"", 2, badCompaniesAllNamePrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
 
@@ -668,15 +801,15 @@ func (o *BadCompany) AddBadCompaniesAliases(ctx context.Context, exec boil.Conte
 
 	if o.R == nil {
 		o.R = &badCompanyR{
-			BadCompaniesAliases: related,
+			BadCompaniesAllNames: related,
 		}
 	} else {
-		o.R.BadCompaniesAliases = append(o.R.BadCompaniesAliases, related...)
+		o.R.BadCompaniesAllNames = append(o.R.BadCompaniesAllNames, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
-			rel.R = &badCompaniesAliasR{
+			rel.R = &badCompaniesAllNameR{
 				BadCompany: o,
 			}
 		} else {
@@ -686,14 +819,14 @@ func (o *BadCompany) AddBadCompaniesAliases(ctx context.Context, exec boil.Conte
 	return nil
 }
 
-// SetBadCompaniesAliases removes all previously related items of the
+// SetBadCompaniesAllNames removes all previously related items of the
 // bad_company replacing them completely with the passed
 // in related items, optionally inserting them as new records.
-// Sets o.R.BadCompany's BadCompaniesAliases accordingly.
-// Replaces o.R.BadCompaniesAliases with related.
-// Sets related.R.BadCompany's BadCompaniesAliases accordingly.
-func (o *BadCompany) SetBadCompaniesAliases(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*BadCompaniesAlias) error {
-	query := "update \"bad_companies_aliases\" set \"bad_company_id\" = null where \"bad_company_id\" = $1"
+// Sets o.R.BadCompany's BadCompaniesAllNames accordingly.
+// Replaces o.R.BadCompaniesAllNames with related.
+// Sets related.R.BadCompany's BadCompaniesAllNames accordingly.
+func (o *BadCompany) SetBadCompaniesAllNames(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*BadCompaniesAllName) error {
+	query := "update \"bad_companies_all_names\" set \"bad_company_id\" = null where \"bad_company_id\" = $1"
 	values := []interface{}{o.ID}
 	if boil.DebugMode {
 		fmt.Fprintln(boil.DebugWriter, query)
@@ -706,7 +839,7 @@ func (o *BadCompany) SetBadCompaniesAliases(ctx context.Context, exec boil.Conte
 	}
 
 	if o.R != nil {
-		for _, rel := range o.R.BadCompaniesAliases {
+		for _, rel := range o.R.BadCompaniesAllNames {
 			queries.SetScanner(&rel.BadCompanyID, nil)
 			if rel.R == nil {
 				continue
@@ -715,15 +848,15 @@ func (o *BadCompany) SetBadCompaniesAliases(ctx context.Context, exec boil.Conte
 			rel.R.BadCompany = nil
 		}
 
-		o.R.BadCompaniesAliases = nil
+		o.R.BadCompaniesAllNames = nil
 	}
-	return o.AddBadCompaniesAliases(ctx, exec, insert, related...)
+	return o.AddBadCompaniesAllNames(ctx, exec, insert, related...)
 }
 
-// RemoveBadCompaniesAliases relationships from objects passed in.
-// Removes related items from R.BadCompaniesAliases (uses pointer comparison, removal does not keep order)
+// RemoveBadCompaniesAllNames relationships from objects passed in.
+// Removes related items from R.BadCompaniesAllNames (uses pointer comparison, removal does not keep order)
 // Sets related.R.BadCompany.
-func (o *BadCompany) RemoveBadCompaniesAliases(ctx context.Context, exec boil.ContextExecutor, related ...*BadCompaniesAlias) error {
+func (o *BadCompany) RemoveBadCompaniesAllNames(ctx context.Context, exec boil.ContextExecutor, related ...*BadCompaniesAllName) error {
 	var err error
 	for _, rel := range related {
 		queries.SetScanner(&rel.BadCompanyID, nil)
@@ -739,21 +872,161 @@ func (o *BadCompany) RemoveBadCompaniesAliases(ctx context.Context, exec boil.Co
 	}
 
 	for _, rel := range related {
-		for i, ri := range o.R.BadCompaniesAliases {
+		for i, ri := range o.R.BadCompaniesAllNames {
 			if rel != ri {
 				continue
 			}
 
-			ln := len(o.R.BadCompaniesAliases)
+			ln := len(o.R.BadCompaniesAllNames)
 			if ln > 1 && i < ln-1 {
-				o.R.BadCompaniesAliases[i] = o.R.BadCompaniesAliases[ln-1]
+				o.R.BadCompaniesAllNames[i] = o.R.BadCompaniesAllNames[ln-1]
 			}
-			o.R.BadCompaniesAliases = o.R.BadCompaniesAliases[:ln-1]
+			o.R.BadCompaniesAllNames = o.R.BadCompaniesAllNames[:ln-1]
 			break
 		}
 	}
 
 	return nil
+}
+
+// AddCompanies adds the given related objects to the existing relationships
+// of the bad_company, optionally inserting them as new records.
+// Appends related to o.R.Companies.
+// Sets related.R.BadCompanies appropriately.
+func (o *BadCompany) AddCompanies(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Company) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		}
+	}
+
+	for _, rel := range related {
+		query := "insert into \"bad_company_to_company\" (\"bad_company_id\", \"company_id\") values ($1, $2)"
+		values := []interface{}{o.ID, rel.ID}
+
+		if boil.DebugMode {
+			fmt.Fprintln(boil.DebugWriter, query)
+			fmt.Fprintln(boil.DebugWriter, values)
+		}
+
+		_, err = exec.ExecContext(ctx, query, values...)
+		if err != nil {
+			return errors.Wrap(err, "failed to insert into join table")
+		}
+	}
+	if o.R == nil {
+		o.R = &badCompanyR{
+			Companies: related,
+		}
+	} else {
+		o.R.Companies = append(o.R.Companies, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &companyR{
+				BadCompanies: BadCompanySlice{o},
+			}
+		} else {
+			rel.R.BadCompanies = append(rel.R.BadCompanies, o)
+		}
+	}
+	return nil
+}
+
+// SetCompanies removes all previously related items of the
+// bad_company replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.BadCompanies's Companies accordingly.
+// Replaces o.R.Companies with related.
+// Sets related.R.BadCompanies's Companies accordingly.
+func (o *BadCompany) SetCompanies(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Company) error {
+	query := "delete from \"bad_company_to_company\" where \"bad_company_id\" = $1"
+	values := []interface{}{o.ID}
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, query)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	removeCompaniesFromBadCompaniesSlice(o, related)
+	if o.R != nil {
+		o.R.Companies = nil
+	}
+	return o.AddCompanies(ctx, exec, insert, related...)
+}
+
+// RemoveCompanies relationships from objects passed in.
+// Removes related items from R.Companies (uses pointer comparison, removal does not keep order)
+// Sets related.R.BadCompanies.
+func (o *BadCompany) RemoveCompanies(ctx context.Context, exec boil.ContextExecutor, related ...*Company) error {
+	var err error
+	query := fmt.Sprintf(
+		"delete from \"bad_company_to_company\" where \"bad_company_id\" = $1 and \"company_id\" in (%s)",
+		strmangle.Placeholders(dialect.UseIndexPlaceholders, len(related), 2, 1),
+	)
+	values := []interface{}{o.ID}
+	for _, rel := range related {
+		values = append(values, rel.ID)
+	}
+
+	if boil.DebugMode {
+		fmt.Fprintln(boil.DebugWriter, query)
+		fmt.Fprintln(boil.DebugWriter, values)
+	}
+
+	_, err = exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+	removeCompaniesFromBadCompaniesSlice(o, related)
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.Companies {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.Companies)
+			if ln > 1 && i < ln-1 {
+				o.R.Companies[i] = o.R.Companies[ln-1]
+			}
+			o.R.Companies = o.R.Companies[:ln-1]
+			break
+		}
+	}
+
+	return nil
+}
+
+func removeCompaniesFromBadCompaniesSlice(o *BadCompany, related []*Company) {
+	for _, rel := range related {
+		if rel.R == nil {
+			continue
+		}
+		for i, ri := range rel.R.BadCompanies {
+			if o.ID != ri.ID {
+				continue
+			}
+
+			ln := len(rel.R.BadCompanies)
+			if ln > 1 && i < ln-1 {
+				rel.R.BadCompanies[i] = rel.R.BadCompanies[ln-1]
+			}
+			rel.R.BadCompanies = rel.R.BadCompanies[:ln-1]
+			break
+		}
+	}
 }
 
 // BadCompanies retrieves all the records using an executor.

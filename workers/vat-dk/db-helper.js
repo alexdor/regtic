@@ -14,11 +14,14 @@ const pool = new Pool({
 function insertCompany(client, company) {
   return client.query(insertCompanyQuery, [
     company.name,
-    company.address,
     company.vat,
     company.startingDate,
     company.countryCode,
-    company.type
+    company.type,
+    company.zipCode,
+    company.region,
+    company.street,
+    company.city
   ]);
 }
 
@@ -26,7 +29,11 @@ function insertPerson(client, person) {
   return client.query(insertPersonQuery, [
     person.firstName,
     person.lastName,
-    person.countryCode
+    person.countryCode,
+    person.zipCode,
+    person.region,
+    person.street,
+    person.city
   ]);
 }
 
