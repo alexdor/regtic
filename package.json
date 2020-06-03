@@ -31,7 +31,7 @@
     "typescript": "^3.7.2"
   },
   "devDependencies": {
-    "@ljharb/eslint-config": "15.1.0",
+    "@ljharb/eslint-config": "17.1.0",
     "@typescript-eslint/eslint-plugin": "^2.9.0",
     "@typescript-eslint/parser": "^2.9.0",
     "@vue/eslint-config-prettier": "^6.0.0",
