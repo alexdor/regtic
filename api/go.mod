@@ -15,7 +15,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.6.3
-	github.com/volatiletech/null v8.0.0+incompatible
+	github.com/volatiletech/null v8.1.0+incompatible
 	github.com/volatiletech/sqlboiler v3.7.1+incompatible
 	github.com/volatiletech/sqlboiler/v4 v4.1.2
 	golang.org/x/sys v0.0.0-20191210023423-ac6580df4449 // indirect
