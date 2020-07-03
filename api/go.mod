@@ -17,7 +17,7 @@ require (
 	github.com/spf13/viper v1.6.3
 	github.com/volatiletech/null v8.0.0+incompatible
 	github.com/volatiletech/sqlboiler v3.7.1+incompatible
-	github.com/volatiletech/sqlboiler/v4 v4.1.2
+	github.com/volatiletech/sqlboiler/v4 v4.2.0
 	golang.org/x/sys v0.0.0-20191210023423-ac6580df4449 // indirect
 	golang.org/x/text v0.3.2 // indirect
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
