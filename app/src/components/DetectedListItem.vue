@@ -25,14 +25,14 @@ import StatusIcon from "@/components/StatusIcon.vue";
 
 export default {
   components: {
-    StatusIcon
+    StatusIcon,
   },
   props: {
     source: String,
     type: String,
     updated: String,
-    status: String
-  }
+    status: String,
+  },
 };
 </script>
 

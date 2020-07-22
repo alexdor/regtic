@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+exports.up = function (knex) {
   return knex.schema.raw(`
   ALTER TABLE company_to_company drop constraint if exists company_to_company_pkey;
   ALTER TABLE company_to_company RENAME mother_company TO mother_company_id;
@@ -13,7 +13,7 @@ exports.up = function(knex) {
   `);
 };
 
-exports.down = function(knex) {
+exports.down = function (knex) {
   return knex.schema.raw(`
   ALTER TABLE company_to_company drop constraint if exists company_to_company_pkey;
   ALTER TABLE company_to_person drop constraint if exists company_to_person_pkey;

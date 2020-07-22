@@ -72,7 +72,7 @@ import { ENTITY_TYPE, ENTITY_STATUS, CARD_STATUS } from "@/enums/enums";
 import { getCountry } from "@/utils/countries";
 export default Vue.extend({
   components: {
-    BeneficiaryListItem
+    BeneficiaryListItem,
   },
   data() {
     return {
@@ -82,15 +82,15 @@ export default Vue.extend({
       entities: [],
       idToIndex: {},
       selectedCompany: null,
-      loading: false
+      loading: false,
     };
   },
   watch: {
     expanded: {
       handler(val) {
         if (val.length > 0) this.setAllExpanded(val === CARD_STATUS.EXPANDED);
-      }
-    }
+      },
+    },
   },
   async mounted() {
     const canvas = this.$el.querySelector(".canvas");
@@ -167,8 +167,8 @@ export default Vue.extend({
               x2: entity.x + 10,
               y2: entity.y + companyCardClosedHeightCenter,
               xWeight1: isCompany ? 0.5 : 0.95,
-              xWeight2: isCompany ? 0.5 : 0.75
-            }
+              xWeight2: isCompany ? 0.5 : 0.75,
+            },
           });
           line.$mount();
           canvas.append(line.$el);
@@ -176,9 +176,9 @@ export default Vue.extend({
       }
     }
 
-    const generateEntityCard = propsData => {
+    const generateEntityCard = (propsData) => {
       const card = new EntityCardClass({
-        propsData
+        propsData,
       });
       card.$parent = this;
       card.$mount();
@@ -197,7 +197,7 @@ export default Vue.extend({
           data: companyGrid[depth][i],
           open: companyGrid[depth][i].open,
           x: companyGrid[depth][i].x,
-          y: companyGrid[depth][i].y
+          y: companyGrid[depth][i].y,
         });
       }
     }
@@ -207,7 +207,7 @@ export default Vue.extend({
         data: people[i],
         open: people[i].open,
         x: people[i].x,
-        y: people[i].y
+        y: people[i].y,
       });
     }
 
@@ -241,9 +241,9 @@ export default Vue.extend({
     },
     // Makes sure the radio toggles matches the current view mode.
     updateViewMode() {
-      if (this.cards.every(card => card.openState))
+      if (this.cards.every((card) => card.openState))
         this.expanded = CARD_STATUS.EXPANDED;
-      else if (this.cards.every(card => !card.openState))
+      else if (this.cards.every((card) => !card.openState))
         this.expanded = CARD_STATUS.COLLAPSED;
       else this.expanded = "";
     },
@@ -270,7 +270,7 @@ export default Vue.extend({
     getCountry,
     // Callback for when 'expanded' is either expanded/collapsed, to toggle all cards.
     setAllExpanded(expanded) {
-      this.cards.forEach(card => (card.open = expanded));
+      this.cards.forEach((card) => (card.open = expanded));
     },
     entityCardSelected(card) {
       if (card.data.entityType === ENTITY_TYPE.COMPANY) {
@@ -278,8 +278,8 @@ export default Vue.extend({
         if (this.selectedCompany != card) card.active = !card.active;
         this.selectedCompany = card.active ? card : null;
       }
-    }
-  }
+    },
+  },
 });
 </script>
 

@@ -26,8 +26,8 @@ import { VclTable } from "vue-content-loading";
   components: {
     SearchInput,
     CompanyListItem,
-    VclTable
-  }
+    VclTable,
+  },
 })
 export default class SelectCompany extends Vue {
   loading = true;

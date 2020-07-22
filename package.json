@@ -54,20 +54,16 @@
   },
   "lint-staged": {
     "*.{js,ts,vue,html}": [
-      "eslint --fix",
-      "git add"
+      "eslint --fix"
     ],
     "*.{md,json,yml,css}": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ],
     "*.py": [
-      "black",
-      "git add"
+      "black"
     ],
     "*.go": [
-      "gofmt -w",
-      "git add"
+      "gofmt -w"
     ]
   },
   "husky": {

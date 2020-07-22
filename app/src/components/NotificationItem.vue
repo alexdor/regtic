@@ -4,9 +4,9 @@
       <i
         :class="
           'el-notification-icon el-icon-' +
-            notificationTypes[data.type].icon +
-            ' el-color-' +
-            notificationTypes[data.type].color
+          notificationTypes[data.type].icon +
+          ' el-color-' +
+          notificationTypes[data.type].color
         "
       ></i>
     </el-col>
@@ -22,18 +22,18 @@
 export default {
   props: {
     data: {
-      type: Object
-    }
+      type: Object,
+    },
   },
   data() {
     return {
       notificationTypes: {
         status: { color: "primary", icon: "document" },
         add: { color: "success", icon: "plus" },
-        warn: { color: "warning", icon: "alarm-clock" }
-      }
+        warn: { color: "warning", icon: "alarm-clock" },
+      },
     };
-  }
+  },
 };
 </script>
 

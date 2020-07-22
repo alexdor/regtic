@@ -2,7 +2,7 @@ module.exports = {
   env: {
     commonjs: true,
     es6: true,
-    node: true
+    node: true,
   },
   extends: [
     "eslint:recommended",
@@ -16,27 +16,37 @@ module.exports = {
     "@vue/typescript",
     "@vue/typescript/recommended",
     "prettier/vue",
-    "@vue/prettier/recommended"
+    "@vue/prettier/recommended",
   ],
   plugins: ["@typescript-eslint"],
   globals: {
     Atomics: "readonly",
-    SharedArrayBuffer: "readonly"
+    SharedArrayBuffer: "readonly",
   },
   rules: {
-    "@typescript-eslint/explicit-function-return-type": "off"
+    "@typescript-eslint/explicit-function-return-type": "off",
   },
   overrides: [
     {
       files: ["workers/**/*.js", "api/**/*.js"],
       rules: {
-        "@typescript-eslint/no-var-requires": "off"
-      }
-    }
+        "@typescript-eslint/no-var-requires": "off",
+      },
+    },
+    {
+      files: ["*.js"],
+      rules: {
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-return": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
+      },
+    },
   ],
   parserOptions: {
     ecmaVersion: 2018,
     project: "tsconfig.json",
-    parser: "@typescript-eslint/parser"
-  }
+    parser: "@typescript-eslint/parser",
+  },
 };

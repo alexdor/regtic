@@ -102,7 +102,7 @@ export default {
   components: {
     BeneficiaryListItem,
     StatusIcon,
-    StatusBar
+    StatusBar,
   },
   data() {
     return {
@@ -110,15 +110,15 @@ export default {
       result: {
         info: {},
         companies: [],
-        people: []
+        people: [],
       },
       entities: [],
       status: {
         ok: 0,
         warning: 0,
-        issue: 0
+        issue: 0,
       },
-      loading: true
+      loading: true,
     };
   },
   async mounted() {
@@ -129,19 +129,19 @@ export default {
     this.entities.push(...this.result.companies);
 
     this.status.ok = this.entities.filter(
-      entity => entity.status == "ok"
+      (entity) => entity.status == "ok"
     ).length;
     this.status.warning = this.entities.filter(
-      entity => entity.status == "warning"
+      (entity) => entity.status == "warning"
     ).length;
     this.status.issue = this.entities.filter(
-      entity => entity.status == "issue"
+      (entity) => entity.status == "issue"
     ).length;
 
     this.entities.forEach(
-      entity => (entity.checkStatus = entity.checkStatus || "OK")
+      (entity) => (entity.checkStatus = entity.checkStatus || "OK")
     );
-    this.entities.forEach(entity => {
+    this.entities.forEach((entity) => {
       if (entity.checkStatus != "OK" && entity.source == undefined) {
         entity.statusNotes =
           entity.statusNotes || "Inherited from beneficiaries";
@@ -152,10 +152,10 @@ export default {
   },
   methods: {
     entityById(id) {
-      return this.entities.find(entity => entity.id == id);
+      return this.entities.find((entity) => entity.id == id);
     },
-    getCountry
-  }
+    getCountry,
+  },
 };
 </script>
 

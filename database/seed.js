@@ -12,11 +12,11 @@ const file = fs.readFileSync("../serverless.yml", "utf8");
 const config = yml.parse(file);
 const localApi = axios.create({
   baseURL: `${backendUrl}${(config.custom || {}).version}`,
-  timeout: 200000
+  timeout: 200000,
 });
 
 function sleep(ms) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 }
@@ -39,13 +39,13 @@ async function cvrWorker() {
       const { data } = await localApi.post("cvr-parse", { scrollId });
       scrollId = data.scrollId;
       keepGoing = data.hitListLength === 200;
-      if (ADD_DELAY) sleep(1000);
+      if (ADD_DELAY) await sleep(1000);
     } catch (error) {
       console.error(RED, error);
       if (breakCounter > 4) break;
       breakCounter++;
       counter--;
-      sleep(10000);
+      await sleep(10000);
     }
   }
 }
@@ -53,15 +53,16 @@ async function cvrWorker() {
 function worker(url) {
   return localApi
     .get(url)
-    .then(res => console.log(GREEN, `${url}:`, res.data))
-    .catch(error => console.error(RED, `${url}:`, error.message));
+    .then((res) => console.log(GREEN, `${url}:`, res.data))
+    .catch((error) => console.error(RED, `${url}:`, error.message));
 }
 
 async function seed() {
   await Promise.all([
     cvrWorker(),
     worker("sanctionworker"),
-    worker("pepworker")
+    worker("pepworker"),
   ]);
 }
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 seed();

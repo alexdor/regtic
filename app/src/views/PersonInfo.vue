@@ -115,7 +115,7 @@ export default Vue.extend({
     CompanyRelationListItem,
     DetectedListItem,
     StatusIcon,
-    StatusBar
+    StatusBar,
   },
   data() {
     return {
@@ -124,15 +124,15 @@ export default Vue.extend({
       result: {
         info: {},
         companies: [],
-        people: []
+        people: [],
       },
       entities: [],
       status: {
         ok: 0,
         warning: 0,
-        issue: 0
+        issue: 0,
       },
-      loading: true
+      loading: true,
     };
   },
   async mounted() {
@@ -140,23 +140,23 @@ export default Vue.extend({
     this.result = await api.getPerson(personId);
 
     this.status.ok = this.result.owns.filter(
-      entity => entity.checkStatus == ENTITY_STATUS.OK
+      (entity) => entity.checkStatus == ENTITY_STATUS.OK
     ).length;
     this.status.warning = this.result.owns.filter(
-      entity => entity.checkStatus == ENTITY_STATUS.WARNING
+      (entity) => entity.checkStatus == ENTITY_STATUS.WARNING
     ).length;
     this.status.issue = this.result.owns.filter(
-      entity => entity.checkStatus == ENTITY_STATUS.ISSUE
+      (entity) => entity.checkStatus == ENTITY_STATUS.ISSUE
     ).length;
 
     this.loading = false;
   },
   methods: {
     entityById(id) {
-      return this.entities.find(entity => entity.id == id);
+      return this.entities.find((entity) => entity.id == id);
     },
-    getCountry
-  }
+    getCountry,
+  },
 });
 </script>
 

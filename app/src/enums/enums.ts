@@ -1,15 +1,15 @@
 export const ENTITY_TYPE = {
   COMPANY: "COMPANY",
-  PERSON: "PERSON"
+  PERSON: "PERSON",
 };
 
 export const ENTITY_STATUS = {
   OK: "OK",
   WARNING: "WARNING",
-  ISSUE: "ISSUE"
+  ISSUE: "ISSUE",
 };
 
 export const CARD_STATUS = {
   EXPANDED: "expanded",
-  COLLAPSED: "collapsed"
+  COLLAPSED: "collapsed",
 };

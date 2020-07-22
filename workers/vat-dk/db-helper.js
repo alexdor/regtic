@@ -7,7 +7,7 @@ const insertCompanyToPersonQuery = require("./sql/insert-company-to-person");
 const insertCompanyToCompanyQuery = require("./sql/insert-company-to-company");
 
 const pool = new Pool({
-  connectionString: process.env.REGTIC_DATABASE_URL
+  connectionString: process.env.REGTIC_DATABASE_URL,
 });
 
 // functions
@@ -21,7 +21,7 @@ function insertCompany(client, company) {
     company.zipCode,
     company.region,
     company.street,
-    company.city
+    company.city,
   ]);
 }
 
@@ -33,7 +33,7 @@ function insertPerson(client, person) {
     person.zipCode,
     person.region,
     person.street,
-    person.city
+    person.city,
   ]);
 }
 
@@ -50,7 +50,7 @@ function insertCompanyToPerson(
     personId,
     `{${relations.join(",")}}`,
     ownership,
-    votingRights
+    votingRights,
   ]);
 }
 
@@ -67,7 +67,7 @@ function insertCompanyToCompany(
     daugtherCompanyId,
     `{${relations.join(",")}}`,
     ownership,
-    votingRights
+    votingRights,
   ]);
 }
 
@@ -80,26 +80,26 @@ async function insertDataTransactionally(company) {
     const companyId = (await insertCompany(client, company)).rows[0].id;
 
     // make persons promises
-    const personsInsertPromises = company.persons.map(person => {
-      return insertPerson(client, person).then(result => {
+    const personsInsertPromises = company.persons.map((person) => {
+      return insertPerson(client, person).then((result) => {
         return {
           id: result.rows[0].id,
           relations: person.relations,
           ownership: person.ownershipPercentage,
-          votingRights: person.votingsRightsPercentage
+          votingRights: person.votingsRightsPercentage,
         };
       });
     });
 
     // make mother companies promises
     const motherCompanyInsertPromises = company.motherCompanies.map(
-      motherCompany => {
-        return insertCompany(client, motherCompany).then(result => {
+      (motherCompany) => {
+        return insertCompany(client, motherCompany).then((result) => {
           return {
             id: result.rows[0].id,
             relations: motherCompany.relations,
             ownership: motherCompany.ownershipPercentage,
-            votingRights: motherCompany.votingsRightsPercentage
+            votingRights: motherCompany.votingsRightsPercentage,
           };
         });
       }
@@ -108,11 +108,11 @@ async function insertDataTransactionally(company) {
     // insert companies and persons
     const [persons, motherCompanies] = await Promise.all([
       Promise.all(personsInsertPromises),
-      Promise.all(motherCompanyInsertPromises)
+      Promise.all(motherCompanyInsertPromises),
     ]);
 
     // insert company to persons relations
-    const companyToPersonInsertPromises = persons.map(person => {
+    const companyToPersonInsertPromises = persons.map((person) => {
       return insertCompanyToPerson(
         client,
         companyId,
@@ -125,7 +125,7 @@ async function insertDataTransactionally(company) {
 
     // insert company to company relations
     const companyToCompanyInsertPromises = motherCompanies.map(
-      motherCompany => {
+      (motherCompany) => {
         return insertCompanyToCompany(
           client,
           motherCompany.id,
@@ -139,7 +139,7 @@ async function insertDataTransactionally(company) {
 
     await Promise.all([
       ...companyToPersonInsertPromises,
-      ...companyToCompanyInsertPromises
+      ...companyToCompanyInsertPromises,
     ]);
 
     await client.query("COMMIT");
@@ -152,5 +152,5 @@ async function insertDataTransactionally(company) {
 }
 
 module.exports = {
-  insertDataTransactionally
+  insertDataTransactionally,
 };

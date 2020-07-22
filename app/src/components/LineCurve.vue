@@ -10,7 +10,7 @@ export default {
     x2: { type: Number, required: true },
     y2: { type: Number, required: true },
     xWeight1: { type: Number, required: true },
-    xWeight2: { type: Number, required: true }
+    xWeight2: { type: Number, required: true },
   },
 
   mounted() {
@@ -45,7 +45,7 @@ export default {
       );
       ctx.stroke();
     }
-  }
+  },
 };
 </script>
 

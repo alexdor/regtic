@@ -7,41 +7,41 @@
 </template>
 
 <script>
-  export default {
-    props: {
-      ok: Number,
-      warning: Number,
-      issue: Number
-    }
-  }
+export default {
+  props: {
+    ok: Number,
+    warning: Number,
+    issue: Number,
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-  $green: #67C23A;
-  $orange: #E6A23C;
-  $red: #F56C6C;
+$green: #67c23a;
+$orange: #e6a23c;
+$red: #f56c6c;
 
-  .status-bar {
-    width: 200px;
-    height: 4px;
-    display: flex;
-    flex-direction: row;
-  }
+.status-bar {
+  width: 200px;
+  height: 4px;
+  display: flex;
+  flex-direction: row;
+}
 
-  .status-bar div {
-    border-radius: 2px;
-    margin: 0 1px;
-  }
+.status-bar div {
+  border-radius: 2px;
+  margin: 0 1px;
+}
 
-  .ok {
-    background-color: $green;
-  }
+.ok {
+  background-color: $green;
+}
 
-  .warning {
-    background-color: $orange;
-  }
+.warning {
+  background-color: $orange;
+}
 
-  .issue {
-    background-color: $red;
-  }
+.issue {
+  background-color: $red;
+}
 </style>

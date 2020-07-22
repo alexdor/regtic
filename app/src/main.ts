@@ -13,5 +13,5 @@ Vue.component("blank-layout", BlankLayout);
 
 new Vue({
   router,
-  render: h => h(App)
+  render: (h) => h(App),
 }).$mount("#root");
