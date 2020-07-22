@@ -1,16 +1,17 @@
-import xml.etree.ElementTree as ET
-import urllib.request
-import pandas as pd
+from json import dumps
+from os import environ
 import traceback
+import urllib.request
+import xml.etree.ElementTree as ET
+
+from pandas import DataFrame
 from workers.pythondbtools import dbtools
-from workers.pythondbtools.dbtools import BAD_PERSON_TYPE, ADDRESS_TYPE
-import os
-import json
+from workers.pythondbtools.dbtools import ADDRESS_TYPE, BAD_PERSON_TYPE
 
 
 def parse_file():
     try:
-        access_token = os.environ["SANCTIONS_LIST"]
+        access_token = environ["SANCTIONS_LIST"]
     except:
         access_token = "https://webgate.ec.europa.eu/europeaid/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content?token=n002wvni"
 
@@ -40,8 +41,6 @@ def select_fields(tree):
     sanctions_export = "{http://eu.europa.ec/fpi/fsd/export}"
 
     for sanctionEntity in tree.findall(sanctions_export + "sanctionEntity"):
-
-        is_duplicate = []
 
         person_alias = []
 
@@ -123,7 +122,7 @@ def select_fields(tree):
         subject_type.append(subjectType.attrib["classificationCode"])
         source.append(regulationSummary.attrib["publicationUrl"])
 
-    sanctions_df = pd.DataFrame(
+    sanctions_df = DataFrame(
         {
             "address_type": address_type,
             "citizenship_code": citizenship_code,
@@ -166,7 +165,7 @@ def run(event, context):
         }
         return {
             "statusCode": 200,
-            "body": json.dumps(body_dict),
+            "body": dumps(body_dict),
             "headers": {"Content-Type": "application/json"},
         }
     except Exception as err:
@@ -176,7 +175,7 @@ def run(event, context):
         }
         return {
             "statusCode": 500,
-            "body": json.dumps(body_dict),
+            "body": dumps(body_dict),
             "headers": {"Content-Type": "application/json"},
         }
 

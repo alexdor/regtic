@@ -1,11 +1,11 @@
-import json
 import re
 import traceback
+from json import dumps
 
-import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
+from pandas import read_excel
 from workers.pythondbtools import dbtools
 from workers.pythondbtools.dbtools import BAD_PERSON_TYPE
 
@@ -21,7 +21,7 @@ def get_link_to_file():
 
 
 def parse_pep_xlsx(link):
-    data = pd.read_excel(link, header=1, index_col=None).reset_index(drop=True)
+    data = read_excel(link, header=1, index_col=None).reset_index(drop=True)
     parsing_cols = [
         "Navn",
         "Unnamed: 2",
@@ -79,7 +79,7 @@ def run(event, context):
         }
         return {
             "statusCode": 500,
-            "body": json.dumps(body_dict),
+            "body": dumps(body_dict),
             "headers": {"Content-Type": "application/json"},
         }
 
@@ -89,10 +89,13 @@ def upsert_run(event, context):
         file_link = get_link_to_file()
         parsed_df = parse_pep_xlsx(file_link)
         result_string = upsert_new_pep_to_db(parsed_df)
-        body_dict = {"data": "pepworker finished", "message": result_string.split("\n")}
+        body_dict = {
+            "data": "pepworker finished",
+            "message": result_string.split("\n"),
+        }
         return {
             "statusCode": 200,
-            "body": json.dumps(body_dict),
+            "body": dumps(body_dict),
             "headers": {"Content-Type": "application/json"},
         }
     except Exception as err:
@@ -102,7 +105,7 @@ def upsert_run(event, context):
         }
         return {
             "statusCode": 500,
-            "body": json.dumps(body_dict),
+            "body": dumps(body_dict),
             "headers": {"Content-Type": "application/json"},
         }
 
