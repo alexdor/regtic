@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+exports.up = function (knex) {
   return knex.schema.raw(`
     CREATE TABLE bad_person_to_person(
       bad_person_id UUID NOT NULL,
@@ -23,7 +23,7 @@ exports.up = function(knex) {
   `);
 };
 
-exports.down = function(knex) {
+exports.down = function (knex) {
   return knex.schema.raw(`
     DROP TABLE IF EXISTS bad_person_to_person;
     DROP TABLE IF EXISTS bad_company_to_company;

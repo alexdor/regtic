@@ -7,11 +7,11 @@ const api = axios.create({
   baseURL: process.env.VUE_APP_API_URL || "http://localhost:8090/",
   timeout: 200000,
   headers: {
-    "Content-Type": "application/json"
-  }
+    "Content-Type": "application/json",
+  },
 });
 
-api.interceptors.response.use(undefined, error => {
+api.interceptors.response.use(undefined, (error) => {
   const isNetworkError = !(error.response || {}).status;
   const errorTitle = isNetworkError ? "Network error" : "There was an error 😅";
   const errorMessage = isNetworkError
@@ -22,7 +22,7 @@ api.interceptors.response.use(undefined, error => {
     duration: 4000,
     title: errorTitle,
     message: errorMessage,
-    position: "bottom-right"
+    position: "bottom-right",
   });
 
   return Promise.reject(error);
@@ -52,5 +52,5 @@ export default Object.freeze({
       ? mockapi.signup(email)
       : api.get(`${this.apiVersion}/signup?email=${email}`);
   },
-  getPerson: mockapi.getPerson
+  getPerson: mockapi.getPerson,
 });

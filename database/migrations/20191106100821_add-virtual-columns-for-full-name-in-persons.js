@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+exports.up = function (knex) {
   return knex.schema.raw(`
     ALTER TABLE persons ADD full_name text
       generated always as (
@@ -7,6 +7,6 @@ exports.up = function(knex) {
   `);
 };
 
-exports.down = function(knex) {
+exports.down = function (knex) {
   return knex.schema.raw(`ALTER TABLE persons DROP IF EXISTS full_name;`);
 };

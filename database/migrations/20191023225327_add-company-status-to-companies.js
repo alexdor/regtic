@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+exports.up = function (knex) {
   return knex.schema.raw(`
     CREATE TYPE COMPANY_STATUS AS ENUM ('active', 'liquidation', 'dissolved', 'closed');
     ALTER TABLE companies ADD status COMPANY_STATUS;
@@ -6,7 +6,7 @@ exports.up = function(knex) {
   `);
 };
 
-exports.down = function(knex) {
+exports.down = function (knex) {
   return knex.schema.raw(`
     ALTER TABLE companies DROP COLUMN IF EXISTS status;
     ALTER TABLE companies DROP COLUMN IF EXISTS status_notes;

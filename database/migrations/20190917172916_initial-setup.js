@@ -2,7 +2,7 @@ require("load-environment");
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
-exports.up = function(knex) {
+exports.up = function (knex) {
   return knex.schema.raw(`
     -- CREATE DATABASE regtic
     -- OWNER =  postgres
@@ -77,7 +77,7 @@ exports.up = function(knex) {
   `);
 };
 
-exports.down = function(knex) {
+exports.down = function (knex) {
   // make sure that this rollback is not able to run in production
   if (!isDevelopment) return;
 

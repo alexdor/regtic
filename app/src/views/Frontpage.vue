@@ -61,32 +61,32 @@ import Vue from "vue";
 
 export default Vue.extend({
   components: {
-    Footer
+    Footer,
   },
 
-  data: function() {
+  data: function () {
     return {
       buttons: [
         {
           icon: "el-icon-user",
           text: "View demo",
           destination: "/search",
-          classes: ""
+          classes: "",
         },
         {
           icon: "el-icon-info",
           text: "About us",
           destination: "/",
-          classes: "disabled"
+          classes: "disabled",
         },
         {
           icon: "el-icon-s-finance",
           text: "Pricing",
           destination: "/",
-          classes: "disabled"
-        }
+          classes: "disabled",
+        },
       ],
-      email: ""
+      email: "",
     };
   },
 
@@ -103,10 +103,10 @@ export default Vue.extend({
         duration: 4000,
         title: "Signup successful",
         message: "",
-        position: "bottom-right"
+        position: "bottom-right",
       });
-    }
-  }
+    },
+  },
 });
 </script>
 

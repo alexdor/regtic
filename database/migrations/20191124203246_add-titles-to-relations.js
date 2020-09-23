@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+exports.up = function (knex) {
   return knex.schema.raw(`
     CREATE TYPE ENTITY_RELATION AS ENUM (
       'ultimate beneficial owner',
@@ -13,7 +13,7 @@ exports.up = function(knex) {
   `);
 };
 
-exports.down = function(knex) {
+exports.down = function (knex) {
   return knex.schema.raw(`
     ALTER TABLE company_to_company DROP COLUMN IF EXISTS relations;
     ALTER TABLE company_to_person DROP COLUMN IF EXISTS relations;

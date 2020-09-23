@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
-
 const countries: { [key: string]: string } = {
   AF: "Afghanistan",
   AX: "Åland Islands",
@@ -250,7 +248,7 @@ const countries: { [key: string]: string } = {
   EH: "Western Sahara",
   YE: "Yemen",
   ZM: "Zambia",
-  ZW: "Zimbabwe"
+  ZW: "Zimbabwe",
 };
 
 export const getCountry = (code: string) => {

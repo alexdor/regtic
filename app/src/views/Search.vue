@@ -15,8 +15,8 @@ import SearchInput from "@/components/SearchInput.vue";
 
 @Component({
   components: {
-    SearchInput
-  }
+    SearchInput,
+  },
 })
 export default class CheckCompany extends Vue {
   test = "";

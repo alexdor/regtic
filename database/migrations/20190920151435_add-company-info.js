@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+exports.up = function (knex) {
   return knex.schema.raw(`
     ALTER TABLE companies ADD name text;
     ALTER TABLE persons ALTER COLUMN created_at SET DEFAULT now();
@@ -6,7 +6,7 @@ exports.up = function(knex) {
   `);
 };
 
-exports.down = function(knex) {
+exports.down = function (knex) {
   return knex.schema.raw(`
     ALTER TABLE companies DROP name;
   `);

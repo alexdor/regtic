@@ -11,13 +11,13 @@ const defaultLayout = "default";
 export default {
   name: "App",
   computed: {
-    showGoBack: function() {
+    showGoBack: function () {
       return ["company", "search-name"].indexOf(this.$route.name) > -1;
     },
     layout() {
       return (this.$route.meta.layout || defaultLayout) + "-layout";
-    }
-  }
+    },
+  },
 };
 </script>
 

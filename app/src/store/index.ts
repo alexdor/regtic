@@ -4,5 +4,5 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   mutations: {},
-  actions: {}
+  actions: {},
 });

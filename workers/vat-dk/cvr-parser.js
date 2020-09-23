@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const { get } = require("lodash");
 
 function addressToString(address, countryCode) {
@@ -7,18 +8,18 @@ function addressToString(address, countryCode) {
     street: [
       get(address, "vejnavn") || "",
       get(address, "husnummerFra") || "",
-      get(address, "bogstavFra") || ""
+      get(address, "bogstavFra") || "",
     ]
       .join(" ")
       .trim(),
     city: get(address, "postdistrikt"),
-    countryCode: countryCode || get(address, "landekode", "ZZ")
+    countryCode: countryCode || get(address, "landekode", "ZZ"),
   };
 }
 
 function getName(entity) {
   const entityNameObj = entity.navne.find(
-    navnObj => !navnObj.periode.gyldigTil
+    (navnObj) => !navnObj.periode.gyldigTil
   );
   return entityNameObj ? entityNameObj.navn : null;
 }
@@ -31,22 +32,16 @@ function getCompanyName(company) {
 
 function getCountryCode(entity) {
   const entityLocationObj = entity.beliggenhedsadresse.find(
-    ba => !ba.periode.gyldigTil
+    (ba) => !ba.periode.gyldigTil
   );
   return (entityLocationObj || {}).landekode;
 }
 
 function parsePerson(person) {
   return {
-    firstName: getName(person)
-      .split(" ")
-      .slice(0, -1)
-      .join(" "),
-    lastName: getName(person)
-      .split(" ")
-      .slice(-1)
-      .join(" "),
-    ...addressToString(person.beliggenhedsadresse[0], getCountryCode(person))
+    firstName: getName(person).split(" ").slice(0, -1).join(" "),
+    lastName: getName(person).split(" ").slice(-1).join(" "),
+    ...addressToString(person.beliggenhedsadresse[0], getCountryCode(person)),
   };
 }
 
@@ -57,8 +52,8 @@ function parseMotherCompany(motherCompany) {
       motherCompany.beliggenhedsadresse[0],
       getCountryCode(motherCompany)
     ),
-    vat: "DK-" + motherCompany.forretningsnoegle,
-    startingDate: motherCompany.sidstOpdateret
+    vat: `DK-${motherCompany.forretningsnoegle}`,
+    startingDate: motherCompany.sidstOpdateret,
   };
 }
 
@@ -73,12 +68,12 @@ function parseCompany(company) {
       company.virksomhedMetadata.nyesteBeliggenhedsadresse,
       countryCode
     ),
-    vat: "DK-" + company.cvrNummer.toString().padStart(8, "0"),
+    vat: `DK-${company.cvrNummer.toString().padStart(8, "0")}`,
     startingDate: get(company, "virksomhedMetadata.stiftelsesDato"),
     type: get(
       company,
       "virksomhedMetadata.nyesteVirksomhedsform.kortBeskrivelse"
-    )
+    ),
   };
 }
 
@@ -92,31 +87,32 @@ function parseMetaData(organizations) {
       if (!isAttributeSet) return 0;
       // find the attribute value which is active
       const activeAttribute =
-        attribute.vaerdier.find(vaerdi => vaerdi.periode.gyldigTil === null) ||
-        {};
+        attribute.vaerdier.find(
+          (vaerdi) => vaerdi.periode.gyldigTil === null
+        ) || {};
       return activeAttribute.vaerdi;
     }
 
     // quickly filter out the non-essential organizations/relations
     const registrantOrganization = organizations.find(
-      organization => organization.hovedtype === "REGISTER"
+      (organization) => organization.hovedtype === "REGISTER"
     );
     if (!registrantOrganization)
       return { ownershipPercentage: 0, votingsRightsPercentage: 0 };
 
     // find the attribute that maches the type we are searching for
     const ownershipAttribute = registrantOrganization.medlemsData[0].attributter.find(
-      attribute => attribute.type === ownershipAmountMatch
+      (attribute) => attribute.type === ownershipAmountMatch
     );
 
     const votingRightsAttribute = registrantOrganization.medlemsData[0].attributter.find(
-      attribute => attribute.type === votingRightsAmountMatch
+      (attribute) => attribute.type === votingRightsAmountMatch
     );
 
     return {
       ownershipPercentage: getActiveValueFromAttribute(ownershipAttribute) || 0,
       votingsRightsPercentage:
-        getActiveValueFromAttribute(votingRightsAttribute) || 0
+        getActiveValueFromAttribute(votingRightsAttribute) || 0,
     };
   }
 
@@ -127,7 +123,7 @@ function parseMetaData(organizations) {
       ejerregister: "legal owner",
       "reelle ejere": "ultimate beneficial owner",
       revision: "accountant",
-      stiftere: "founder"
+      stiftere: "founder",
     };
 
     title = title.toLowerCase();
@@ -169,7 +165,7 @@ function parse(hit) {
   const isEntryValid = !!entry.deltagerRelation;
   if (!isEntryValid) return;
 
-  entry.deltagerRelation.forEach(entity => {
+  entry.deltagerRelation.forEach((entity) => {
     const hasDeltager = !!entity.deltager;
     const hasType = hasDeltager && entity.deltager.enhedstype;
     if (!hasType) return;
@@ -180,7 +176,7 @@ function parse(hit) {
     if (isPerson) {
       persons.push({
         ...parsePerson(entity.deltager),
-        ...metaData
+        ...metaData,
       });
     }
 
@@ -188,7 +184,7 @@ function parse(hit) {
     if (isCompany) {
       motherCompanies.push({
         ...parseMotherCompany(entity.deltager),
-        ...metaData
+        ...metaData,
       });
     }
   });

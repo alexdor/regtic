@@ -62,15 +62,15 @@ import { getCountry } from "@/utils/countries";
 
 export default {
   components: {
-    StatusIcon
+    StatusIcon,
   },
   props: {
     data: {
-      type: Object
+      type: Object,
     },
     x: Number,
     y: Number,
-    open: Boolean
+    open: Boolean,
   },
   data() {
     return {
@@ -81,26 +81,26 @@ export default {
           { name: "VAT", key: "vat", type: "literal" },
           { name: "Country", key: "countryCode", type: "country" },
           { name: "Address", key: "address", type: "literal" },
-          { name: "Type", key: "type", type: "literal" }
+          { name: "Type", key: "type", type: "literal" },
         ],
         PERSON: [
           { name: "Address", key: "address", type: "literal" },
-          { name: "Country", key: "countryCode", type: "country" }
-        ]
-      }
+          { name: "Country", key: "countryCode", type: "country" },
+        ],
+      },
     };
   },
   watch: {
     open(val) {
       this.openState = val;
-    }
+    },
   },
   methods: {
     setActive() {
       this.$parent.entityCardSelected(this);
     },
-    getCountry
-  }
+    getCountry,
+  },
 };
 </script>
 

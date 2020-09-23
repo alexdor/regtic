@@ -12,10 +12,10 @@ module.exports = {
     client: "pg",
     connection: process.env.REGTIC_DATABASE_URL || getURLFromConf(),
     migrations: {
-      directory: "migrations"
+      directory: "migrations",
     },
     seeds: {
-      directory: "seeds"
-    }
-  }
+      directory: "seeds",
+    },
+  },
 };

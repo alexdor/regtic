@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+exports.up = function (knex) {
   return knex.schema.raw(`
     ALTER TABLE companies DROP IF EXISTS name_vector;
     ALTER TABLE companies ADD name_vector tsvector
@@ -20,7 +20,7 @@ exports.up = function(knex) {
   `);
 };
 
-exports.down = function(knex) {
+exports.down = function (knex) {
   return knex.schema.raw(`
     ALTER TABLE companies DROP IF EXISTS name_vector;
     ALTER TABLE persons DROP IF EXISTS name_vector;

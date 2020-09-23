@@ -22,7 +22,7 @@ const foreignKeyToID = (keyName, table) =>
 
 const citizenShip = `citizenship_country_code varchar(2)[] default '{ZZ}' NOT NULL`;
 
-exports.up = function(knex) {
+exports.up = function (knex) {
   return knex.schema.raw(`
     CREATE TYPE ADDRESS_TYPE AS ENUM ('birthplace', 'address');
 
@@ -91,7 +91,7 @@ exports.up = function(knex) {
      `);
 };
 
-exports.down = function(knex) {
+exports.down = function (knex) {
   return knex.schema.raw(`
     DROP INDEX IF EXISTS bad_companies_aliases_uniqueness;
     DROP INDEX IF EXISTS bad_persons_aliases_uniqueness;

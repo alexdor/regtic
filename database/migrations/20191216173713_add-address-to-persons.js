@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+exports.up = function (knex) {
   return knex.schema.raw(
     `
     CREATE
@@ -45,7 +45,7 @@ exports.up = function(knex) {
   `
   );
 };
-exports.down = function(knex) {
+exports.down = function (knex) {
   return knex.schema.raw(
     `
 ALTER TABLE persons DROP COLUMN IF EXISTS street;

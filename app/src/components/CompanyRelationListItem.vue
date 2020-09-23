@@ -42,13 +42,13 @@ import StatusIcon from "@/components/StatusIcon.vue";
 
 export default {
   components: {
-    StatusIcon
+    StatusIcon,
   },
   props: {
     company: {
-      type: Object
-    }
-  }
+      type: Object,
+    },
+  },
 };
 </script>
 

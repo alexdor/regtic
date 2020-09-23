@@ -21,11 +21,11 @@ export default Vue.extend({
   components: {
     Topbar,
     Sidebar,
-    Footer
+    Footer,
   },
   props: {
-    showGoBack: { type: Boolean, default: true }
-  }
+    showGoBack: { type: Boolean, default: true },
+  },
 });
 </script>
 

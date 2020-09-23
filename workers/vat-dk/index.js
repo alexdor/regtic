@@ -9,11 +9,11 @@ const cvrApi = axios.create({
   baseURL: process.env.CVR_BASE_URL,
   timeout: 200000,
   headers: {
-    "Content-Type": "application/json"
-  }
+    "Content-Type": "application/json",
+  },
 });
 
-cvrApi.interceptors.request.use(function(config) {
+cvrApi.interceptors.request.use(function (config) {
   config.headers.Authorization = process.env.CVR_AUTH_TOKEN;
 
   return config;
@@ -29,8 +29,7 @@ function scrollRequest(config = {}) {
       )
     : cvrApi.post("/_search/scroll", {
         scroll: scrollTimeout,
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        scroll_id: config.scrollId
+        scroll_id: config.scrollId,
       });
   return request;
 }
@@ -43,7 +42,7 @@ async function asyncForEach(array, callback) {
 
 async function parseAndSaveResponse(responseData) {
   const hitList = responseData.hits.hits;
-  await asyncForEach(hitList, async hit => {
+  await asyncForEach(hitList, async (hit) => {
     try {
       const company = cvrParser.parse(hit);
       if (!company) return;
@@ -56,10 +55,10 @@ async function parseAndSaveResponse(responseData) {
   });
 }
 
-module.exports.scrollAndParse = async event => {
+module.exports.scrollAndParse = async (event) => {
   try {
     const scrollRequestResponse = await scrollRequest({
-      scrollId: (JSON.parse(event.body) || {}).scrollId
+      scrollId: (JSON.parse(event.body) || {}).scrollId,
     });
 
     const data = scrollRequestResponse.data || {};
@@ -73,8 +72,8 @@ module.exports.scrollAndParse = async event => {
       statusCode: 200,
       body: JSON.stringify({
         scrollId: data._scroll_id,
-        hitListLength: hitListLengthFromResponse
-      })
+        hitListLength: hitListLengthFromResponse,
+      }),
     };
   } catch (error) {
     console.error(error);
@@ -83,8 +82,8 @@ module.exports.scrollAndParse = async event => {
       statusCode: 500,
       body: JSON.stringify({
         error: error.message,
-        message: "unexpected_failure"
-      })
+        message: "unexpected_failure",
+      }),
     };
   }
 };

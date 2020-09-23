@@ -37,28 +37,28 @@ import Vue from "vue";
 
 export default Vue.extend({
   components: {
-    StatusIcon
+    StatusIcon,
   },
   props: {
     entity: {
       type: Object,
-      required: true
+      required: true,
     },
     relation: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     entityType() {
       return (this.entity || {}).entityType || "";
-    }
+    },
   },
   methods: {
     percent(value: number) {
       return Math.round(value * 100) + "%";
-    }
-  }
+    },
+  },
 });
 </script>
 
