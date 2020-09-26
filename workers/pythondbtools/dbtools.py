@@ -3,9 +3,15 @@ import os
 import uuid
 from datetime import datetime
 from sqlalchemy import Column, String, create_engine, Enum, cast, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP, VARCHAR, ARRAY
+from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP, VARCHAR, ARRAY, TSVECTOR
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.schema import FetchedValue
+
+from workers.watchlistworker.watchlistworker import (
+    inserted_person_worker,
+    inserted_company_worker,
+)
 
 db_uri = os.environ["REGTIC_DATABASE_URL"]
 
@@ -25,10 +31,31 @@ class ADDRESS_TYPE(enum.Enum):
     address = "address"
 
 
+class Persons(base):
+    __tablename__ = "persons"
+    id = Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid.uuid4)
+    first_name = Column(String)
+    last_name = Column(String)
+    name_vector = Column(TSVECTOR, FetchedValue())
+    country_code = Column(VARCHAR(2))
+    full_name = Column(String, FetchedValue())
+
+
+class Companies(base):
+    __tablename__ = "companies"
+    id = Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid.uuid4)
+    address = Column(String)
+    vat = Column(String)
+    name_vector = Column(TSVECTOR, FetchedValue())
+    country_code = Column(VARCHAR(2))
+    name = Column(String, FetchedValue())
+
+
 class BadPerson(base):
     __tablename__ = "bad_persons"
     id = Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid.uuid4)
     full_name = Column(String)
+    name_vector = Column(TSVECTOR, FetchedValue())
     type = Column(Enum(BAD_PERSON_TYPE))
     source = Column(String)
     updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -39,6 +66,7 @@ class BadPersonAllNames(base):
     __tablename__ = "bad_persons_all_names"
     id = Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid.uuid4)
     full_name = Column(String)
+    name_vector = Column(TSVECTOR, FetchedValue())
     bad_person_id = Column(
         UUID(as_uuid=True), ForeignKey("bad_persons.id"), nullable=False
     )
@@ -51,7 +79,7 @@ class BadCompany(base):
     address = Column(String)
     source = Column(String)
     citizenship_region = Column(String)
-    citizenship_country_code = Column(ARRAY(VARCHAR(2)))
+    citizenship_country_code = Column(ARRAY(VARCHAR(2)), default=["ZZ"])
     updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
     type = Column(Enum(BAD_PERSON_TYPE))
 
@@ -92,6 +120,28 @@ class BadPersonAddresses(base):
     bad_person_id = Column(
         UUID(as_uuid=True), ForeignKey("bad_persons.id"), nullable=False
     )
+
+
+class BadPersonToPerson(base):
+    __tablename__ = "bad_person_to_person"
+    bad_person_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("bad_persons.id"),
+        nullable=False,
+        primary_key=True,
+    )
+    person_id = Column(UUID(as_uuid=True), ForeignKey("persons.id"), nullable=False)
+
+
+class BadCompanyToCompany(base):
+    __tablename__ = "bad_company_to_company"
+    bad_company_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("bad_companies.id"),
+        nullable=False,
+        primary_key=True,
+    )
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
 
 
 def push_bad_person(full_name, list_type, source, country_code):
@@ -287,7 +337,7 @@ def upsert_df(df, list_type):
                 )
 
             if query_row is None:
-                person_id = push_person_in_session(
+                person_id, _ = push_person_in_session(
                     session=session, bad_person=row, list_type=list_type
                 )
                 inserted_ids[row_type_switch].append(person_id)
@@ -317,6 +367,7 @@ def upsert_df(df, list_type):
         for company in removed_companies:
             deleted_ids["E"].append(company.id)
 
+        # todo find proper way to handle duplicates in Sanction list
         updates_trigger(updated_ids)
         inserts_trigger(inserted_ids)
         deletes_trigger(deleted_ids)
@@ -332,17 +383,18 @@ def upsert_df(df, list_type):
         session.close()
 
 
-def updates_trigger(uuids):
+def updates_trigger(uuid_dict):
     # Do cool stuff
     return 1
 
 
-def inserts_trigger(uuids):
-    # Do cool stuff
+def inserts_trigger(uuid_dict):
+    inserted_person_worker(uuid_dict["P"])
+    inserted_company_worker(uuid_dict["E"])
     return 1
 
 
-def deletes_trigger(uuids):
+def deletes_trigger(uuid_dict):
     # Do cool stuff
     return 1
 
