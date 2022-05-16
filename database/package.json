@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.2",
     "knex": "^0.21.2",
     "load-environment": "^3.0.0",
     "pg": "^8.3.0",
