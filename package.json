@@ -49,7 +49,7 @@
     "husky": "4.2.5",
     "lint-staged": "^10.2.11",
     "prettier": "2.0.5",
-    "serverless-offline": "5.12.1",
+    "serverless-offline": "12.0.4",
     "serverless-python-requirements": "5.1.0"
   },
   "lint-staged": {
